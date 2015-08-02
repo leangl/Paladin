@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">GarD</string>
+
+    <string name="door_open">The Door is Open.\nSay \'%s\'.</string>
+    <string name="door_closed">The Door is Closed.\nSay \'%s\'.</string>
+
+    <string name="default_open">open door</string>
+    <string name="default_close">close door</string>
+</resources>

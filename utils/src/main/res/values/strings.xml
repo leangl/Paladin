@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Tattu Utils</string>
+    <string name="crash_toast_text">Ups, an error was found...</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="loading">Loading...</string>
+    <string name="no_location">Cannot obtain your position</string>
+</resources>
