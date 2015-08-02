@@ -33,6 +33,7 @@ import ioio.lib.util.android.IOIOAndroidApplicationHelper;
 import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.image.AsyncTask;
 import mobi.tattu.utils.services.BaseService;
+import retrofit.RetrofitError;
 
 import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
 
@@ -75,6 +76,8 @@ public class VoiceRecognitionService extends BaseService implements RecognitionL
     private IOIOAndroidApplicationHelper helper_;
 
     private static long MESSAGES_CHECK_TIME = TimeUnit.SECONDS.toMillis(5);
+    private static long MESSAGES_RETRY_TIME = TimeUnit.SECONDS.toMillis(30);
+
     /**
      * Periondically checks Twilio Messages Log for new messages
      */
@@ -97,6 +100,9 @@ public class VoiceRecognitionService extends BaseService implements RecognitionL
                     handler.removeCallbacksAndMessages(null);
                     handler.postDelayed(checkMessages, MESSAGES_CHECK_TIME);
                 }
+            }, error -> {
+                handler.removeCallbacksAndMessages(null);
+                handler.postDelayed(checkMessages, MESSAGES_RETRY_TIME);
             });
         }
     };
