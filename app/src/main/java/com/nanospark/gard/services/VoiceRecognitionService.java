@@ -33,7 +33,6 @@ import ioio.lib.util.android.IOIOAndroidApplicationHelper;
 import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.image.AsyncTask;
 import mobi.tattu.utils.services.BaseService;
-import retrofit.RetrofitError;
 
 import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
 
@@ -216,13 +215,13 @@ public class VoiceRecognitionService extends BaseService implements RecognitionL
 
                 // high for 2 seconds and then low again
                 pin.write(true);
-                toast("High!");
+                //toast("High!");
                 Thread.sleep(2000);
                 pin.write(false);
-                toast("Low!");
-                Thread.sleep(2000);
+                //toast("Low!");
+                //Thread.sleep(2000);
             } else {
-                toast("Waiting");
+                //toast("Waiting");
                 Thread.sleep(200);
             }
         }
