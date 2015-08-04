@@ -44,8 +44,8 @@ public class VoiceRecognitionService extends BaseService implements RecognitionL
     public static final String KEY_OPEN = "open";
     public static final String KEY_CLOSE = "close";
 
-    public static final String DEFAULT_PHRASE_OPEN = "open the door";
-    public static final String DEFAULT_PHRASE_CLOSE = "close the door";
+    public static final String DEFAULT_PHRASE_OPEN = "hello garage door";
+    public static final String DEFAULT_PHRASE_CLOSE = "goodbye garage door";
 
     public static final String KEY_THRESHOLD = "threshold";
     public static final float DEFAULT_THRESHOLD = 1e-40f;
@@ -87,7 +87,7 @@ public class VoiceRecognitionService extends BaseService implements RecognitionL
                 // if new message is received
                 if (message != null) {
                     // check if the body matches the current door status
-                    if (currentKey.equals(message.get("body").getAsString())) {
+                    if (currentKey.toLowerCase().equals(message.get("body").getAsString().toLowerCase())) {
                         // publish event so that other components update accordingly
                         Tattu.post(new PhraseRecognized(currentPhrase));
                         // and switch the current phrase
@@ -163,6 +163,7 @@ public class VoiceRecognitionService extends BaseService implements RecognitionL
                     if (e != null) {
                         setCurrentState(RecognizerLifecycle.State.ERROR);
                         stopSelf();
+                        toast("Error, unrecognized word entered.");
                     } else {
                         switchPhrase();
                         setCurrentState(RecognizerLifecycle.State.STARTED);
@@ -341,7 +342,7 @@ public class VoiceRecognitionService extends BaseService implements RecognitionL
     public void toast(String message) {
         Tattu.runOnUiThread(() -> {
             if (toast != null) toast.cancel();
-            toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+            toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
             toast.show();
         });
     }

@@ -73,7 +73,8 @@ public class MainActivity extends BaseActivity {
             stopLoading();
             mStoppedContent.setVisibility(View.GONE);
             mStartedContent.setVisibility(View.VISIBLE);
-        } else if (state.state == RecognizerLifecycle.State.STOPPED) {
+        } else if (state.state == RecognizerLifecycle.State.STOPPED || state.state == RecognizerLifecycle.State.ERROR) {
+            stopLoading();
             mStoppedContent.setVisibility(View.VISIBLE);
             mStartedContent.setVisibility(View.GONE);
         }
@@ -81,10 +82,10 @@ public class MainActivity extends BaseActivity {
 
     @Subscribe
     public void on(PhraseRecognized event) {
-        if (event.phrase.equals(mOpen.getText().toString())) {
-            mState.setText(getString(R.string.door_open, mClose.getText().toString()));
+        if (event.phrase.toLowerCase().equals(mOpen.getText().toString().toLowerCase())) {
+            mState.setText(getString(R.string.door_open, mClose.getText().toString().toLowerCase()));
         } else {
-            mState.setText(getString(R.string.door_closed, mOpen.getText().toString()));
+            mState.setText(getString(R.string.door_closed, mOpen.getText().toString().toLowerCase()));
         }
     }
 
@@ -108,8 +109,8 @@ public class MainActivity extends BaseActivity {
         }
         double threshold = Math.pow(10, power);
 
-        VoiceRecognitionService.start((float) threshold, mOpen.getText().toString(), mClose.getText().toString());
-        mState.setText(getString(R.string.door_closed, mOpen.getText().toString()));
+        VoiceRecognitionService.start((float) threshold, mOpen.getText().toString().toLowerCase(), mClose.getText().toString().toLowerCase());
+        mState.setText(getString(R.string.door_closed, mOpen.getText().toString().toLowerCase()));
     }
 
     @Override
@@ -132,9 +133,6 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if ((intent.getFlags() & Intent.FLAG_ACTIVITY_NEW_TASK) != 0) {
-            //helper_.restart();
-        }
         checkBoardConnected(intent);
         setIntent(intent);
     }

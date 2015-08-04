@@ -33,7 +33,7 @@ public class MessagesClient {
     private static final String TWILIO_PASSWD = "3f5dab33644d33cacb4bf300194299eb";
 
     // Wed, 08 Jul 2015 23:54:32 +0000
-    private static final SimpleDateFormat formatter = new SimpleDateFormat("EEE, dd MMM yyyy hh:MM:ss Z", Locale.US);
+    private static final SimpleDateFormat formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.US);
 
     private MessagesApi mApi;
 

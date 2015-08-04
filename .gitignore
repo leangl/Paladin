@@ -12,3 +12,4 @@ iOIOLibAndroidDevice/.idea/
 iOIOLibBT/build/
 iOIOLibAccessory/build/
 .idea/
+*.apk
