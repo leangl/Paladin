@@ -1,13 +1,21 @@
 package mobi.tattu.utils.activities;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import mobi.tattu.utils.R;
 import mobi.tattu.utils.Tattu;
+import mobi.tattu.utils.billing.IabHelper;
 import mobi.tattu.utils.fragments.BaseFragment;
 import roboguice.RoboGuice;
 import roboguice.activity.RoboActionBarActivity;
@@ -48,6 +56,14 @@ public class BaseActivity extends RoboActionBarActivity {
 
     public <T extends BaseFragment> void start(T fragment) {
         start(fragment, true);
+    }
+
+    public boolean popBackStack() {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStack();
+            return true;
+        }
+        return false;
     }
 
     public void stopLoading() {
@@ -101,6 +117,63 @@ public class BaseActivity extends RoboActionBarActivity {
 
     public void changeTitleActionBar(String title) {
         getSupportActionBar().setTitle(title);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if (!popBackStack()) {
+                    NavUtils.navigateUpFromSameTask(this);
+                }
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void snackbar(int resId) {
+        snackbar(getString(resId));
+    }
+
+    public void snackbar(String message) {
+        final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) this.findViewById(android.R.id.content)).getChildAt(0);
+        Snackbar.make(viewGroup, message, Snackbar.LENGTH_LONG).show();
+    }
+
+    private Toast mToast;
+
+    public void toast(int resId) {
+        toast(getString(resId));
+    }
+
+    public void toast(String message) {
+        Tattu.runOnUiThread(() -> {
+            if (mToast != null) {
+                mToast.cancel();
+            }
+            mToast = Toast.makeText(this, message, Toast.LENGTH_LONG);
+            mToast.setGravity(Gravity.BOTTOM, 0, 150);
+            mToast.show();
+        });
+    }
+
+    /**
+     * Se tiene que sobreescribir si se va a usar la opcion de comprar desde la aplicacion
+     *
+     * @return
+     */
+    public IabHelper getIabHelper() {
+        return null;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (getIabHelper() != null && !getIabHelper().handleActivityResult(requestCode,
+                resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
 }

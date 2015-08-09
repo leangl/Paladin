@@ -1,0 +1,43 @@
+package mobi.tattu.utils;
+
+/**
+ * Created by Leandro on 21/02/2015.
+ * TODO Mover las cosas especificas de SpyKit a otro proyecto
+ */
+public interface Intents {
+    String INTENT_PREFIX = "mobi.tattu.";
+
+    String ACTION_CAMERA_EVENT = INTENT_PREFIX + "camera";
+
+    String CAMERA_EXTRA = "CAMERA_EXTRA";
+    String START_CAMERA_EXTRA = "START";
+    String STOP_CAMERA_EXTRA = "STOP";
+    String PICTURE_TAKEN_EXTRA ="PICTURE_TAKEN";
+
+    String DELETE_NOTIFICATION_INTENT_ACTION = INTENT_PREFIX + "DELETE_NOTIFICATION";
+    String STOP_AUDIO_RECORDING_INTENT_ACTION = INTENT_PREFIX + "STOP_AUDIO_RECORDING";
+    String STOP_VIDEO_RECORDING_INTENT_ACTION = INTENT_PREFIX + "STOP_VIDEO_RECORDING";
+    String TOGGLE_STATE_CHANGED_ACTION = INTENT_PREFIX + "TOGGLE_STATE_CHANGED_ACTION";
+    String NEW_FILE_INTENT_ACTION = INTENT_PREFIX + "NEW_FILE";
+
+    String NEW_FILE_EXTRA_KEY = "NEW_FILE";
+    String NEW_FILE_TYPE_EXTRA_KEY = "NEW_FILE_TYPE";
+    int NEW_FILE_PICTURE_EXTRA_VAL = 0;
+    int NEW_FILE_VIDEO_EXTRA_VAL = 1;
+    int NEW_FILE_AUDIO_EXTRA_VAL = 2;
+
+    String VIEW_ITEM_EXTRA_KEY = "view_action_extra_key";
+    int VIEW_PICTURES_EXTRA_VAL = 0;
+    int VIEW_VIDEOS_EXTRA_VAL = 1;
+    int VIEW_AUDIOS_EXTRA_VAL = 2;
+
+    String RECENT_PICTURES_EXTRA_KEY = "recent_pictures_extra_key";
+    String EXCEPTION_EXTRA_KEY = "exception_extra_key";
+
+
+    String ITEM_PURCHASE_STATE_CHANGED_ACTION = INTENT_PREFIX + "cas4802mc32dmp==";
+    String REFRESH_SYNC_INTENT_ACTION = INTENT_PREFIX + "START_SYNC";
+
+    String PURCHASABLE_ITEM_EXTRA_KEY = "hju32Ln2dsad2s==";
+    String ITEM_PURCHASE_STATE_EXTRA_KEY = "aks580kdsa52s2==";
+}

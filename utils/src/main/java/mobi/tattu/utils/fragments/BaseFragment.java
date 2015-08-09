@@ -14,7 +14,7 @@ import mobi.tattu.utils.annotations.SaveState;
 import mobi.tattu.utils.log.Logger;
 import roboguice.fragment.RoboFragment;
 
-public class BaseFragment extends Fragment implements BaseActivity.OnBackListener {
+public class BaseFragment extends RoboFragment implements BaseActivity.OnBackListener {
 
     /**
      * Automatically restores Fragment state annotated with {@link mobi.tattu.utils.annotations.SaveState} annotation.
@@ -88,11 +88,15 @@ public class BaseFragment extends Fragment implements BaseActivity.OnBackListene
     }
 
     public void start(Fragment fragment) {
-        ((BaseActivity) getActivity()).start(fragment, true);
+        start(fragment, true);
+    }
+
+    public void start(Fragment fragment, boolean addToBackStack) {
+        ((BaseActivity) getActivity()).start(fragment, addToBackStack);
     }
 
     public void finish() {
-        getFragmentManager().popBackStack();
+        getBaseActivity().popBackStack();
     }
 
     protected void stopLoading() {
@@ -128,7 +132,25 @@ public class BaseFragment extends Fragment implements BaseActivity.OnBackListene
         getBaseActivity().setOnBackListener(this);
     }
 
-    public void changeTitleActionBar(String title){
+    public void changeTitleActionBar(String title) {
         getBaseActivity().changeTitleActionBar(title);
     }
+
+
+    public void snackbar(int resId) {
+        getBaseActivity().snackbar(resId);
+    }
+
+    public void snackbar(String message) {
+        getBaseActivity().snackbar(message);
+    }
+
+    public void toast(int resId) {
+        getBaseActivity().toast(resId);
+    }
+
+    public void toast(String message) {
+        getBaseActivity().toast(message);
+    }
+
 }

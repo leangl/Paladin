@@ -2,6 +2,10 @@ package com.nanospark.gard;
 
 import android.app.Application;
 
+import com.nanospark.gard.events.DoorState;
+import com.nanospark.gard.events.RecognizerLifecycle;
+import com.nanospark.gard.services.GarDService;
+
 import mobi.tattu.utils.Tattu;
 
 /**
@@ -18,6 +22,11 @@ public class GarD extends Application {
         Tattu.bus().register(this);
 
         instance = this;
+
+        DoorState.getInstance();
+        RecognizerLifecycle.getInstance();
+
+        GarDService.start();
 
     }
 }

@@ -15,9 +15,10 @@ import android.widget.Toast;
 
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
-import com.nanospark.gard.events.PhraseRecognized;
+import com.nanospark.gard.events.DoorState;
+import com.nanospark.gard.events.DoorToggled;
 import com.nanospark.gard.events.RecognizerLifecycle;
-import com.nanospark.gard.services.VoiceRecognitionService;
+import com.nanospark.gard.services.GarDService;
 import com.squareup.otto.Subscribe;
 
 import mobi.tattu.utils.Tattu;
@@ -40,26 +41,27 @@ public class MainActivity extends BaseActivity {
     @InjectView(R.id.close)
     private EditText mClose;
     @InjectView(R.id.start)
-    private Button mStart;
-    @InjectView(R.id.stop)
-    private Button mStop;
-    @InjectView(R.id.stopped_content)
-    private View mStoppedContent;
-    @InjectView(R.id.started_content)
-    private View mStartedContent;
-    @InjectView(R.id.state)
-    private TextView mState;
+    private Button mToggleVoiceControl;
+    @InjectView(R.id.door_state)
+    private TextView mDoorState;
+    @InjectView(R.id.toggle)
+    private View mDoorToggle;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_layout);
 
-        mStart.setOnClickListener(v -> {
-            start();
+        mDoorToggle.setOnClickListener(v -> {
+            DoorState.getInstance().toggle();
         });
-        mStop.setOnClickListener(v -> {
-            VoiceRecognitionService.stop();
+        mToggleVoiceControl.setOnClickListener(v -> {
+            if (RecognizerLifecycle.State.STARTED == RecognizerLifecycle.getInstance().getCurrentState().state) {
+                GarDService.stopVoiceRecognition();
+            } else {
+                start();
+            }
         });
 
         mThreshold.setText(DEFAULT_THRESHOLD + "");
@@ -71,21 +73,25 @@ public class MainActivity extends BaseActivity {
     public void onStateChange(RecognizerLifecycle.State state) {
         if (state.state == RecognizerLifecycle.State.STARTED) {
             stopLoading();
-            mStoppedContent.setVisibility(View.GONE);
-            mStartedContent.setVisibility(View.VISIBLE);
+            mToggleVoiceControl.setText("Stop");
+            mThreshold.setEnabled(false);
+            mOpen.setEnabled(false);
+            mClose.setEnabled(false);
         } else if (state.state == RecognizerLifecycle.State.STOPPED || state.state == RecognizerLifecycle.State.ERROR) {
             stopLoading();
-            mStoppedContent.setVisibility(View.VISIBLE);
-            mStartedContent.setVisibility(View.GONE);
+            mToggleVoiceControl.setText("Start");
+            mThreshold.setEnabled(true);
+            mOpen.setEnabled(true);
+            mClose.setEnabled(true);
         }
     }
 
     @Subscribe
-    public void on(PhraseRecognized event) {
-        if (event.phrase.toLowerCase().equals(mOpen.getText().toString().toLowerCase())) {
-            mState.setText(getString(R.string.door_open, mClose.getText().toString().toLowerCase()));
+    public void on(DoorToggled event) {
+        if (event.opened) {
+            mDoorState.setText("OPENED");
         } else {
-            mState.setText(getString(R.string.door_closed, mOpen.getText().toString().toLowerCase()));
+            mDoorState.setText("CLOSED");
         }
     }
 
@@ -109,8 +115,7 @@ public class MainActivity extends BaseActivity {
         }
         double threshold = Math.pow(10, power);
 
-        VoiceRecognitionService.start((float) threshold, mOpen.getText().toString().toLowerCase(), mClose.getText().toString().toLowerCase());
-        mState.setText(getString(R.string.door_closed, mOpen.getText().toString().toLowerCase()));
+        GarDService.startVoiceRecognition((float) threshold, mOpen.getText().toString().toLowerCase(), mClose.getText().toString().toLowerCase());
     }
 
     @Override

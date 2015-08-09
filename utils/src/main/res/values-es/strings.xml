@@ -1,0 +1,11 @@
+<resources>
+    <string name="crash_toast_text">Se produjo un error, se esta enviando un mensaje a el equipo de desarollo para corregirlo</string>
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+    <string name="ok">Aceptar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="loading">Cargando...</string>
+    <string name="no_location">No se ha podido obtener su ubicación</string>
+    <string name="open_drawer">Abrir menu</string>
+    <string name="close_drawer">Cerrar menu</string>
+</resources>

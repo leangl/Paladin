@@ -46,7 +46,7 @@
                 android:resource="@xml/device_filter"/>
         </activity>
 
-        <service android:name=".services.VoiceRecognitionService"/>
+        <service android:name=".services.GarDService"/>
 
     </application>
 

@@ -2,10 +2,12 @@ package mobi.tattu.utils;
 
 import android.content.SharedPreferences;
 
+import java.io.Serializable;
+
 import mobi.tattu.utils.log.Logger;
 import mobi.tattu.utils.preferences.Config;
 
-public class TypedPref<T> {
+public class TypedPref<T> implements Serializable {
     private String key;
     private T defaultValue;
     private Class<T> fetchType;

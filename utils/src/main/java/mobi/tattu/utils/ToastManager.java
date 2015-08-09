@@ -38,7 +38,7 @@ public class ToastManager {
     }
 
     private ToastManager() {
-        mHandler = new Handler();
+        mHandler = Tattu.createUiHandler();
         groups = new SparseArray<>();
     }
 

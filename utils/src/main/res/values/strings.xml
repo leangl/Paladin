@@ -7,4 +7,6 @@
     <string name="cancel">Cancel</string>
     <string name="loading">Loading...</string>
     <string name="no_location">Cannot obtain your position</string>
+    <string name="open_drawer">Open menu</string>
+    <string name="close_drawer">Close menu</string>
 </resources>

@@ -34,7 +34,7 @@ public class LocationClient implements GoogleApiClient.ConnectionCallbacks, Goog
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private Subscriber<? super Location> mSubscriber;
-    //private Handler mHandler = new Handler();
+    //private Handler mHandler = Tattu.createUiHandler();
 
     private LocationClient(Subscriber<? super Location> subscriber) {
         mSubscriber = subscriber;

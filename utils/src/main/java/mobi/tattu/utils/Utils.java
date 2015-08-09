@@ -1,6 +1,5 @@
 package mobi.tattu.utils;
 
-import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,11 +8,10 @@ import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
-import android.support.v4.BuildConfig;
-import android.util.Log;
 import android.util.Patterns;
-import android.widget.ImageView;
 
 import org.acra.ACRA;
 import org.acra.ACRAConfiguration;
@@ -23,7 +21,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -33,7 +33,7 @@ import mobi.tattu.utils.log.Logger;
  * Created by Leandro on 30/05/2015.
  */
 public class Utils {
-    private static String MULTIVALUE_PREFERENCE_SEPARATOR = "|";
+    public static String MULTIVALUE_PREFERENCE_SEPARATOR = "|";
     private static final SimpleDateFormat FILENAME_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd_hhmm");
     private static final char[] FILE_ILLEGAL_CHARACTERS = {'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':'};
 
@@ -53,27 +53,6 @@ public class Utils {
             }
         }
         return true;
-    }
-
-    public static boolean isBlank(String text) {
-        return text == null || text.trim().isEmpty();
-    }
-
-    public static boolean isNotBlank(String text) {
-        return !isBlank(text);
-    }
-
-    public static boolean equals(String s1, String s2) {
-        if (s1 == null && s2 == null) {
-            return true;
-        }
-        if (s1 != null) {
-            return s1.equals(s2);
-        }
-        if (s2 != null) {
-            return s2.equals(s1);
-        }
-        return false;
     }
 
     private static final int MAX_INCREMENT = 3;
@@ -259,7 +238,7 @@ public class Utils {
         return BuildConfig.DEBUG;
     }
 
-//    /**
+    //    /**
 //     * Devuelve un ImageView buscando en el los resources
 //     * @param context
 //     * @param id Imagen
@@ -301,7 +280,6 @@ public class Utils {
     }
 
 
-
     public static boolean hasHoneycombMR1() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1;
     }
@@ -325,7 +303,7 @@ public class Utils {
      */
     public static String[] findMaxMinIsoValues(Camera.Parameters params) {
         String isoValues = params.get("iso-values");
-        if (!isEmpty(isoValues)) {
+        if (!StringUtils.isEmpty(isoValues)) {
             Integer minIsoValue = null;
             Integer maxIsoValue = null;
             String minIso = null;
@@ -354,9 +332,28 @@ public class Utils {
         }
         return null;
     }
+
+    @Deprecated
     public static boolean isEmpty(String text) {
-        return text == null || text.length() == 0;
+        return StringUtils.isEmpty(text);
     }
+
+
+    @Deprecated
+    public static boolean isBlank(String text) {
+        return StringUtils.isBlank(text);
+    }
+
+    @Deprecated
+    public static boolean isNotBlank(String text) {
+        return StringUtils.isNotBlank(text);
+    }
+
+    @Deprecated
+    public static boolean equals(String s1, String s2) {
+        return StringUtils.equals(s1, s2);
+    }
+
     /**
      * Try to parse the ISO value (ie 1600 or ISO1600)
      *
@@ -376,9 +373,10 @@ public class Utils {
         in.close();
         return val;
     }
+
     public static boolean supportsAutoIso(Camera.Parameters params) {
         String isoValues = params.get("iso-values");
-        if (!isEmpty(isoValues)) {
+        if (!StringUtils.isEmpty(isoValues)) {
             String[] isoValuesArr = isoValues.split(",");
             for (int i = 0; i < isoValuesArr.length; i++) {
                 if ("auto".equals(isoValuesArr[i])) {
@@ -404,11 +402,106 @@ public class Utils {
     }
 
     /**
-     *
      * @return El modelo del telefono
      */
-    public static String cellPhoneModel(){
+    public static String cellPhoneModel() {
         return Build.MANUFACTURER + " " + Build.MODEL;
+    }
+
+    public static String joinMultiValue(List<String> values) {
+        StringBuilder sb = new StringBuilder();
+        if (values != null) {
+            Iterator<String> it = values.iterator();
+            while (it.hasNext()) {
+                sb.append(it.next());
+                if (it.hasNext()) {
+                    sb.append(MULTIVALUE_PREFERENCE_SEPARATOR);
+                }
+            }
+        }
+        return sb.toString();
+    }
+    public static String joinMultiValueByComma(List<String> values) {
+        StringBuilder sb = new StringBuilder();
+        if (values != null) {
+            Iterator<String> it = values.iterator();
+            while (it.hasNext()) {
+                sb.append(it.next());
+                if (it.hasNext()) {
+                    sb.append(",");
+                }
+            }
+        }
+        return sb.toString();
+    }
+    public static final String getBase64Key() {
+        StringBuilder sb = new StringBuilder();
+        int evenIdx = 0, oddIdx = 0;
+        for (int i = 0; i < Base64.BASE_64_KEYS_ODD.length + Base64.BASE_64_KEYS_EVEN.length; i++) {
+            if (i % 2 == 0) { // If even
+                sb.append(Base64.BASE_64_KEYS_EVEN[evenIdx++]);
+            } else { // if odd
+                sb.append(Base64.BASE_64_KEYS_ODD[oddIdx++]);
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Saca el valor de la preferencia
+     *
+     * @param value
+     * @param pref
+     * @return
+     */
+    public static String removeValuePreference(String value, TypedPref<String> pref) {
+        String multiValuePreference = pref.getValue();
+        String[] vals = multiValuePreference.split("\\" + Utils.MULTIVALUE_PREFERENCE_SEPARATOR);
+        List<String> newVals = new ArrayList<String>(vals.length);
+        for (int i = 0; i < vals.length; i++) {
+            if (!vals[i].equals(value)) {
+                newVals.add(vals[i]);
+            }
+        }
+        return Utils.joinMultiValue(newVals);
+    }
+
+    /**
+     * Devuelve un ImageView buscando en el los resources
+     *
+     * @param context
+     * @param id      Imagen
+     * @return Drawable
+     */
+    public static Drawable getDrawableResources(Context context, int id) {
+        Drawable image = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            image = context.getResources().getDrawable(id, null);
+        } else {
+            image = context.getResources().getDrawable(id);
+        }
+        return image;
+    }
+
+    /**
+     * Verifica que haya una conexion de internet y este disponible para conectarse.
+     *
+     * @param context
+     * @return true, if successful
+     */
+    public static boolean checkConnection(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo == null) {
+            return Boolean.FALSE;
+        }
+        if (!networkInfo.isConnected()) {
+            return Boolean.FALSE;
+        }
+        if (!networkInfo.isAvailable()) {
+            return Boolean.FALSE;
+        }
+        return Boolean.TRUE;
     }
 
 
