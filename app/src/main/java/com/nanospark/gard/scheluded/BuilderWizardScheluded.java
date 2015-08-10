@@ -69,6 +69,7 @@ public class BuilderWizardScheluded implements DialogInterface.OnMultiChoiceClic
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.HOUR_OF_DAY, scheluded.hourOfDay);
         calendar.set(Calendar.MINUTE, scheluded.minute);
+        calendar.set(Calendar.SECOND,0);
 
         long timeInMillis = calendar.getTimeInMillis();
         scheluded.timeStamp = timeInMillis;
