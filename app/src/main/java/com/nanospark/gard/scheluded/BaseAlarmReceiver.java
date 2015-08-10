@@ -5,19 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
-import com.nanospark.gard.events.DoorToggled;
-
 import java.util.Calendar;
 
-import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.persistance.datastore.DataStore;
 
-public class AlarmReceiver extends BroadcastReceiver {
+public abstract class BaseAlarmReceiver extends BroadcastReceiver {
 
-    public static final String ACTION = "mobi.tattu.garagescheluder.ALARM_LAUNCHED";
+    public static final String ACTION_OPEN = "mobi.tattu.garagescheluder.ALARM_LAUNCHED_OPEN";
+    public static final String ACTION_CLOSE = "mobi.tattu.garagescheluder.ALARM_LAUNCHED_CLOSE";
     public static final String KEY_EXTRA_ACTION = "extra_action";
 
-    public AlarmReceiver() {
+    public BaseAlarmReceiver() {
     }
 
     @Override
@@ -28,10 +26,13 @@ public class AlarmReceiver extends BroadcastReceiver {
         try {
             Scheluded scheluded = DataStore.getInstance().getObject(key, Scheluded.class);
             if (scheluded.days.contains(day)) {
-                Tattu.post(new DoorToggled(BuilderWizardScheluded.ACTION_OPEN_DOOR.equals(key)));
+                System.out.println("Disparar una accion ");
+                launcherEvent();
             }
         } catch (DataStore.ObjectNotFoundException e) {
             Toast.makeText(context, "Error " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+
+    public abstract void launcherEvent();
 }

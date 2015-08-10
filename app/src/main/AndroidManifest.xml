@@ -47,14 +47,23 @@
 
         <service android:name=".services.GarDService" />
 
-        <receiver android:name=".scheluded.AlarmReceiver" />
         <receiver
             android:name=".scheluded.BootReceiver"
             android:enabled="true"
             android:exported="true" >
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".scheluded.AlarmOpenReceiver"
+            android:enabled="true"
+            android:exported="true" >
+        </receiver>
+        <receiver
+            android:name=".scheluded.AlarmCloseReceiver"
+            android:enabled="true"
+            android:exported="true" >
         </receiver>
     </application>
 

@@ -20,7 +20,9 @@ import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.DoorState;
 import com.nanospark.gard.events.DoorToggled;
 import com.nanospark.gard.events.RecognizerLifecycle;
-import com.nanospark.gard.scheluded.AlarmReceiver;
+import com.nanospark.gard.scheluded.AlarmCloseReceiver;
+import com.nanospark.gard.scheluded.AlarmOpenReceiver;
+import com.nanospark.gard.scheluded.BaseAlarmReceiver;
 import com.nanospark.gard.scheluded.BuilderWizardScheluded;
 import com.nanospark.gard.scheluded.DialogUtils;
 import com.nanospark.gard.scheluded.Scheluded;
@@ -32,12 +34,13 @@ import java.util.List;
 
 import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.activities.BaseActivity;
+import mobi.tattu.utils.persistance.datastore.DataStore;
 import roboguice.inject.InjectView;
 
 /**
  * Created by Leandro on 19/7/2015.
  */
-public class MainActivity extends BaseActivity implements BuilderWizardScheluded.BuilderWizardScheludedListener{
+public class MainActivity extends BaseActivity implements BuilderWizardScheluded.BuilderWizardScheludedListener {
 
     public static final int DEFAULT_THRESHOLD = -40;
 
@@ -58,7 +61,9 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
 
     public static final String SCHELUDED_ONE = "scheludedOne";
     public static final String SCHELUDED_TWO = "scheludedTwo";
-    private AlarmReceiver mAlarmReceiver;
+
+    private AlarmOpenReceiver mAlarmOpenReceiver;
+    private AlarmCloseReceiver mAlarmCloseReceiver;
     private ListView mScheludedOneListView;
     private ListView mScheludedTwoListView;
 
@@ -77,37 +82,44 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
                 start();
             }
         });
-        mAlarmReceiver = new AlarmReceiver();
+
+        mAlarmOpenReceiver = new AlarmOpenReceiver();
+        mAlarmCloseReceiver = new AlarmCloseReceiver();
+        registerReceiver(mAlarmOpenReceiver, new IntentFilter(BaseAlarmReceiver.ACTION_OPEN));
+        registerReceiver(mAlarmCloseReceiver,new IntentFilter(BaseAlarmReceiver.ACTION_CLOSE));
+
         mThreshold.setText(DEFAULT_THRESHOLD + "");
-        registerReceiver(mAlarmReceiver,new IntentFilter(AlarmReceiver.ACTION));
         registerReceiver(mUsbReceiver, new IntentFilter(UsbManager.ACTION_USB_ACCESSORY_DETACHED));
         Button buttonOne = (Button) findViewById(R.id.scheluder_one);
         Button buttonTwo = (Button) findViewById(R.id.scheluder_two);
         mScheludedOneListView = (ListView) findViewById(R.id.listView_one);
         mScheludedTwoListView = (ListView) findViewById(R.id.listView2_two);
-        buttonOne.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                handlerScheludedOne();
-            }
-        });
-        buttonTwo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                handlerScheludedTwo();
-            }
-        });
-    }
+        buttonOne.setOnClickListener(v -> {handlerScheludedOne();});
+        buttonTwo.setOnClickListener(v -> {handlerScheludedTwo();});
+        
+        loadScheluded(BuilderWizardScheluded.ACTION_OPEN_DOOR);
+        loadScheluded(BuilderWizardScheluded.ACTION_CLOSE_DOOR);
 
-    private void handlerScheludedOne(){
-        BuilderWizardScheluded handlerScheluded = new BuilderWizardScheluded(this,SCHELUDED_ONE);
+
+
+    }
+    private void loadScheluded(String key){
+        try {
+            Scheluded scheluded = DataStore.getInstance().getObject(key,Scheluded.class);
+            populateListView(scheluded.name,scheluded);
+        } catch (DataStore.ObjectNotFoundException e1) {
+            e1.printStackTrace();
+        }
+    }
+    private void handlerScheludedOne() {
+        BuilderWizardScheluded handlerScheluded = new BuilderWizardScheluded(this, SCHELUDED_ONE);
         handlerScheluded.setListener(this);
         DialogUtils.builderDesiredAction(this, handlerScheluded);
 
     }
 
-    private void handlerScheludedTwo(){
-        BuilderWizardScheluded handlerScheluded = new BuilderWizardScheluded(this,SCHELUDED_TWO);
+    private void handlerScheludedTwo() {
+        BuilderWizardScheluded handlerScheluded = new BuilderWizardScheluded(this, SCHELUDED_TWO);
         handlerScheluded.setListener(this);
         DialogUtils.builderDesiredAction(this, handlerScheluded);
     }
@@ -165,7 +177,8 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mUsbReceiver);
-        unregisterReceiver(mAlarmReceiver);
+        unregisterReceiver(mAlarmOpenReceiver);
+        unregisterReceiver(mAlarmCloseReceiver);
     }
 
     @Override
@@ -205,13 +218,17 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
 
     @Override
     public void onSuccess(String id, Scheluded scheluded) {
-        List<String> list  = new ArrayList<>();
+        populateListView(id, scheluded);
+    }
+
+    private void populateListView(String id, Scheluded scheluded) {
+        List<String> list = new ArrayList<>();
         String[] desiredActions = getResources().getStringArray(R.array.desiredActions);
         list.add(scheluded.action.contains("open") ? desiredActions[0] : desiredActions[1]);
-        list.add(formattedHour(String.valueOf(scheluded.hourOfDay)) +":" + formattedHour(String.valueOf(scheluded.minute)));
+        list.add(formattedHour(String.valueOf(scheluded.hourOfDay)) + ":" + formattedHour(String.valueOf(scheluded.minute)));
         list.add(scheluded.dayNameSelecteds.toString());
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,list);
-        switch (id){
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, list);
+        switch (id) {
             case SCHELUDED_ONE:
                 mScheludedOneListView.setAdapter(arrayAdapter);
                 break;
@@ -222,10 +239,13 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
         }
         arrayAdapter.notifyDataSetChanged();
     }
-    private String formattedHour(String value){
-        if(value.length() == 1){
-            return  "0" + value;
+
+    private String formattedHour(String value) {
+        if (value.length() == 1) {
+            return "0" + value;
         }
         return value;
     }
+
+
 }

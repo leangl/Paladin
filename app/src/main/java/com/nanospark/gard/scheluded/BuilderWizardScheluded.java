@@ -54,6 +54,7 @@ public class BuilderWizardScheluded implements DialogInterface.OnMultiChoiceClic
             newFragment.show(((MainActivity) mContext).getSupportFragmentManager(), "timePicker");
             launcherClock = false;
         }else{
+            mScheluded.name = mId;
             DataStore.getInstance().putObject(mScheluded.action, mScheluded);
             initializeAlarm(mContext,mScheluded);
             this.mListener.onSuccess(mId, mScheluded);
@@ -64,9 +65,7 @@ public class BuilderWizardScheluded implements DialogInterface.OnMultiChoiceClic
     public static void initializeAlarm(Context context,Scheluded scheluded) {
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        Intent intent = new Intent(context, AlarmReceiver.class);
-        intent.putExtra(AlarmReceiver.KEY_EXTRA_ACTION,scheluded.action);
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        PendingIntent alarmIntent = getPendingIntent(context, scheluded);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.HOUR_OF_DAY, scheluded.hourOfDay);
@@ -75,6 +74,16 @@ public class BuilderWizardScheluded implements DialogInterface.OnMultiChoiceClic
         alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 TimeUnit.HOURS.toMillis(24), alarmIntent);
         context.getSharedPreferences("alarm",Context.MODE_PRIVATE).edit().putString(scheluded.action,scheluded.action).commit();
+    }
+
+    private static PendingIntent getPendingIntent(Context context, Scheluded scheluded) {
+       Class  clazz = AlarmCloseReceiver.class;
+        if(scheluded.action.equals(ACTION_OPEN_DOOR)){
+           clazz = AlarmOpenReceiver.class;
+        }
+        Intent intent = new Intent(context,clazz);
+        intent.putExtra(BaseAlarmReceiver.KEY_EXTRA_ACTION,scheluded.action);
+        return PendingIntent.getBroadcast(context, 0, intent, 0);
     }
 
     @Override
@@ -104,9 +113,14 @@ public class BuilderWizardScheluded implements DialogInterface.OnMultiChoiceClic
      */
     @Override
     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+        Integer index = which +1;
+        String nameSelected = mContext.getResources().getStringArray(R.array.days)[which];
         if (isChecked) {
-            mScheluded.dayNameSelecteds.add(mContext.getResources().getStringArray(R.array.days)[which]);
-            mScheluded.days.add(which +1);
+            mScheluded.dayNameSelecteds.add(nameSelected);
+            mScheluded.days.add(index);
+        }else{
+            mScheluded.days.remove(index);
+            mScheluded.dayNameSelecteds.remove(nameSelected);
         }
     }
 
