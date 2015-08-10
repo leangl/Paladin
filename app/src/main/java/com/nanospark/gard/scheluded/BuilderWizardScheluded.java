@@ -70,6 +70,7 @@ public class BuilderWizardScheluded implements DialogInterface.OnMultiChoiceClic
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.HOUR_OF_DAY, scheluded.hourOfDay);
         calendar.set(Calendar.MINUTE, scheluded.minute);
+        calendar.set(Calendar.SECOND, 0);
 
         alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 TimeUnit.HOURS.toMillis(24), alarmIntent);
