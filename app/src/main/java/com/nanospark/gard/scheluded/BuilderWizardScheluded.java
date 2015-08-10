@@ -65,6 +65,7 @@ public class BuilderWizardScheluded implements DialogInterface.OnMultiChoiceClic
     public static void initializeAlarm(Context context,Scheluded scheluded) {
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
+        PendingIntent alarmIntent = getPendingIntent(context, scheluded);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.HOUR_OF_DAY, scheluded.hourOfDay);

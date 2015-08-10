@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="drawer_background">@color/grey_600</color>
-    <color name="drawer_item_background">@color/grey_600</color>
+    <color name="drawer_background">@color/grey_800</color>
+    <color name="drawer_item_background">@color/grey_800</color>
+    <color name="drawer_item_selected">@color/light_blue_A400</color>
+    <color name="drawer_item">@color/white</color>
     <color name="divider">@color/grey_600</color>
 </resources>

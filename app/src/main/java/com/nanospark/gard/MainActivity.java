@@ -7,10 +7,12 @@ import android.content.IntentFilter;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -90,27 +92,27 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
 
         mThreshold.setText(DEFAULT_THRESHOLD + "");
         registerReceiver(mUsbReceiver, new IntentFilter(UsbManager.ACTION_USB_ACCESSORY_DETACHED));
-        Button buttonOne = (Button) findViewById(R.id.scheluder_one);
-        Button buttonTwo = (Button) findViewById(R.id.scheluder_two);
+        View buttonOne = findViewById(R.id.cardview);
+        View buttonTwo = findViewById(R.id.cardview2);
+        buttonOne.setOnClickListener(v -> handlerScheludedOne());
+        buttonTwo.setOnClickListener(v -> handlerScheludedTwo());
+
         mScheludedOneListView = (ListView) findViewById(R.id.listView_one);
         mScheludedTwoListView = (ListView) findViewById(R.id.listView2_two);
-        buttonOne.setOnClickListener(v -> {handlerScheludedOne();});
-        buttonTwo.setOnClickListener(v -> {handlerScheludedTwo();});
 
         loadScheluded(BuilderWizardScheluded.ACTION_OPEN_DOOR);
         loadScheluded(BuilderWizardScheluded.ACTION_CLOSE_DOOR);
-
-
-
     }
-    private void loadScheluded(String key){
+
+    private void loadScheluded(String key) {
         try {
-            Scheluded scheluded = DataStore.getInstance().getObject(key,Scheluded.class);
-            populateListView(scheluded.name,scheluded);
+            Scheluded scheluded = DataStore.getInstance().getObject(key, Scheluded.class);
+            populateListView(scheluded.name, scheluded);
         } catch (DataStore.ObjectNotFoundException e1) {
             e1.printStackTrace();
         }
     }
+
     private void handlerScheludedOne() {
         BuilderWizardScheluded handlerScheluded = new BuilderWizardScheluded(this, SCHELUDED_ONE);
         handlerScheluded.setListener(this);
@@ -228,16 +230,42 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
         list.add(formattedHour(String.valueOf(scheluded.hourOfDay)) + ":" + formattedHour(String.valueOf(scheluded.minute)));
         list.add(scheluded.dayNameSelecteds.toString());
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, list);
+        ListView listView = null;
         switch (id) {
             case SCHELUDED_ONE:
                 mScheludedOneListView.setAdapter(arrayAdapter);
+                listView = mScheludedOneListView;
                 break;
             case SCHELUDED_TWO:
                 mScheludedTwoListView.setAdapter(arrayAdapter);
+                listView = mScheludedTwoListView;
                 break;
 
         }
         arrayAdapter.notifyDataSetChanged();
+        setListViewHeightBasedOnChildren(listView);
+    }
+
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null)
+            return;
+
+        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
+        int totalHeight = 0;
+        View view = null;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            view = listAdapter.getView(i, view, listView);
+            if (i == 0)
+                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, ListView.LayoutParams.WRAP_CONTENT));
+
+            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+            totalHeight += view.getMeasuredHeight();
+        }
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+        listView.requestLayout();
     }
 
     private String formattedHour(String value) {

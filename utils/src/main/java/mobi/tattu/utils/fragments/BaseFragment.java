@@ -95,8 +95,8 @@ public class BaseFragment extends RoboFragment implements BaseActivity.OnBackLis
         ((BaseActivity) getActivity()).start(fragment, addToBackStack);
     }
 
-    public void finish() {
-        getBaseActivity().popBackStack();
+    public boolean finish() {
+        return getBaseActivity().popBackStack();
     }
 
     protected void stopLoading() {
