@@ -151,7 +151,10 @@
         </RelativeLayout>
 
         <include layout="@layout/divider"/>
-
+        <include layout="@layout/activity_main"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"></include>
+        <include layout="@layout/divider"/>
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
