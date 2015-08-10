@@ -11,6 +11,7 @@ import android.hardware.Camera.Size;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.support.v4.BuildConfig;
 import android.util.Patterns;
 
 import org.acra.ACRA;
@@ -111,7 +112,6 @@ public class Utils {
 
         return f;
     }
-
 
     public static Comparator<Size> SIZE_COMPARATOR = new Comparator<Size>() {
 
@@ -253,6 +253,7 @@ public class Utils {
 //        }
 //        return image;
 //    }
+
     public static boolean hasHoneycomb() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
     }
@@ -263,6 +264,7 @@ public class Utils {
         ACRA.setConfig(acraCfg);
         ACRA.init(app);
     }
+
     public static void init(Application app) {
         initACRA(app);
         Thread.UncaughtExceptionHandler defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
@@ -273,7 +275,6 @@ public class Utils {
             }
         });
     }
-
 
     public static boolean hasGingerbread() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD;
@@ -295,6 +296,7 @@ public class Utils {
     public static boolean hasJellyBeanMR1() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1;
     }
+
     /**
      * Returns the max and min Iso values supported by the camera
      *
@@ -397,6 +399,7 @@ public class Utils {
         }
         return false;
     }
+
     public static String[] splitMultiValue(String values) {
         return values.split("\\" + MULTIVALUE_PREFERENCE_SEPARATOR);
     }
@@ -503,7 +506,5 @@ public class Utils {
         }
         return Boolean.TRUE;
     }
-
-
 }
 
