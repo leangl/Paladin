@@ -7,13 +7,10 @@ import android.content.IntentFilter;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,8 +22,8 @@ import com.nanospark.gard.events.RecognizerLifecycle;
 import com.nanospark.gard.scheluded.AlarmCloseReceiver;
 import com.nanospark.gard.scheluded.AlarmOpenReceiver;
 import com.nanospark.gard.scheluded.BaseAlarmReceiver;
-import com.nanospark.gard.scheluded.BuilderWizardScheluded;
 import com.nanospark.gard.scheluded.BuilderDialogs;
+import com.nanospark.gard.scheluded.BuilderWizardScheluded;
 import com.nanospark.gard.scheluded.Scheluded;
 import com.nanospark.gard.services.GarDService;
 import com.squareup.otto.Subscribe;
@@ -66,8 +63,8 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
 
     private AlarmOpenReceiver mAlarmOpenReceiver;
     private AlarmCloseReceiver mAlarmCloseReceiver;
-    private ListView mScheludedOneListView;
-    private ListView mScheludedTwoListView;
+    private LinearLayout mScheludedOneContainer;
+    private LinearLayout mScheludedTwoContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,8 +94,8 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
         buttonOne.setOnClickListener(v -> handlerScheludedOne());
         buttonTwo.setOnClickListener(v -> handlerScheludedTwo());
 
-        mScheludedOneListView = (ListView) findViewById(R.id.listView_one);
-        mScheludedTwoListView = (ListView) findViewById(R.id.listView2_two);
+        mScheludedOneContainer = (LinearLayout) findViewById(R.id.container_one);
+        mScheludedTwoContainer = (LinearLayout) findViewById(R.id.container_two);
 
         loadScheluded(BuilderWizardScheluded.ACTION_OPEN_DOOR);
         loadScheluded(BuilderWizardScheluded.ACTION_CLOSE_DOOR);
@@ -229,44 +226,31 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
         list.add(scheluded.action.contains("open") ? desiredActions[0] : desiredActions[1]);
         list.add(formattedHour(String.valueOf(scheluded.hourOfDay)) + ":" + formattedHour(String.valueOf(scheluded.minute)));
         list.add(scheluded.dayNameSelecteds.toString());
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, list);
-        ListView listView = null;
         switch (id) {
             case SCHELUDED_ONE:
-                mScheludedOneListView.setAdapter(arrayAdapter);
-                listView = mScheludedOneListView;
+
+                addTextViewContainer(list,mScheludedOneContainer);
                 break;
             case SCHELUDED_TWO:
-                mScheludedTwoListView.setAdapter(arrayAdapter);
-                listView = mScheludedTwoListView;
+                addTextViewContainer(list,mScheludedTwoContainer);
                 break;
 
         }
-        arrayAdapter.notifyDataSetChanged();
-        setListViewHeightBasedOnChildren(listView);
+
+
     }
-
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null)
-            return;
-
-        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
-        int totalHeight = 0;
-        View view = null;
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            view = listAdapter.getView(i, view, listView);
-            if (i == 0)
-                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, ListView.LayoutParams.WRAP_CONTENT));
-
-            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
-            totalHeight += view.getMeasuredHeight();
+    private void addTextViewContainer(List<String> list, LinearLayout container){
+        container.removeAllViews();
+        for(String text : list){
+            container.addView(createTextView(text));
         }
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
-        listView.requestLayout();
     }
+    private TextView createTextView(String text){
+        TextView textView = new TextView(this);
+        textView.setText(text);
+        return textView;
+    }
+
 
     private String formattedHour(String value) {
         if (value.length() == 1) {

@@ -27,12 +27,13 @@
                 android:textColor="@color/black"
                 android:textSize="16sp"/>
 
-            <ListView
-                android:id="@+id/listView_one"
+            <LinearLayout
+                android:id="@+id/container_one"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/scheduler_one"
-                android:layout_centerHorizontal="true"/>
+                android:layout_centerHorizontal="true"
+                android:orientation="vertical"/>
         </RelativeLayout>
     </FrameLayout>
 
@@ -60,8 +61,9 @@
                 android:textColor="@color/black"
                 android:textSize="16sp"/>
 
-            <ListView
-                android:id="@+id/listView2_two"
+            <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/container_two"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
