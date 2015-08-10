@@ -20,7 +20,7 @@ import mobi.tattu.utils.persistance.datastore.DataStore;
  * Created by cristian on 09/08/15.
  */
 public class BuilderWizardScheluded implements DialogInterface.OnMultiChoiceClickListener,
-        DialogInterface.OnClickListener, DialogUtils.DialogListener, TimePickerFragment.TimePickerFragmentListener {
+        DialogInterface.OnClickListener, BuilderDialogs.DialogListener, TimePickerFragment.TimePickerFragmentListener {
 
     public static String ACTION_OPEN_DOOR = "action_open_door";
     public static String ACTION_CLOSE_DOOR = "action_close_door";
@@ -55,7 +55,7 @@ public class BuilderWizardScheluded implements DialogInterface.OnMultiChoiceClic
             launcherClock = false;
         }else{
             mScheluded.name = mId;
-            DataStore.getInstance().putObject(mScheluded.action, mScheluded);
+
             initializeAlarm(mContext,mScheluded);
             this.mListener.onSuccess(mId, mScheluded);
         }
@@ -65,14 +65,20 @@ public class BuilderWizardScheluded implements DialogInterface.OnMultiChoiceClic
     public static void initializeAlarm(Context context,Scheluded scheluded) {
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        PendingIntent alarmIntent = getPendingIntent(context, scheluded);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.HOUR_OF_DAY, scheluded.hourOfDay);
         calendar.set(Calendar.MINUTE, scheluded.minute);
 
-        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+        long timeInMillis = calendar.getTimeInMillis();
+        scheluded.timeStamp = timeInMillis;
+
+        DataStore.getInstance().putObject(scheluded.action, scheluded);
+        PendingIntent alarmIntent = getPendingIntent(context, scheluded);
+
+        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, timeInMillis,
                 TimeUnit.HOURS.toMillis(24), alarmIntent);
+
         context.getSharedPreferences("alarm",Context.MODE_PRIVATE).edit().putString(scheluded.action,scheluded.action).commit();
     }
 
@@ -83,6 +89,7 @@ public class BuilderWizardScheluded implements DialogInterface.OnMultiChoiceClic
         }
         Intent intent = new Intent(context,clazz);
         intent.putExtra(BaseAlarmReceiver.KEY_EXTRA_ACTION,scheluded.action);
+        intent.putExtra(BaseAlarmReceiver.KEY_EXTRA_TIMESTAMP,scheluded.timeStamp);
         return PendingIntent.getBroadcast(context, 0, intent, 0);
     }
 
@@ -128,7 +135,7 @@ public class BuilderWizardScheluded implements DialogInterface.OnMultiChoiceClic
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         mScheluded.hourOfDay = hourOfDay;
         mScheluded.minute = minute;
-        DialogUtils.builderSelectDays(mContext,this);
+        BuilderDialogs.builderSelectDays(mContext, this);
     }
 
     public void setListener(BuilderWizardScheludedListener listener){

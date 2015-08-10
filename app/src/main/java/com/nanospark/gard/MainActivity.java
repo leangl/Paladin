@@ -24,7 +24,7 @@ import com.nanospark.gard.scheluded.AlarmCloseReceiver;
 import com.nanospark.gard.scheluded.AlarmOpenReceiver;
 import com.nanospark.gard.scheluded.BaseAlarmReceiver;
 import com.nanospark.gard.scheluded.BuilderWizardScheluded;
-import com.nanospark.gard.scheluded.DialogUtils;
+import com.nanospark.gard.scheluded.BuilderDialogs;
 import com.nanospark.gard.scheluded.Scheluded;
 import com.nanospark.gard.services.GarDService;
 import com.squareup.otto.Subscribe;
@@ -96,7 +96,7 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
         mScheludedTwoListView = (ListView) findViewById(R.id.listView2_two);
         buttonOne.setOnClickListener(v -> {handlerScheludedOne();});
         buttonTwo.setOnClickListener(v -> {handlerScheludedTwo();});
-        
+
         loadScheluded(BuilderWizardScheluded.ACTION_OPEN_DOOR);
         loadScheluded(BuilderWizardScheluded.ACTION_CLOSE_DOOR);
 
@@ -114,14 +114,14 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
     private void handlerScheludedOne() {
         BuilderWizardScheluded handlerScheluded = new BuilderWizardScheluded(this, SCHELUDED_ONE);
         handlerScheluded.setListener(this);
-        DialogUtils.builderDesiredAction(this, handlerScheluded);
+        BuilderDialogs.builderDesiredAction(this, handlerScheluded);
 
     }
 
     private void handlerScheludedTwo() {
         BuilderWizardScheluded handlerScheluded = new BuilderWizardScheluded(this, SCHELUDED_TWO);
         handlerScheluded.setListener(this);
-        DialogUtils.builderDesiredAction(this, handlerScheluded);
+        BuilderDialogs.builderDesiredAction(this, handlerScheluded);
     }
 
     @Subscribe

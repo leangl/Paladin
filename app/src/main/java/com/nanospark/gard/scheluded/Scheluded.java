@@ -15,6 +15,7 @@ public class Scheluded {
     public int minute;
     //Es para indicarle si pertenece a scheluded one o two
     public String name;
+    public long timeStamp;
 
     @Override
     public boolean equals(Object o) {

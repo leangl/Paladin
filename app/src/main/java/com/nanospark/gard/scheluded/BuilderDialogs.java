@@ -5,16 +5,15 @@ import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 
 import com.nanospark.gard.R;
-import com.nanospark.gard.scheluded.BuilderWizardScheluded;
 
 /**
  * Created by cristian on 09/08/15.
  */
-public class DialogUtils {
+public class BuilderDialogs {
 
     public interface DialogListener  {
-        public void positiveButton(DialogInterface dialog);
-        public void negativeButton(DialogInterface dialog);
+         void positiveButton(DialogInterface dialog);
+         void negativeButton(DialogInterface dialog);
     }
 
     public static void builderDesiredAction(Context context,final BuilderWizardScheluded handlerScheluded){
