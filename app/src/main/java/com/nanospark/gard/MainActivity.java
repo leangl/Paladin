@@ -89,7 +89,7 @@ public class MainActivity extends BaseActivity {
     @Subscribe
     public void on(DoorToggled event) {
         if (event.opened) {
-            mDoorState.setText("OPENED");
+            mDoorState.setText("OPEN");
         } else {
             mDoorState.setText("CLOSED");
         }
