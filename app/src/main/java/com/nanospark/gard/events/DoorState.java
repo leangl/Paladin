@@ -2,6 +2,7 @@ package com.nanospark.gard.events;
 
 import com.squareup.otto.Produce;
 
+import ioio.lib.spi.Log;
 import mobi.tattu.utils.Tattu;
 
 /**
@@ -24,13 +25,29 @@ public class DoorState {
     }
 
     public void open() {
-        this.opened = true;
-        Tattu.post(new DoorToggled(opened));
+        if (!isOpened()) {
+            this.opened = true;
+            Tattu.post(new DoorToggled(opened));
+        } else {
+            Log.w("DOOR", "Door already open");
+        }
     }
 
     public void close() {
-        this.opened = false;
-        Tattu.post(new DoorToggled(opened));
+        if (isOpened()) {
+            this.opened = false;
+            Tattu.post(new DoorToggled(opened));
+        } else {
+            Log.w("DOOR", "Door already closed");
+        }
+    }
+
+    public void set(boolean open) {
+        if (open) {
+            open();
+        } else {
+            close();
+        }
     }
 
     public void toggle() {
