@@ -132,7 +132,7 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
     @Subscribe
     public void on(DoorToggled event) {
         if (event.opened) {
-            mDoorState.setText("OPENED");
+            mDoorState.setText("OPEN");
         } else {
             mDoorState.setText("CLOSED");
         }

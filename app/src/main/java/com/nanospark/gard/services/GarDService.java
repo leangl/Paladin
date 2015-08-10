@@ -46,9 +46,6 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
     public static final String KEY_OPEN = "open";
     public static final String KEY_CLOSE = "close";
 
-    public static final String DEFAULT_PHRASE_OPEN = "hello garage door";
-    public static final String DEFAULT_PHRASE_CLOSE = "goodbye garage door";
-
     public static final String KEY_THRESHOLD = "threshold";
     public static final float DEFAULT_THRESHOLD = 1e-40f;
     public static final String VOICE_RECOGNITION = "VOICE_RECOGNITION";
@@ -178,11 +175,11 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
         threshold = intent.getFloatExtra(KEY_THRESHOLD, DEFAULT_THRESHOLD);
         openPhrase = intent.getStringExtra(KEY_OPEN);
         if (openPhrase == null || openPhrase.trim().length() == 0) {
-            openPhrase = DEFAULT_PHRASE_OPEN;
+            openPhrase = getString(R.string.default_open);
         }
         closePhrase = intent.getStringExtra(KEY_CLOSE);
         if (closePhrase == null || closePhrase.trim().length() == 0) {
-            closePhrase = DEFAULT_PHRASE_CLOSE;
+            closePhrase = getString(R.string.default_close);
         }
 
         // Start voice recognition asynchronously
@@ -223,10 +220,16 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
         }
     }
 
+    @Subscribe
     public void on(DoorToggled event) {
         switchPhrase(event.opened);
         activatePin = true;
         toast("Door is in motion");
+    }
+
+    @Subscribe
+    public void on(PhraseRecognized event) {
+        DoorState.getInstance().toggle();
     }
 
     private void switchPhrase(boolean opened) {
@@ -241,11 +244,6 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
             recognizer.stop();
             recognizer.startListening(currentKey);
         }
-    }
-
-    @Subscribe
-    public void on(PhraseRecognized event) {
-        DoorState.getInstance().toggle();
     }
 
     @Override
