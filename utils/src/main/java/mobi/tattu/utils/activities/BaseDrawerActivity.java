@@ -67,6 +67,10 @@ public abstract class BaseDrawerActivity extends BaseActivity implements Navigat
         start(getFragmentForDrawerItem(mNavigationView.getMenu().getItem(0).getItemId()), false);
     }
 
+    /**
+     * @param id el id del item del menu: menuItem.getItemId()
+     * @return fragment correspondiente al item seleccionado. Si es null entonces no se abre nada.
+     */
     protected abstract Fragment getFragmentForDrawerItem(int id);
 
     public void startDrawerFragment(Fragment fragment) {
@@ -90,13 +94,15 @@ public abstract class BaseDrawerActivity extends BaseActivity implements Navigat
                 getSupportFragmentManager().popBackStack();
             }
         } else {
-            FragmentManager fm = getSupportFragmentManager();
-            Fragment fragment = getFragmentForDrawerItem(menuItem.getItemId()); // FIXME esto esta mal, se pide una instancia sin saber si realmente se va a insertar
-            if (fm.getBackStackEntryCount() == 0 || !fragment.getClass().getSimpleName().equals(fm.getBackStackEntryAt(fm.getBackStackEntryCount() - 1).getName())) {
-                for (int i = 0; i < fm.getBackStackEntryCount(); i++) {
-                    fm.popBackStackImmediate();
+            Fragment fragment = getFragmentForDrawerItem(menuItem.getItemId()); // FIXME es poco eficiente, se pide una instancia sin saber realmente si va a mostrarse
+            if (fragment != null) {
+                FragmentManager fm = getSupportFragmentManager();
+                if (fm.getBackStackEntryCount() == 0 || !fragment.getClass().getSimpleName().equals(fm.getBackStackEntryAt(fm.getBackStackEntryCount() - 1).getName())) {
+                    for (int i = 0; i < fm.getBackStackEntryCount(); i++) {
+                        fm.popBackStackImmediate();
+                    }
+                    start(fragment, true);
                 }
-                start(fragment, true);
             }
         }
 
