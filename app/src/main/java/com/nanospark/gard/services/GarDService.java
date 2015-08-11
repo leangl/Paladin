@@ -255,7 +255,7 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
 
         @Override
         protected void setup() throws ConnectionLostException {
-            pin = ioio_.openDigitalOutput(41, false);
+            pin = ioio_.openDigitalOutput(41, true);
         }
 
         @Override
@@ -314,7 +314,6 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
     private void setupRecognizer(File assetsDir) throws IOException {
         // The recognizer can be configured to perform multiple searches
         // of different kind and switch between them
-
         recognizer = defaultSetup()
                 .setAcousticModel(new File(assetsDir, "en-us-ptm"))
                 .setDictionary(new File(assetsDir, "cmudict-en-us.dict"))

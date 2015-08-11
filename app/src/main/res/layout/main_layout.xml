@@ -63,7 +63,7 @@
 
         </RelativeLayout>
 
-        <!--include layout="@layout/divider"/-->
+        <include layout="@layout/divider"/>
 
         <RelativeLayout
             android:id="@+id/stopped_content"
@@ -174,14 +174,14 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/phone"
+                    android:id="@+id/twilio_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Phone Number"
                     android:inputType="phone"
                     android:minWidth="300dp"
                     android:textSize="16sp"
-                    tools:text="+1234567890"/>
+                    android:text="+17155772945"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -195,6 +195,7 @@
                     android:hint="Account SID"
                     android:inputType="text"
                     android:minWidth="300dp"
+                    android:text="AC83aacf8a55784375290210a9eb924ad4"
                     android:textSize="16sp"/>
             </android.support.design.widget.TextInputLayout>
 
@@ -209,6 +210,7 @@
                     android:hint="Auth Token"
                     android:inputType="text"
                     android:minWidth="300dp"
+                    android:text="3f5dab33644d33cacb4bf300194299eb"
                     android:textSize="16sp"/>
             </android.support.design.widget.TextInputLayout>
 

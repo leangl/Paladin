@@ -26,6 +26,7 @@ import com.nanospark.gard.scheluded.BuilderDialogs;
 import com.nanospark.gard.scheluded.BuilderWizardScheluded;
 import com.nanospark.gard.scheluded.Scheluded;
 import com.nanospark.gard.services.GarDService;
+import com.nanospark.gard.twilio.model.Account;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
@@ -57,6 +58,14 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
     private TextView mDoorState;
     @InjectView(R.id.toggle)
     private View mDoorToggle;
+    @InjectView(R.id.twilio_phone)
+    private EditText mTwilioPhone;
+    @InjectView(R.id.twilio_token)
+    private EditText mTwilioToken;
+    @InjectView(R.id.twilio_account)
+    private EditText mTwilioAccount;
+    @InjectView(R.id.twilio_save)
+    private View mTwilioSave;
 
     public static final String SCHELUDED_ONE = "scheludedOne";
     public static final String SCHELUDED_TWO = "scheludedTwo";
@@ -85,7 +94,7 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
         mAlarmOpenReceiver = new AlarmOpenReceiver();
         mAlarmCloseReceiver = new AlarmCloseReceiver();
         registerReceiver(mAlarmOpenReceiver, new IntentFilter(BaseAlarmReceiver.ACTION_OPEN));
-        registerReceiver(mAlarmCloseReceiver,new IntentFilter(BaseAlarmReceiver.ACTION_CLOSE));
+        registerReceiver(mAlarmCloseReceiver, new IntentFilter(BaseAlarmReceiver.ACTION_CLOSE));
 
         mThreshold.setText(DEFAULT_THRESHOLD + "");
         registerReceiver(mUsbReceiver, new IntentFilter(UsbManager.ACTION_USB_ACCESSORY_DETACHED));
@@ -99,6 +108,32 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
 
         loadScheluded(BuilderWizardScheluded.ACTION_OPEN_DOOR);
         loadScheluded(BuilderWizardScheluded.ACTION_CLOSE_DOOR);
+
+        try {
+            Account a = DataStore.getInstance().getObject(Account.class.getSimpleName(), Account.class);
+            mTwilioPhone.setText(a.getPhone());
+            mTwilioAccount.setText(a.getSid());
+            mTwilioToken.setText(a.getToken());
+        } catch (DataStore.ObjectNotFoundException e) {
+        }
+
+        mTwilioSave.setOnClickListener(v -> saveTwilio());
+    }
+
+    private void saveTwilio() {
+        Account account = new Account();
+        account.setPhone(mTwilioPhone.getText().toString());
+        account.setSid(mTwilioAccount.getText().toString());
+        account.setToken(mTwilioToken.getText().toString());
+
+        DataStore.getInstance().putObject(Account.class.getSimpleName(), account);
+
+        if (account.isValid()) {
+            toast("Account saved!");
+        } else {
+            toast("Twilio disabled!");
+        }
+
     }
 
     private void loadScheluded(String key) {
@@ -228,29 +263,26 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
         list.add(scheluded.dayNameSelecteds.toString());
         switch (id) {
             case SCHELUDED_ONE:
-
-                addTextViewContainer(list,mScheludedOneContainer);
+                addTextViewContainer(list, mScheludedOneContainer);
                 break;
             case SCHELUDED_TWO:
-                addTextViewContainer(list,mScheludedTwoContainer);
+                addTextViewContainer(list, mScheludedTwoContainer);
                 break;
-
         }
-
-
     }
-    private void addTextViewContainer(List<String> list, LinearLayout container){
+
+    private void addTextViewContainer(List<String> list, LinearLayout container) {
         container.removeAllViews();
-        for(String text : list){
+        for (String text : list) {
             container.addView(createTextView(text));
         }
     }
-    private TextView createTextView(String text){
+
+    private TextView createTextView(String text) {
         TextView textView = new TextView(this);
         textView.setText(text);
         return textView;
     }
-
 
     private String formattedHour(String value) {
         if (value.length() == 1) {
@@ -258,6 +290,5 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
         }
         return value;
     }
-
 
 }
