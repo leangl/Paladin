@@ -30,6 +30,6 @@
         android:layout_height="20dp"
         android:layout_below="@id/toolbar"
         android:scaleType="fitXY"
-        android:src="@drawable/top_shadow"/>
+        android:src="@drawable/top_shadow_light"/>
 
 </RelativeLayout>

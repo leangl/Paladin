@@ -14,19 +14,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.inject.Inject;
+import com.nanospark.gard.config.TwilioAccount;
+import com.nanospark.gard.config.VoiceRecognitionConfig;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
-import com.nanospark.gard.events.DoorState;
 import com.nanospark.gard.events.DoorToggled;
-import com.nanospark.gard.events.RecognizerLifecycle;
-import com.nanospark.gard.scheluded.AlarmCloseReceiver;
-import com.nanospark.gard.scheluded.AlarmOpenReceiver;
-import com.nanospark.gard.scheluded.BaseAlarmReceiver;
-import com.nanospark.gard.scheluded.BuilderDialogs;
-import com.nanospark.gard.scheluded.BuilderWizardScheluded;
-import com.nanospark.gard.scheluded.Scheluded;
+import com.nanospark.gard.events.VoiceRecognitionEventProducer;
+import com.nanospark.gard.scheduler.DialogBuilder;
+import com.nanospark.gard.scheduler.Schedule;
+import com.nanospark.gard.scheduler.SchedulerWizard;
 import com.nanospark.gard.services.GarDService;
-import com.nanospark.gard.twilio.model.Account;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
@@ -40,9 +38,7 @@ import roboguice.inject.InjectView;
 /**
  * Created by Leandro on 19/7/2015.
  */
-public class MainActivity extends BaseActivity implements BuilderWizardScheluded.BuilderWizardScheludedListener {
-
-    public static final int DEFAULT_THRESHOLD = -40;
+public class MainActivity extends BaseActivity implements SchedulerWizard.BuilderWizardScheludedListener {
 
     @InjectView(R.id.board_led)
     private ImageView mBoardLed;
@@ -67,50 +63,54 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
     @InjectView(R.id.twilio_save)
     private View mTwilioSave;
 
-    public static final String SCHELUDED_ONE = "scheludedOne";
-    public static final String SCHELUDED_TWO = "scheludedTwo";
+    @Inject
+    private Door mDoor;
 
-    private AlarmOpenReceiver mAlarmOpenReceiver;
-    private AlarmCloseReceiver mAlarmCloseReceiver;
-    private LinearLayout mScheludedOneContainer;
-    private LinearLayout mScheludedTwoContainer;
+    public static final String SCHEDULE_ONE = "scheduleOne";
+    public static final String SCHEDULE_TWO = "scheduleTwo";
+
+    private LinearLayout mScheduleOneContainer;
+    private LinearLayout mScheduleTwoContainer;
+
+    private VoiceRecognitionConfig mVoiceConfig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_layout);
 
+        //mDoorState.setText(null);
+        //mDoorToggle.setEnabled(false);
         mDoorToggle.setOnClickListener(v -> {
-            DoorState.getInstance().toggle();
+            mDoor.toggle("Door is in motion");
         });
         mToggleVoiceControl.setOnClickListener(v -> {
-            if (RecognizerLifecycle.State.STARTED == RecognizerLifecycle.getInstance().getCurrentState().state) {
+            if (VoiceRecognitionEventProducer.State.STARTED == VoiceRecognitionEventProducer.getInstance().getCurrentState().state) {
                 GarDService.stopVoiceRecognition();
             } else {
-                start();
+                startVoiceRecognition();
             }
         });
 
-        mAlarmOpenReceiver = new AlarmOpenReceiver();
-        mAlarmCloseReceiver = new AlarmCloseReceiver();
-        registerReceiver(mAlarmOpenReceiver, new IntentFilter(BaseAlarmReceiver.ACTION_OPEN));
-        registerReceiver(mAlarmCloseReceiver, new IntentFilter(BaseAlarmReceiver.ACTION_CLOSE));
+        mVoiceConfig = VoiceRecognitionConfig.getSavedValue();
 
-        mThreshold.setText(DEFAULT_THRESHOLD + "");
-        registerReceiver(mUsbReceiver, new IntentFilter(UsbManager.ACTION_USB_ACCESSORY_DETACHED));
+        mThreshold.setText(mVoiceConfig.getLevel() + "");
+        mOpen.setText(mVoiceConfig.getOpenPhrase());
+        mClose.setText(mVoiceConfig.getClosePhrase());
+
         View buttonOne = findViewById(R.id.cardview);
         View buttonTwo = findViewById(R.id.cardview2);
-        buttonOne.setOnClickListener(v -> handlerScheludedOne());
-        buttonTwo.setOnClickListener(v -> handlerScheludedTwo());
+        buttonOne.setOnClickListener(v -> handlerScheduledOne());
+        buttonTwo.setOnClickListener(v -> handlerScheduledTwo());
 
-        mScheludedOneContainer = (LinearLayout) findViewById(R.id.container_one);
-        mScheludedTwoContainer = (LinearLayout) findViewById(R.id.container_two);
+        mScheduleOneContainer = (LinearLayout) findViewById(R.id.container_one);
+        mScheduleTwoContainer = (LinearLayout) findViewById(R.id.container_two);
 
-        loadScheluded(BuilderWizardScheluded.ACTION_OPEN_DOOR);
-        loadScheluded(BuilderWizardScheluded.ACTION_CLOSE_DOOR);
+        loadSchedule(SCHEDULE_ONE);
+        loadSchedule(SCHEDULE_TWO);
 
         try {
-            Account a = DataStore.getInstance().getObject(Account.class.getSimpleName(), Account.class);
+            TwilioAccount a = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class);
             mTwilioPhone.setText(a.getPhone());
             mTwilioAccount.setText(a.getSid());
             mTwilioToken.setText(a.getToken());
@@ -118,15 +118,17 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
         }
 
         mTwilioSave.setOnClickListener(v -> saveTwilio());
+
+        registerReceiver(mUsbReceiver, new IntentFilter(UsbManager.ACTION_USB_ACCESSORY_DETACHED));
     }
 
     private void saveTwilio() {
-        Account account = new Account();
+        TwilioAccount account = new TwilioAccount();
         account.setPhone(mTwilioPhone.getText().toString());
         account.setSid(mTwilioAccount.getText().toString());
         account.setToken(mTwilioToken.getText().toString());
 
-        DataStore.getInstance().putObject(Account.class.getSimpleName(), account);
+        DataStore.getInstance().putObject(TwilioAccount.class.getSimpleName(), account);
 
         if (account.isValid()) {
             toast("Account saved!");
@@ -136,37 +138,36 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
 
     }
 
-    private void loadScheluded(String key) {
+    private void loadSchedule(String key) {
         try {
-            Scheluded scheluded = DataStore.getInstance().getObject(key, Scheluded.class);
-            populateListView(scheluded.name, scheluded);
+            Schedule schedule = DataStore.getInstance().getObject(key, Schedule.class);
+            populateListView(schedule.name, schedule);
         } catch (DataStore.ObjectNotFoundException e1) {
-            e1.printStackTrace();
         }
     }
 
-    private void handlerScheludedOne() {
-        BuilderWizardScheluded handlerScheluded = new BuilderWizardScheluded(this, SCHELUDED_ONE);
-        handlerScheluded.setListener(this);
-        BuilderDialogs.builderDesiredAction(this, handlerScheluded);
+    private void handlerScheduledOne() {
+        SchedulerWizard handlerScheduled = new SchedulerWizard(this, SCHEDULE_ONE);
+        handlerScheduled.setListener(this);
+        DialogBuilder.buildDesiredActions(this, handlerScheduled);
 
     }
 
-    private void handlerScheludedTwo() {
-        BuilderWizardScheluded handlerScheluded = new BuilderWizardScheluded(this, SCHELUDED_TWO);
-        handlerScheluded.setListener(this);
-        BuilderDialogs.builderDesiredAction(this, handlerScheluded);
+    private void handlerScheduledTwo() {
+        SchedulerWizard handlerScheduled = new SchedulerWizard(this, SCHEDULE_TWO);
+        handlerScheduled.setListener(this);
+        DialogBuilder.buildDesiredActions(this, handlerScheduled);
     }
 
     @Subscribe
-    public void onStateChange(RecognizerLifecycle.State state) {
-        if (state.state == RecognizerLifecycle.State.STARTED) {
+    public void onStateChange(VoiceRecognitionEventProducer.State state) {
+        if (state.state == VoiceRecognitionEventProducer.State.STARTED) {
             stopLoading();
             mToggleVoiceControl.setText("Stop");
             mThreshold.setEnabled(false);
             mOpen.setEnabled(false);
             mClose.setEnabled(false);
-        } else if (state.state == RecognizerLifecycle.State.STOPPED || state.state == RecognizerLifecycle.State.ERROR) {
+        } else if (state.state == VoiceRecognitionEventProducer.State.STOPPED || state.state == VoiceRecognitionEventProducer.State.ERROR) {
             stopLoading();
             mToggleVoiceControl.setText("Start");
             mThreshold.setEnabled(true);
@@ -182,37 +183,44 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
         } else {
             mDoorState.setText("CLOSED");
         }
+        mDoorToggle.setEnabled(true);
     }
 
     @Subscribe
     public void on(BoardConnected event) {
-        mBoardLed.setImageResource(R.drawable.led_green);
+        mBoardLed.setImageResource(R.drawable.led_on);
     }
 
     @Subscribe
     public void on(BoardDisconnected event) {
         mBoardLed.setImageResource(R.drawable.led_off);
+        //mDoorState.setText(null);
+        //mDoorToggle.setEnabled(false);
     }
 
-    public void start() {
+    private void startVoiceRecognition() {
         showLoading(false, "Starting voice recognition...");
-        int power = DEFAULT_THRESHOLD;
+        int level = VoiceRecognitionConfig.DEFAULT_LEVEL;
         try {
-            power = Integer.parseInt(mThreshold.getText().toString());
+            level = Integer.parseInt(mThreshold.getText().toString());
         } catch (NumberFormatException e) {
-            toast("Wrong threshold format! Using default value: 40");
+            mThreshold.setText(level + "");
+            toast("Wrong threshold format! Using default value: -40");
         }
-        double threshold = Math.pow(10, power);
+        String openPhrase = mOpen.getText().toString().toLowerCase();
+        String closePhrase = mClose.getText().toString().toLowerCase();
 
-        GarDService.startVoiceRecognition((float) threshold, mOpen.getText().toString().toLowerCase(), mClose.getText().toString().toLowerCase());
+        mVoiceConfig = new VoiceRecognitionConfig(level, openPhrase, closePhrase);
+        mVoiceConfig.save();
+
+        double threshold = Math.pow(10, level);
+        GarDService.startVoiceRecognition((float) threshold, openPhrase, closePhrase);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mUsbReceiver);
-        unregisterReceiver(mAlarmOpenReceiver);
-        unregisterReceiver(mAlarmCloseReceiver);
     }
 
     @Override
@@ -251,22 +259,22 @@ public class MainActivity extends BaseActivity implements BuilderWizardScheluded
     }
 
     @Override
-    public void onSuccess(String id, Scheluded scheluded) {
-        populateListView(id, scheluded);
+    public void onSuccess(String id, Schedule scheduled) {
+        populateListView(id, scheduled);
     }
 
-    private void populateListView(String id, Scheluded scheluded) {
+    private void populateListView(String id, Schedule scheduled) {
         List<String> list = new ArrayList<>();
         String[] desiredActions = getResources().getStringArray(R.array.desiredActions);
-        list.add(scheluded.action.contains("open") ? desiredActions[0] : desiredActions[1]);
-        list.add(formattedHour(String.valueOf(scheluded.hourOfDay)) + ":" + formattedHour(String.valueOf(scheluded.minute)));
-        list.add(scheluded.dayNameSelecteds.toString());
+        list.add(scheduled.action.contains("open") ? desiredActions[0] : desiredActions[1]);
+        list.add(formattedHour(String.valueOf(scheduled.hourOfDay)) + ":" + formattedHour(String.valueOf(scheduled.minute)));
+        list.add(scheduled.dayNameSelecteds.toString());
         switch (id) {
-            case SCHELUDED_ONE:
-                addTextViewContainer(list, mScheludedOneContainer);
+            case SCHEDULE_ONE:
+                addTextViewContainer(list, mScheduleOneContainer);
                 break;
-            case SCHELUDED_TWO:
-                addTextViewContainer(list, mScheludedTwoContainer);
+            case SCHEDULE_TWO:
+                addTextViewContainer(list, mScheduleTwoContainer);
                 break;
         }
     }

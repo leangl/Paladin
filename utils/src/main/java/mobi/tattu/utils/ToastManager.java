@@ -89,7 +89,7 @@ public class ToastManager {
             toast.setView(layout);
             reference.toast = toast;
         } else {
-            reference.toast = Toast.makeText(Tattu.context, toastText, Toast.LENGTH_SHORT);
+            reference.toast = Toast.makeText(Tattu.context, toastText, duration >= LONG_DURATION ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
         }
 
         if (reference.group != NOT_GROUPED) {

@@ -9,7 +9,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Singleton;
-import com.nanospark.gard.twilio.model.Account;
+import com.nanospark.gard.config.TwilioAccount;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -54,7 +54,7 @@ public class MessagesClient {
 
     private RequestInterceptor mBasicAuthInterceptor = request -> {
         try {
-            Account account = DataStore.getInstance().getObject(Account.class.getSimpleName(), Account.class);
+            TwilioAccount account = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class);
             String credentials = account.getSid() + ":" + account.getToken();
             String string = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
             request.addHeader("Authorization", string);
@@ -73,13 +73,13 @@ public class MessagesClient {
      */
     public Observable<JsonObject> getNewMessage() {
         try {
-            Account account = DataStore.getInstance().getObject(Account.class.getSimpleName(), Account.class);
+            TwilioAccount account = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class);
             if (!account.isValid()) {
                 Log.i("TWILIO", "Account not set!");
                 return Observable.error(new Exception());
             }
 
-            return mApi.getMessages(account.getSid()).map(response -> {
+            return mApi.getMessages(account.getSid(), account.getPhone()).map(response -> {
                 JsonArray messages = response.getAsJsonObject().getAsJsonArray("messages");
                 if (messages.size() > 0) {
                     for (JsonElement message : messages) {

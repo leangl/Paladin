@@ -1,4 +1,4 @@
-package com.nanospark.gard.twilio.model;
+package com.nanospark.gard.config;
 
 import java.io.Serializable;
 
@@ -7,7 +7,7 @@ import mobi.tattu.utils.StringUtils;
 /**
  * Created by Leandro on 10/8/2015.
  */
-public class Account implements Serializable {
+public class TwilioAccount implements Serializable {
 
     private String phone;
     private String sid;

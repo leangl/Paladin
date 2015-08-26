@@ -4,17 +4,20 @@ import android.app.Notification;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.NotificationCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.inject.Inject;
 import com.nanospark.gard.GarD;
 import com.nanospark.gard.R;
+import com.nanospark.gard.config.VoiceRecognitionConfig;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
-import com.nanospark.gard.events.DoorState;
+import com.nanospark.gard.Door;
+import com.nanospark.gard.events.DoorActivation;
 import com.nanospark.gard.events.DoorToggled;
 import com.nanospark.gard.events.PhraseRecognized;
-import com.nanospark.gard.events.RecognizerLifecycle;
+import com.nanospark.gard.events.VoiceRecognitionEventProducer;
 import com.nanospark.gard.twilio.MessagesClient;
 import com.squareup.otto.Subscribe;
 
@@ -26,13 +29,16 @@ import edu.cmu.pocketsphinx.Assets;
 import edu.cmu.pocketsphinx.Hypothesis;
 import edu.cmu.pocketsphinx.RecognitionListener;
 import edu.cmu.pocketsphinx.SpeechRecognizer;
+import ioio.lib.api.DigitalInput;
 import ioio.lib.api.DigitalOutput;
 import ioio.lib.api.exception.ConnectionLostException;
 import ioio.lib.util.BaseIOIOLooper;
 import ioio.lib.util.IOIOLooper;
 import ioio.lib.util.IOIOLooperProvider;
 import ioio.lib.util.android.IOIOAndroidApplicationHelper;
+import mobi.tattu.utils.StringUtils;
 import mobi.tattu.utils.Tattu;
+import mobi.tattu.utils.ToastManager;
 import mobi.tattu.utils.image.AsyncTask;
 import mobi.tattu.utils.services.BaseService;
 
@@ -47,10 +53,12 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
     public static final String KEY_CLOSE = "close";
 
     public static final String KEY_THRESHOLD = "threshold";
-    public static final float DEFAULT_THRESHOLD = 1e-40f;
-    public static final String VOICE_RECOGNITION = "VOICE_RECOGNITION";
+
+    public static final String START_VOICE_RECOGNITION = "START_VOICE_RECOGNITION";
     public static final String STOP_VOICE_RECOGNITION = "STOP_VOICE_RECOGNITION";
 
+    public static final int OUTPUT_PIN = 2;
+    public static final int INPUT_PIN = 4;
 
     // current key = [KEY_OPEN|KEY_CLOSE]
     private String currentKey;
@@ -67,11 +75,14 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
     private String closePhrase;
 
     @Inject
-    private MessagesClient mClient;
+    private Door mDoor;
 
+    @Inject
+    private MessagesClient mClient;
     private Handler smsHandler;
 
-    private DigitalOutput pin;
+    private DigitalOutput outputPin;
+    private DigitalInput inputPin;
     private boolean activatePin;
 
     private IOIOAndroidApplicationHelper ioioHelper;
@@ -92,7 +103,7 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
                 if (message != null) {
                     // check if the body matches the current door status
                     if (currentKey.toLowerCase().equals(message.get("body").getAsString().toLowerCase())) {
-                        DoorState.getInstance().toggle();
+                        mDoor.toggle("Message received, door is in motion");
                     }
                 }
                 // Reschedule message log check
@@ -134,7 +145,7 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
         if (recognizer != null) {
             recognizer.cancel();
             recognizer.shutdown();
-            setCurrentState(RecognizerLifecycle.State.STOPPED);
+            setCurrentState(VoiceRecognitionEventProducer.State.STOPPED);
         }
     }
 
@@ -143,7 +154,7 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
         super.onStartCommand(intent, flags, startId);
         if (!started) {
             started = true;
-            ioioHelper.start();
+            //ioioHelper.start();
 
             mNotification = new NotificationCompat.Builder(GarDService.this)
                     .setContentTitle("GarD is active")
@@ -158,7 +169,7 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
 
         if (intent != null && intent.getAction() != null) {
             switch (intent.getAction()) {
-                case VOICE_RECOGNITION:
+                case START_VOICE_RECOGNITION:
                     startVoiceRecognitionInternal(intent);
                     break;
                 case STOP_VOICE_RECOGNITION:
@@ -172,7 +183,7 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
 
     private void startVoiceRecognitionInternal(Intent intent) {
         // Get setup parameters (recognition threshold and open/close phrases)
-        threshold = intent.getFloatExtra(KEY_THRESHOLD, DEFAULT_THRESHOLD);
+        threshold = intent.getFloatExtra(KEY_THRESHOLD, VoiceRecognitionConfig.DEFAULT_THRESHOLD);
         openPhrase = intent.getStringExtra(KEY_OPEN);
         if (openPhrase == null || openPhrase.trim().length() == 0) {
             openPhrase = getString(R.string.default_open);
@@ -199,12 +210,12 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
             @Override
             protected void onPostExecute(Exception e) {
                 if (e != null) {
-                    setCurrentState(RecognizerLifecycle.State.ERROR);
+                    setCurrentState(VoiceRecognitionEventProducer.State.ERROR);
                     stopSelf();
                     toast("Error, unrecognized word entered.");
                 } else {
-                    switchPhrase(DoorState.getInstance().isOpened());
-                    setCurrentState(RecognizerLifecycle.State.STARTED);
+                    switchPhrase(mDoor.isOpened());
+                    setCurrentState(VoiceRecognitionEventProducer.State.STARTED);
                 }
             }
         }.execute((Void) null);
@@ -212,6 +223,7 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
 
     @Subscribe
     public void on(BoardConnected e) {
+        //toast("Board connected!");
         if (!ioioStarted) {
             ioioHelper.start();
             ioioStarted = true;
@@ -221,15 +233,19 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
     }
 
     @Subscribe
+    public void on(DoorActivation event) {
+        activatePin = true;
+        toast(event.message);
+    }
+
+    @Subscribe
     public void on(DoorToggled event) {
         switchPhrase(event.opened);
-        activatePin = true;
-        toast("Door is in motion");
     }
 
     @Subscribe
     public void on(PhraseRecognized event) {
-        DoorState.getInstance().toggle();
+        mDoor.toggle("Command heard, door is in motion");
     }
 
     private void switchPhrase(boolean opened) {
@@ -253,25 +269,29 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
 
     private class Looper extends BaseIOIOLooper {
 
+        private Boolean lastState;
+
         @Override
         protected void setup() throws ConnectionLostException {
-            pin = ioio_.openDigitalOutput(41, true);
+            outputPin = ioio_.openDigitalOutput(OUTPUT_PIN, true);
+            inputPin = ioio_.openDigitalInput(INPUT_PIN, DigitalInput.Spec.Mode.PULL_DOWN);
         }
 
         @Override
         public void loop() throws ConnectionLostException, InterruptedException {
             if (activatePin) {
                 activatePin = false;
-
                 // high for 2 seconds and then low again
-                pin.write(false);
-                //toast("High!");
-                Thread.sleep(2000);
-                pin.write(true);
+                outputPin.write(false);
                 //toast("Low!");
-                //Thread.sleep(2000);
+                Thread.sleep(2000);
+                outputPin.write(true);
             } else {
-                //toast("Waiting");
+                boolean state = inputPin.read(); // true is closed
+                if (lastState == null || !lastState.equals(state)) {
+                    lastState = state;
+                    mDoor.confirm(!state);
+                }
                 Thread.sleep(200);
             }
         }
@@ -289,7 +309,7 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
 
     public static void startVoiceRecognition(float threshold, String openPhrase, String closePhrase) {
         Intent i = new Intent(GarD.instance, GarDService.class);
-        i.setAction(VOICE_RECOGNITION);
+        i.setAction(START_VOICE_RECOGNITION);
         i.putExtra(KEY_THRESHOLD, threshold);
         i.putExtra(KEY_OPEN, openPhrase);
         i.putExtra(KEY_CLOSE, closePhrase);
@@ -330,7 +350,7 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
     }
 
     private void setCurrentState(int state) {
-        RecognizerLifecycle.getInstance().setState(state);
+        VoiceRecognitionEventProducer.getInstance().setState(state);
     }
 
     /**
@@ -372,7 +392,7 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
 
     @Override
     public void onError(Exception error) {
-        setCurrentState(RecognizerLifecycle.State.ERROR);
+        setCurrentState(VoiceRecognitionEventProducer.State.ERROR);
     }
 
     @Override
@@ -382,10 +402,11 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
     private Toast toast;
 
     public void toast(String message) {
-        Tattu.runOnUiThread(() -> {
-            if (toast != null) toast.cancel();
-            toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
-            toast.show();
-        });
+        if (StringUtils.isNotBlank(message)) {
+            Tattu.runOnUiThread(() -> {
+                Log.i("GarD", message);
+                ToastManager.get().showToast(message, 10000, 1);
+            });
+        }
     }
 }

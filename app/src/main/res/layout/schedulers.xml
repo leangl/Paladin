@@ -23,7 +23,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="10dp"
-                android:text="Scheluder One"
+                android:text="Scheduler One"
                 android:textColor="@color/black"
                 android:textSize="16sp"/>
 

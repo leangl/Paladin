@@ -1,5 +1,7 @@
 package mobi.tattu.utils.activities;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -10,6 +12,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
 
 import mobi.tattu.utils.R;
 
@@ -37,6 +40,7 @@ public abstract class BaseDrawerActivity extends BaseActivity implements Navigat
 
         mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
         mNavigationView.setNavigationItemSelectedListener(this);
+        ((ListView) mNavigationView.getChildAt(0)).setSelector(new ColorDrawable(Color.TRANSPARENT));
 
         fm.addOnBackStackChangedListener(() -> {
             if (fm.getBackStackEntryCount() == 0) {

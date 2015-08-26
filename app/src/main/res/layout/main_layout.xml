@@ -18,8 +18,8 @@
 
             <ImageView
                 android:id="@+id/board_led"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:layout_margin="10dp"
@@ -115,8 +115,8 @@
                     android:inputType="text"
                     android:maxLength="40"
                     android:minWidth="300dp"
-                    android:text="@string/default_open"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp"
+                    tools:text="@string/default_open"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -134,8 +134,8 @@
                     android:inputType="text"
                     android:maxLength="40"
                     android:minWidth="300dp"
-                    android:text="@string/default_close"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp"
+                    tools:text="@string/default_close"/>
             </android.support.design.widget.TextInputLayout>
 
             <Button
@@ -154,7 +154,7 @@
         <include layout="@layout/divider"/>
 
         <include
-            layout="@layout/activity_main"
+            layout="@layout/schedulers"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
@@ -180,8 +180,8 @@
                     android:hint="Phone Number"
                     android:inputType="phone"
                     android:minWidth="300dp"
-                    android:textSize="16sp"
-                    android:text="+17155772945"/>
+                    android:text="+17155772945"
+                    android:textSize="16sp"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout

@@ -1,4 +1,4 @@
-package com.nanospark.gard.scheluded;
+package com.nanospark.gard.scheduler;
 
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -12,13 +12,12 @@ import java.util.Calendar;
 /**
  * Created by cristian on 09/08/15.
  */
-public  class TimePickerFragment extends DialogFragment
-        implements TimePickerDialog.OnTimeSetListener {
+public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
     private TimePickerFragmentListener mListener;
     private TimePickerDialog mTimePickerDialog;
     private boolean callListener = true;
 
-    public void setTimePickerFragmentListener(TimePickerFragmentListener listener){
+    public void setTimePickerFragmentListener(TimePickerFragmentListener listener) {
         this.mListener = listener;
     }
     @Override
@@ -27,15 +26,19 @@ public  class TimePickerFragment extends DialogFragment
         final Calendar c = Calendar.getInstance();
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int minute = c.get(Calendar.MINUTE);
-        mTimePickerDialog= new TimePickerDialog(getActivity(), this, hour, minute,
+        mTimePickerDialog = new TimePickerDialog(getActivity(), this, hour, minute,
                 DateFormat.is24HourFormat(getActivity()));
+
+        mTimePickerDialog.setOnCancelListener(dialog -> {
+            dialog.dismiss();
+        });
 
         return mTimePickerDialog;
     }
 
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        if(callListener == true){
-            this.mListener.onTimeSet(view,hourOfDay,minute);
+        if (callListener == true) {
+            this.mListener.onTimeSet(view, hourOfDay, minute);
             callListener = false;
         }
     }

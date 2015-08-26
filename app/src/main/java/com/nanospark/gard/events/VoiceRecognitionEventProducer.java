@@ -7,18 +7,18 @@ import mobi.tattu.utils.Tattu;
 /**
  * Created by Leandro on 21/7/2015.
  */
-public class RecognizerLifecycle {
+public class VoiceRecognitionEventProducer {
 
-    private static RecognizerLifecycle instance;
+    private static VoiceRecognitionEventProducer instance;
     private State currentState = new State(State.STOPPED);
 
-    private RecognizerLifecycle() {
+    private VoiceRecognitionEventProducer() {
         Tattu.register(this);
     }
 
-    public static final RecognizerLifecycle getInstance() {
+    public static final VoiceRecognitionEventProducer getInstance() {
         if (instance == null) {
-            instance = new RecognizerLifecycle();
+            instance = new VoiceRecognitionEventProducer();
         }
         return instance;
     }

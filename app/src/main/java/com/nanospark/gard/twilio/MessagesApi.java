@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 
 import retrofit.http.GET;
 import retrofit.http.Path;
+import retrofit.http.Query;
 import rx.Observable;
 
 /**
@@ -12,6 +13,6 @@ import rx.Observable;
 public interface MessagesApi {
 
     @GET("/2010-04-01/Accounts/{AccountSid}/Messages.json")
-    Observable<JsonElement> getMessages(@Path("AccountSid") String accountSid);
+    Observable<JsonElement> getMessages(@Path("AccountSid") String accountSid, @Query("To") String to);
 
 }

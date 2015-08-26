@@ -104,7 +104,7 @@ public class BaseFragment extends RoboFragment implements BaseActivity.OnBackLis
     }
 
     protected void showLoading() {
-        showLoading(true);
+        showLoading(false);
     }
 
     protected void showLoading(boolean cancelable) {
