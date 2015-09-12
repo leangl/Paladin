@@ -5,15 +5,14 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.inject.Inject;
+import com.nanospark.gard.Door;
 import com.nanospark.gard.GarD;
 import com.nanospark.gard.R;
 import com.nanospark.gard.config.VoiceRecognitionConfig;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
-import com.nanospark.gard.Door;
 import com.nanospark.gard.events.DoorActivation;
 import com.nanospark.gard.events.DoorToggled;
 import com.nanospark.gard.events.PhraseRecognized;
@@ -102,9 +101,28 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
                 // if new message is received
                 if (message != null) {
                     // check if the body matches the current door status
-                    if (currentKey.toLowerCase().equals(message.get("body").getAsString().toLowerCase())) {
+                    String body = message.get("body").getAsString();
+                    String from = message.get("from").getAsString();
+                    String replyMessage = null;
+                    if (currentKey.equalsIgnoreCase(body)) {
                         mDoor.toggle("Message received, door is in motion");
+                        if (KEY_OPEN.equalsIgnoreCase(body)) {
+                            replyMessage = "Open door command received.";
+                        } else {
+                            replyMessage = "Close door command received.";
+                        }
+                    } else {
+                        if (KEY_OPEN.equalsIgnoreCase(body)) {
+                            replyMessage = "The door is already open.";
+                        } else {
+                            replyMessage = "The door is already closed.";
+                        }
                     }
+                    mClient.sendMessage(replyMessage, from).subscribe(success -> {
+                        Log.i("TWILIO", "Reply sent successfully");
+                    }, error -> {
+                        Log.e("TWILIO", "Error sending reply.", error);
+                    });
                 }
                 // Reschedule message log check
                 if (smsHandler != null) {
@@ -370,11 +388,13 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
     public void onResult(Hypothesis hypothesis) {
     }
 
-    public void showHypothesis(Hypothesis hypothesis) {
+    private void showHypothesis(Hypothesis hypothesis) {
         if (hypothesis != null) {
             String text = hypothesis.getHypstr();
             if (text.equals(openPhrase) || text.equals(closePhrase)) {
                 Tattu.post(new PhraseRecognized(text));
+                recognizer.stop();
+                recognizer.startListening(currentKey);
             }
         }
     }
@@ -398,8 +418,6 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
     @Override
     public void onTimeout() {
     }
-
-    private Toast toast;
 
     public void toast(String message) {
         if (StringUtils.isNotBlank(message)) {

@@ -59,10 +59,28 @@ public class MessagesClient {
             String string = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
             request.addHeader("Authorization", string);
         } catch (DataStore.ObjectNotFoundException e) {
-            Log.i("TWILIO", "Account not set!");
+            Log.e("TWILIO", "Account not set!");
         }
 
     };
+
+    public Observable<Void> sendMessage(String message, String to) {
+        try {
+            TwilioAccount account = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class);
+            if (!account.isValid()) {
+                Log.e("TWILIO", "Account not set!");
+                return Observable.error(new Exception());
+            }
+
+            return mApi.sendMessage(account.getSid(), message, account.getPhone(), to).map(result -> {
+                Log.i("TWILIO", "Messages sent: " + message + " to " + to);
+                return null;
+            });
+        } catch (DataStore.ObjectNotFoundException e) {
+            Log.e("TWILIO", "Account not set!");
+            return Observable.error(new Exception());
+        }
+    }
 
     /**
      * Returns the last new message received since the last check.
@@ -75,7 +93,7 @@ public class MessagesClient {
         try {
             TwilioAccount account = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class);
             if (!account.isValid()) {
-                Log.i("TWILIO", "Account not set!");
+                Log.e("TWILIO", "Account not set!");
                 return Observable.error(new Exception());
             }
 
@@ -113,7 +131,7 @@ public class MessagesClient {
                 return null;
             });
         } catch (DataStore.ObjectNotFoundException e) {
-            Log.i("TWILIO", "Account not set!");
+            Log.e("TWILIO", "Account not set!");
             return Observable.error(new Exception());
         }
     }

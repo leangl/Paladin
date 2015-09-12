@@ -180,13 +180,14 @@
                     android:hint="Phone Number"
                     android:inputType="phone"
                     android:minWidth="300dp"
-                    android:text="+17155772945"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp"
+                    tools:text="+17155772945"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:visibility="gone">
 
                 <EditText
                     android:id="@+id/twilio_account"
@@ -201,7 +202,8 @@
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:visibility="gone">
 
                 <EditText
                     android:id="@+id/twilio_token"
