@@ -263,6 +263,12 @@ public class MainActivity extends BaseActivity implements SchedulerWizard.Builde
         populateListView(id, scheduled);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        GarDService.start(); // restart ioio
+    }
+
     private void populateListView(String id, Schedule scheduled) {
         List<String> list = new ArrayList<>();
         String[] desiredActions = getResources().getStringArray(R.array.desiredActions);

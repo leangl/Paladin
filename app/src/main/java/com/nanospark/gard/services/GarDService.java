@@ -140,8 +140,6 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
     public void onCreate() {
         super.onCreate();
         smsHandler = new Handler();
-        ioioHelper = new IOIOAndroidApplicationHelper(this, this);
-        ioioHelper.create();
     }
 
     @Override
@@ -153,10 +151,7 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
             smsHandler.removeCallbacksAndMessages(null);
             smsHandler = null;
         }
-        if (ioioHelper != null) {
-            ioioHelper.stop();
-            ioioHelper.destroy();
-        }
+
     }
 
     private void stopVoiceRecognitionInternal() {
@@ -172,7 +167,6 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
         super.onStartCommand(intent, flags, startId);
         if (!started) {
             started = true;
-            //ioioHelper.start();
 
             mNotification = new NotificationCompat.Builder(GarDService.this)
                     .setContentTitle("GarD is active")
@@ -184,6 +178,8 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
             smsHandler.removeCallbacksAndMessages(null);
             smsHandler.postDelayed(checkMessages, MESSAGES_CHECK_TIME);
         }
+
+        startIOIO();
 
         if (intent != null && intent.getAction() != null) {
             switch (intent.getAction()) {
@@ -242,11 +238,22 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
     @Subscribe
     public void on(BoardConnected e) {
         //toast("Board connected!");
-        if (!ioioStarted) {
-            ioioHelper.start();
-            ioioStarted = true;
-        } else {
-            ioioHelper.restart();
+        //startIOIO();
+    }
+
+    private void startIOIO() {
+        stopIOIO();
+
+        ioioHelper = new IOIOAndroidApplicationHelper(this, this);
+        ioioHelper.create();
+        ioioHelper.start();
+    }
+
+    private void stopIOIO() {
+        if (ioioHelper != null) {
+            ioioHelper.stop();
+            ioioHelper.destroy();
+            ioioHelper = null;
         }
     }
 
@@ -291,8 +298,9 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
 
         @Override
         protected void setup() throws ConnectionLostException {
-            outputPin = ioio_.openDigitalOutput(OUTPUT_PIN, true);
+            outputPin = ioio_.openDigitalOutput(OUTPUT_PIN, false);
             inputPin = ioio_.openDigitalInput(INPUT_PIN, DigitalInput.Spec.Mode.PULL_DOWN);
+            Tattu.post(new BoardConnected());
         }
 
         @Override
@@ -300,10 +308,9 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
             if (activatePin) {
                 activatePin = false;
                 // high for 2 seconds and then low again
-                outputPin.write(false);
-                //toast("Low!");
-                Thread.sleep(2000);
                 outputPin.write(true);
+                Thread.sleep(2000);
+                outputPin.write(false);
             } else {
                 boolean state = inputPin.read(); // true is closed
                 if (lastState == null || !lastState.equals(state)) {

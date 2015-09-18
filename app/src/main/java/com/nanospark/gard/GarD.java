@@ -5,7 +5,6 @@ import android.app.Application;
 import com.nanospark.gard.events.VoiceRecognitionEventProducer;
 import com.nanospark.gard.scheduler.Schedule;
 import com.nanospark.gard.scheduler.SchedulerWizard;
-import com.nanospark.gard.services.GarDService;
 
 import java.util.Set;
 
@@ -35,7 +34,7 @@ public class GarD extends Application {
         Door.getInstance(); // force initialization
         VoiceRecognitionEventProducer.getInstance(); // force initialization
 
-        GarDService.start();
+        //GarDService.start();
 
         Set<Schedule> schedules = DataStore.getInstance().getAll(Schedule.class);
         for (Schedule schedule : schedules) {
