@@ -61,12 +61,9 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
 
     // current key = [KEY_OPEN|KEY_CLOSE]
     private String currentKey;
-    private String currentPhrase;
 
     // service started flag
     private boolean started;
-    // ioio connection started flag
-    private boolean ioioStarted = false;
 
     private SpeechRecognizer recognizer;
     private float threshold;
@@ -276,10 +273,8 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
     private void switchPhrase(boolean opened) {
         if (opened) {
             currentKey = KEY_CLOSE;
-            currentPhrase = closePhrase;
         } else {
             currentKey = KEY_OPEN;
-            currentPhrase = openPhrase;
         }
         if (recognizer != null) {
             recognizer.stop();
@@ -362,7 +357,6 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
         recognizer = defaultSetup()
                 .setAcousticModel(new File(assetsDir, "en-us-ptm"))
                 .setDictionary(new File(assetsDir, "cmudict-en-us.dict"))
-                        //.setRawLogDir(assetsDir) // To disable logging of raw audio comment out this call (takes a lot of space on the device)
                 .setKeywordThreshold(threshold) // Threshold to tune for keyphrase to balance between false alarms and misses
                 .setBoolean("-allphone_ci", true) // Use context-independent phonetic search, context-dependent is too slow for mobile
                 .getRecognizer();
