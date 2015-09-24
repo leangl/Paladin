@@ -27,7 +27,6 @@ import com.nanospark.gard.scheduler.DialogBuilder;
 import com.nanospark.gard.scheduler.Schedule;
 import com.nanospark.gard.scheduler.SchedulerWizard;
 import com.nanospark.gard.services.GarDService;
-import com.nanospark.gard.ui.custom.BaseActivity;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
@@ -40,7 +39,7 @@ import roboguice.inject.InjectView;
 /**
  * Created by Leandro on 19/7/2015.
  */
-public class MainActivity extends BaseActivity implements SchedulerWizard.BuilderWizardScheludedListener {
+public class MainActivity extends mobi.tattu.utils.activities.BaseActivity implements SchedulerWizard.BuilderWizardScheludedListener {
 
     @InjectView(R.id.board_led)
     private ImageView mBoardLed;
@@ -204,6 +203,7 @@ public class MainActivity extends BaseActivity implements SchedulerWizard.Builde
         showLoading(false, "Starting voice recognition...");
         int level = VoiceRecognitionConfig.DEFAULT_LEVEL;
         try {
+            //todo mThreshold - 40 por defualt
             level = Integer.parseInt(mThreshold.getText().toString());
         } catch (NumberFormatException e) {
             mThreshold.setText(level + "");
