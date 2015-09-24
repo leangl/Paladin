@@ -3,4 +3,21 @@
 
     <string name="default_open">oh mighty computer</string>
     <string name="default_close">goodbye garage door</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="title_toolbar">@string/app_name</string>
+    <string name="title_users">Users</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_schedules">Schedules</string>
+    <string name="title_main">Main</string>
+    <string name="door_one_label">Door 1</string>
+    <string name="door_two_label">Door 2</string>
+    <string name="door_one_label_two_points">Door 1:</string>
+    <string name="door_two_label_two_points">Door 2:</string>
+    <string name="open_label">Open:</string>
+    <string name="close_label">Close:</string>
+    <string name="status_label">Status</string>
+    <string name="voice_label">Voice</string>
 </resources>

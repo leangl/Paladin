@@ -1,4 +1,4 @@
-package com.nanospark.gard;
+package com.nanospark.gard.ui;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,6 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.inject.Inject;
+import com.nanospark.gard.Door;
+import com.nanospark.gard.R;
 import com.nanospark.gard.config.TwilioAccount;
 import com.nanospark.gard.config.VoiceRecognitionConfig;
 import com.nanospark.gard.events.BoardConnected;
@@ -25,13 +27,13 @@ import com.nanospark.gard.scheduler.DialogBuilder;
 import com.nanospark.gard.scheduler.Schedule;
 import com.nanospark.gard.scheduler.SchedulerWizard;
 import com.nanospark.gard.services.GarDService;
+import com.nanospark.gard.ui.custom.BaseActivity;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import mobi.tattu.utils.Tattu;
-import mobi.tattu.utils.activities.BaseActivity;
 import mobi.tattu.utils.persistance.datastore.DataStore;
 import roboguice.inject.InjectView;
 

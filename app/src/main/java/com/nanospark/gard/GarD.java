@@ -5,6 +5,7 @@ import android.app.Application;
 import com.nanospark.gard.events.VoiceRecognitionEventProducer;
 import com.nanospark.gard.scheduler.Schedule;
 import com.nanospark.gard.scheduler.SchedulerWizard;
+import com.nanospark.gard.ui.MainActivity;
 
 import java.util.Set;
 

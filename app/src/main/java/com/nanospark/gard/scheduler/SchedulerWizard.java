@@ -7,7 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.widget.TimePicker;
 
-import com.nanospark.gard.MainActivity;
+import com.nanospark.gard.ui.MainActivity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
