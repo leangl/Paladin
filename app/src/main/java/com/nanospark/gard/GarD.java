@@ -32,7 +32,8 @@ public class GarD extends Application {
 
         instance = this;
 
-        Door.getInstance(); // force initialization
+        Door.getInstance(1); // force initialization
+        Door.getInstance(2); // force initialization
         VoiceRecognitionEventProducer.getInstance(); // force initialization
 
         //GarDService.start();

@@ -71,7 +71,9 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
     private String closePhrase;
 
     @Inject
-    private Door mDoor;
+    private Door.One mDoorOne;
+    @Inject
+    private Door.Two mDoorTwo;
 
     @Inject
     private MessagesClient mClient;
@@ -102,7 +104,7 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
                     String from = message.get("from").getAsString();
                     String replyMessage = null;
                     if (currentKey.equalsIgnoreCase(body)) {
-                        mDoor.toggle("Message received, door is in motion");
+                        mDoorOne.toggle("Message received, door is in motion");
                         if (KEY_OPEN.equalsIgnoreCase(body)) {
                             replyMessage = "Open door command received.";
                         } else {
@@ -225,7 +227,7 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
                     stopSelf();
                     toast("Error, unrecognized word entered.");
                 } else {
-                    switchPhrase(mDoor.isOpened());
+                    switchPhrase(mDoorOne.isOpened());
                     setCurrentState(VoiceRecognitionEventProducer.State.STARTED);
                 }
             }
@@ -267,7 +269,7 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
 
     @Subscribe
     public void on(PhraseRecognized event) {
-        mDoor.toggle("Command heard, door is in motion");
+        mDoorOne.toggle("Command heard, door is in motion");
     }
 
     private void switchPhrase(boolean opened) {
@@ -310,7 +312,7 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
                 boolean state = inputPin.read(); // true is closed
                 if (lastState == null || !lastState.equals(state)) {
                     lastState = state;
-                    mDoor.confirm(!state);
+                    mDoorOne.confirm(!state);
                 }
                 Thread.sleep(200);
             }

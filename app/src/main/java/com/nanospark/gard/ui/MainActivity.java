@@ -65,7 +65,9 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
     private View mTwilioSave;
 
     @Inject
-    private Door mDoor;
+    private Door.One mDoorOne;
+    @Inject
+    private Door.Two mDoorTwo;
 
     public static final String SCHEDULE_ONE = "scheduleOne";
     public static final String SCHEDULE_TWO = "scheduleTwo";
@@ -83,7 +85,7 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
         //mDoorState.setText(null);
         //mDoorToggle.setEnabled(false);
         mDoorToggle.setOnClickListener(v -> {
-            mDoor.toggle("Door is in motion");
+            mDoorOne.toggle("Door is in motion");
         });
         mToggleVoiceControl.setOnClickListener(v -> {
             if (VoiceRecognitionEventProducer.State.STARTED == VoiceRecognitionEventProducer.getInstance().getCurrentState().state) {

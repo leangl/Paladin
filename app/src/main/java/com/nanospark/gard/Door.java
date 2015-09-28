@@ -13,25 +13,34 @@ import roboguice.RoboGuice;
 /**
  * Created by Leandro on 9/8/2015.
  */
-@Singleton
-public class Door {
+public abstract class Door {
 
     private Boolean opened = true;
+    private int id;
 
-    public Door() {
+    public Door(int id) {
+        this.id = id;
         Tattu.register(this);
     }
 
-    public static final Door getInstance() {
-        return RoboGuice.getInjector(GarD.instance).getInstance(Door.class);
+    public static final Door getInstance(Integer id) {
+        switch (id) {
+            case 1:
+                return RoboGuice.getInjector(GarD.instance).getInstance(One.class);
+            case 2:
+                return RoboGuice.getInjector(GarD.instance).getInstance(Two.class);
+        }
+        throw new IllegalArgumentException("No door with id " + id);
     }
 
     public boolean open(String message) {
         if (!isOpened()) {
-            Tattu.post(new DoorActivation(true, message));
+            Log.i("DOOR", "Opening door: " + id);
+            Log.i("DOOR", message);
+            Tattu.post(new DoorActivation(this, true, message));
             return true;
         } else {
-            Log.w("DOOR", "Door already open");
+            Log.w("DOOR", "Door already open: " + id);
             ToastManager.get().showToast("The door is already open.", 1);
             return false;
         }
@@ -39,21 +48,25 @@ public class Door {
 
     public boolean close(String message) {
         if (isOpened()) {
-            Tattu.post(new DoorActivation(false, message));
+            Log.i("DOOR", "Closing door: " + id);
+            Log.i("DOOR", message);
+            Tattu.post(new DoorActivation(this, false, message));
             return true;
         } else {
-            Log.w("DOOR", "Door already closed");
+            Log.w("DOOR", "Door already closed: " + id);
             ToastManager.get().showToast("The door is already closed.", 1);
             return false;
         }
     }
 
     public void confirm(boolean opened) {
+        Log.i("DOOR", "Confirmed door: " + id + " - opened: " + opened);
         this.opened = opened;
-        Tattu.post(new DoorToggled(opened));
+        Tattu.post(new DoorToggled(this, opened));
     }
 
     public void toggle(String message) {
+        Log.i("DOOR", "Toggle door: " + id);
         if (this.opened) {
             close(message);
         } else {
@@ -72,9 +85,27 @@ public class Door {
     @Produce
     public DoorToggled produce() {
         if (isReady()) {
-            return new DoorToggled(this.opened);
+            return new DoorToggled(this, this.opened);
         } else {
             return null;
+        }
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    @Singleton
+    public class One extends Door {
+        private One(int id) {
+            super(id);
+        }
+    }
+
+    @Singleton
+    public class Two extends Door {
+        private Two(int id) {
+            super(id);
         }
     }
 
