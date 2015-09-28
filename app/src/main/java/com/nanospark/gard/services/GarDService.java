@@ -28,8 +28,6 @@ import edu.cmu.pocketsphinx.Assets;
 import edu.cmu.pocketsphinx.Hypothesis;
 import edu.cmu.pocketsphinx.RecognitionListener;
 import edu.cmu.pocketsphinx.SpeechRecognizer;
-import ioio.lib.api.DigitalInput;
-import ioio.lib.api.DigitalOutput;
 import ioio.lib.api.exception.ConnectionLostException;
 import ioio.lib.util.BaseIOIOLooper;
 import ioio.lib.util.IOIOLooper;
@@ -56,9 +54,6 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
     public static final String START_VOICE_RECOGNITION = "START_VOICE_RECOGNITION";
     public static final String STOP_VOICE_RECOGNITION = "STOP_VOICE_RECOGNITION";
 
-    public static final int OUTPUT_PIN = 2;
-    public static final int INPUT_PIN = 4;
-
     // current key = [KEY_OPEN|KEY_CLOSE]
     private String currentKey;
 
@@ -78,10 +73,6 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
     @Inject
     private MessagesClient mClient;
     private Handler smsHandler;
-
-    private DigitalOutput outputPin;
-    private DigitalInput inputPin;
-    private boolean activatePin;
 
     private IOIOAndroidApplicationHelper ioioHelper;
 
@@ -258,7 +249,6 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
 
     @Subscribe
     public void on(DoorActivation event) {
-        activatePin = true;
         toast(event.message);
     }
 
@@ -291,31 +281,17 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
 
     private class Looper extends BaseIOIOLooper {
 
-        private Boolean lastState;
-
         @Override
         protected void setup() throws ConnectionLostException {
-            outputPin = ioio_.openDigitalOutput(OUTPUT_PIN, false);
-            inputPin = ioio_.openDigitalInput(INPUT_PIN, DigitalInput.Spec.Mode.PULL_DOWN);
+            mDoorOne.setup(ioio_);
+            mDoorTwo.setup(ioio_);
             Tattu.post(new BoardConnected());
         }
 
         @Override
         public void loop() throws ConnectionLostException, InterruptedException {
-            if (activatePin) {
-                activatePin = false;
-                // high for 2 seconds and then low again
-                outputPin.write(true);
-                Thread.sleep(2000);
-                outputPin.write(false);
-            } else {
-                boolean state = inputPin.read(); // true is closed
-                if (lastState == null || !lastState.equals(state)) {
-                    lastState = state;
-                    mDoorOne.confirm(!state);
-                }
-                Thread.sleep(200);
-            }
+            mDoorOne.loop();
+            mDoorTwo.loop();
         }
 
         @Override
@@ -325,7 +301,7 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
 
         @Override
         public void incompatible() {
-            //toast("Incompatible firmware version!");
+            toast("Incompatible firmware version!");
         }
     }
 

@@ -4,7 +4,12 @@ import com.google.inject.Singleton;
 import com.nanospark.gard.events.DoorActivation;
 import com.nanospark.gard.events.DoorToggled;
 import com.squareup.otto.Produce;
+import com.squareup.otto.Subscribe;
 
+import ioio.lib.api.DigitalInput;
+import ioio.lib.api.DigitalOutput;
+import ioio.lib.api.IOIO;
+import ioio.lib.api.exception.ConnectionLostException;
 import ioio.lib.spi.Log;
 import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.ToastManager;
@@ -17,9 +22,17 @@ public abstract class Door {
 
     private Boolean opened = true;
     private int id;
+    private int inputPinNumber;
+    private int outputPinNumber;
+    private DigitalOutput outputPin;
+    private DigitalInput inputPin;
+    private boolean activatePin;
+    private Boolean lastState;
 
-    public Door(int id) {
+    public Door(int id, Integer outputPinNumber, Integer inputPinNumber) {
         this.id = id;
+        this.outputPinNumber = outputPinNumber;
+        this.inputPinNumber = inputPinNumber;
         Tattu.register(this);
     }
 
@@ -74,6 +87,11 @@ public abstract class Door {
         }
     }
 
+    @Subscribe
+    public void on(DoorActivation event) {
+        activatePin = true;
+    }
+
     public boolean isOpened() {
         return this.opened;
     }
@@ -95,17 +113,39 @@ public abstract class Door {
         return id;
     }
 
+    public void setup(IOIO ioio) throws ConnectionLostException {
+        outputPin = ioio.openDigitalOutput(outputPinNumber, false);
+        inputPin = ioio.openDigitalInput(inputPinNumber, DigitalInput.Spec.Mode.PULL_DOWN);
+    }
+
+    public void loop() throws ConnectionLostException, InterruptedException {
+        if (activatePin) {
+            activatePin = false;
+            // high for 2 seconds and then low again
+            outputPin.write(true);
+            Thread.sleep(2000);
+            outputPin.write(false);
+        } else {
+            boolean state = inputPin.read(); // true is closed
+            if (lastState == null || !lastState.equals(state)) {
+                lastState = state;
+                confirm(!state);
+            }
+            Thread.sleep(100);
+        }
+    }
+
     @Singleton
     public class One extends Door {
-        private One(int id) {
-            super(id);
+        private One() {
+            super(1, 4, 5);
         }
     }
 
     @Singleton
     public class Two extends Door {
-        private Two(int id) {
-            super(id);
+        private Two() {
+            super(2, 6, 7);
         }
     }
 
