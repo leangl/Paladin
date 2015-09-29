@@ -24,6 +24,7 @@ import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
  */
 @Singleton
 public class VoiceRecognition implements RecognitionListener {
+    public static final float DEFAULT_THRESHOLD = 1e-40f;
 
     private static final String KEY_OPEN = "open";
     private static final String KEY_CLOSE = "open";
@@ -46,7 +47,7 @@ public class VoiceRecognition implements RecognitionListener {
         Tattu.post(this.currentState);
     }
 
-    public void start(float threshold) {
+    public void start() {
         // Start voice recognition asynchronously
         new AsyncTask<Void, Void, Exception>() {
             @Override
@@ -54,7 +55,7 @@ public class VoiceRecognition implements RecognitionListener {
                 try {
                     Assets assets = new Assets(GarD.instance);
                     File assetDir = assets.syncAssets();
-                    setupRecognizer(assetDir, threshold);
+                    setupRecognizer(assetDir, DEFAULT_THRESHOLD);
                     return null;
                 } catch (Exception e) {
                     return e;
@@ -107,8 +108,8 @@ public class VoiceRecognition implements RecognitionListener {
 
     @Subscribe
     public void on(Door.VoiceRecognitionEnabled event) {
-        if (VoiceRecognition.State.STARTED.equals(getCurrentState())) {
-            // TODO
+        if (!VoiceRecognition.State.STARTED.equals(getCurrentState())) {
+            start();
         }
     }
 

@@ -155,7 +155,7 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
             switch (intent.getAction()) {
                 case START_VOICE_RECOGNITION:
                     // Get setup parameters (recognition threshold and open/close phrases)
-                    mVoiceRecognition.start(intent.getFloatExtra(KEY_THRESHOLD, VoiceRecognitionConfig.DEFAULT_THRESHOLD));
+                    mVoiceRecognition.start(VoiceRecognitionConfig.DEFAULT_THRESHOLD);
                     break;
                 case STOP_VOICE_RECOGNITION:
                     mVoiceRecognition.stop();
