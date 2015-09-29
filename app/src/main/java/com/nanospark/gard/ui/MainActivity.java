@@ -22,7 +22,7 @@ import com.nanospark.gard.config.VoiceRecognitionConfig;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.DoorToggled;
-import com.nanospark.gard.events.VoiceRecognitionEventProducer;
+import com.nanospark.gard.events.VoiceRecognition;
 import com.nanospark.gard.scheduler.DialogBuilder;
 import com.nanospark.gard.scheduler.Schedule;
 import com.nanospark.gard.scheduler.SchedulerWizard;
@@ -88,7 +88,7 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
             mDoorOne.toggle("Door is in motion");
         });
         mToggleVoiceControl.setOnClickListener(v -> {
-            if (VoiceRecognitionEventProducer.State.STARTED == VoiceRecognitionEventProducer.getInstance().getCurrentState().state) {
+            if (VoiceRecognition.State.STARTED == VoiceRecognition.getInstance().getCurrentState().state) {
                 GarDService.stopVoiceRecognition();
             } else {
                 startVoiceRecognition();
@@ -163,14 +163,14 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
     }
 
     @Subscribe
-    public void onStateChange(VoiceRecognitionEventProducer.State state) {
-        if (state.state == VoiceRecognitionEventProducer.State.STARTED) {
+    public void onStateChange(VoiceRecognition.State state) {
+        if (state.state == VoiceRecognition.State.STARTED) {
             stopLoading();
             mToggleVoiceControl.setText("Stop");
             mThreshold.setEnabled(false);
             mOpen.setEnabled(false);
             mClose.setEnabled(false);
-        } else if (state.state == VoiceRecognitionEventProducer.State.STOPPED || state.state == VoiceRecognitionEventProducer.State.ERROR) {
+        } else if (state.state == VoiceRecognition.State.STOPPED || state.state == VoiceRecognition.State.ERROR) {
             stopLoading();
             mToggleVoiceControl.setText("Start");
             mThreshold.setEnabled(true);

@@ -1,15 +1,20 @@
 package com.nanospark.gard;
 
 import android.app.Application;
+import android.util.Log;
 
-import com.nanospark.gard.events.VoiceRecognitionEventProducer;
+import com.nanospark.gard.events.DoorActivation;
+import com.nanospark.gard.events.VoiceRecognition;
 import com.nanospark.gard.scheduler.Schedule;
 import com.nanospark.gard.scheduler.SchedulerWizard;
 import com.nanospark.gard.ui.MainActivity;
+import com.squareup.otto.Subscribe;
 
 import java.util.Set;
 
+import mobi.tattu.utils.StringUtils;
 import mobi.tattu.utils.Tattu;
+import mobi.tattu.utils.ToastManager;
 import mobi.tattu.utils.persistance.datastore.DataStore;
 import roboguice.RoboGuice;
 
@@ -34,7 +39,7 @@ public class GarD extends Application {
 
         Door.getInstance(1); // force initialization
         Door.getInstance(2); // force initialization
-        VoiceRecognitionEventProducer.getInstance(); // force initialization
+        VoiceRecognition.getInstance(); // force initialization
 
         //GarDService.start();
 
@@ -43,5 +48,19 @@ public class GarD extends Application {
             SchedulerWizard.initializeAlarm(this, schedule);
         }
 
+    }
+
+    @Subscribe
+    public void on(DoorActivation event) {
+        toast(event.message);
+    }
+
+    public void toast(String message) {
+        if (StringUtils.isNotBlank(message)) {
+            Tattu.runOnUiThread(() -> {
+                Log.i("GarD", message);
+                ToastManager.get().showToast(message, 10000, 1);
+            });
+        }
     }
 }

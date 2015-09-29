@@ -28,11 +28,15 @@ public abstract class Door {
     private DigitalInput inputPin;
     private boolean activatePin;
     private Boolean lastState;
+    private boolean voiceEnabled;
+    private String openPhrase;
+    private String closePhrase;
 
     public Door(int id, Integer outputPinNumber, Integer inputPinNumber) {
         this.id = id;
         this.outputPinNumber = outputPinNumber;
         this.inputPinNumber = inputPinNumber;
+        restore();
         Tattu.register(this);
     }
 
@@ -44,6 +48,10 @@ public abstract class Door {
                 return RoboGuice.getInjector(GarD.instance).getInstance(Two.class);
         }
         throw new IllegalArgumentException("No door with id " + id);
+    }
+
+    public static final Door[] getDoors() {
+        return new Door[]{getInstance(1), getInstance(2)};
     }
 
     public boolean open(String message) {
@@ -113,6 +121,44 @@ public abstract class Door {
         return id;
     }
 
+    private void disableVoiceRecognition() {
+        this.voiceEnabled = false;
+        Tattu.post(new VoiceRecognitionDisabled(this));
+        persist();
+    }
+
+    public void enableVoiceRecognition() {
+        this.voiceEnabled = true;
+        Tattu.post(new VoiceRecognitionEnabled(this));
+        persist();
+    }
+
+    public String getOpenPhrase() {
+        return openPhrase;
+    }
+
+    public void setOpenPhrase(String openPhrase) {
+        this.openPhrase = openPhrase;
+        persist();
+    }
+
+    public String getClosePhrase() {
+        return closePhrase;
+    }
+
+    public void setClosePhrase(String closePhrase) {
+        this.closePhrase = closePhrase;
+        persist();
+    }
+
+    private void restore() {
+        // TODO
+    }
+
+    private void persist() {
+        // TODO save state
+    }
+
     public void setup(IOIO ioio) throws ConnectionLostException {
         outputPin = ioio.openDigitalOutput(outputPinNumber, false);
         inputPin = ioio.openDigitalInput(inputPinNumber, DigitalInput.Spec.Mode.PULL_DOWN);
@@ -149,4 +195,24 @@ public abstract class Door {
         }
     }
 
+    public class VoiceRecognitionEnabled {
+        public final Door door;
+
+        private VoiceRecognitionEnabled(Door door) {
+            this.door = door;
+        }
+    }
+
+    public class VoiceRecognitionDisabled {
+        public final Door door;
+
+        private VoiceRecognitionDisabled(Door door) {
+            this.door = door;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return id + "";
+    }
 }

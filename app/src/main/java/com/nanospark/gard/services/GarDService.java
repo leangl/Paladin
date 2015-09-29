@@ -13,57 +13,33 @@ import com.nanospark.gard.R;
 import com.nanospark.gard.config.VoiceRecognitionConfig;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
-import com.nanospark.gard.events.DoorActivation;
-import com.nanospark.gard.events.DoorToggled;
-import com.nanospark.gard.events.PhraseRecognized;
-import com.nanospark.gard.events.VoiceRecognitionEventProducer;
+import com.nanospark.gard.events.VoiceRecognition;
 import com.nanospark.gard.twilio.MessagesClient;
 import com.squareup.otto.Subscribe;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import edu.cmu.pocketsphinx.Assets;
-import edu.cmu.pocketsphinx.Hypothesis;
-import edu.cmu.pocketsphinx.RecognitionListener;
-import edu.cmu.pocketsphinx.SpeechRecognizer;
 import ioio.lib.api.exception.ConnectionLostException;
 import ioio.lib.util.BaseIOIOLooper;
 import ioio.lib.util.IOIOLooper;
 import ioio.lib.util.IOIOLooperProvider;
 import ioio.lib.util.android.IOIOAndroidApplicationHelper;
-import mobi.tattu.utils.StringUtils;
 import mobi.tattu.utils.Tattu;
-import mobi.tattu.utils.ToastManager;
-import mobi.tattu.utils.image.AsyncTask;
 import mobi.tattu.utils.services.BaseService;
-
-import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
 
 /**
  * Created by Leandro on 21/7/2015.
  */
-public class GarDService extends BaseService implements RecognitionListener, IOIOLooperProvider {
-
-    public static final String KEY_OPEN = "open";
-    public static final String KEY_CLOSE = "close";
+public class GarDService extends BaseService implements IOIOLooperProvider {
 
     public static final String KEY_THRESHOLD = "threshold";
-
     public static final String START_VOICE_RECOGNITION = "START_VOICE_RECOGNITION";
     public static final String STOP_VOICE_RECOGNITION = "STOP_VOICE_RECOGNITION";
-
-    // current key = [KEY_OPEN|KEY_CLOSE]
-    private String currentKey;
 
     // service started flag
     private boolean started;
 
-    private SpeechRecognizer recognizer;
-    private float threshold;
-    private String openPhrase;
-    private String closePhrase;
+    private VoiceRecognition mVoiceRecognition;
 
     @Inject
     private Door.One mDoorOne;
@@ -94,20 +70,32 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
                     String body = message.get("body").getAsString();
                     String from = message.get("from").getAsString();
                     String replyMessage = null;
-                    if (currentKey.equalsIgnoreCase(body)) {
-                        mDoorOne.toggle("Message received, door is in motion");
-                        if (KEY_OPEN.equalsIgnoreCase(body)) {
-                            replyMessage = "Open door command received.";
+
+                    try {
+                        String[] bodyParts = body.split(" ");
+                        int doorNumber = Integer.parseInt(bodyParts[0]);
+                        String command = bodyParts[1];
+
+                        boolean isOpenCommand = "open".equalsIgnoreCase(command);
+                        if (Door.getInstance(doorNumber).isOpened() != isOpenCommand) {
+                            mDoorOne.toggle("Message received, door is in motion");
+                            if (isOpenCommand) {
+                                replyMessage = "Open door command received.";
+                            } else {
+                                replyMessage = "Close door command received.";
+                            }
                         } else {
-                            replyMessage = "Close door command received.";
+                            if (isOpenCommand) {
+                                replyMessage = "The door is already open.";
+                            } else {
+                                replyMessage = "The door is already closed.";
+                            }
                         }
-                    } else {
-                        if (KEY_OPEN.equalsIgnoreCase(body)) {
-                            replyMessage = "The door is already open.";
-                        } else {
-                            replyMessage = "The door is already closed.";
-                        }
+                    } catch (Exception e) {
+                        Log.e("TWILIO", "Invalid command: " + body);
+                        replyMessage = "Invalid command. Format has to be: {door} {command}";
                     }
+
                     mClient.sendMessage(replyMessage, from).subscribe(success -> {
                         Log.i("TWILIO", "Reply sent successfully");
                     }, error -> {
@@ -130,25 +118,17 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
     public void onCreate() {
         super.onCreate();
         smsHandler = new Handler();
+        mVoiceRecognition = VoiceRecognition.getInstance();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        stopVoiceRecognitionInternal();
+        mVoiceRecognition.stop();
 
         if (smsHandler != null) {
             smsHandler.removeCallbacksAndMessages(null);
             smsHandler = null;
-        }
-
-    }
-
-    private void stopVoiceRecognitionInternal() {
-        if (recognizer != null) {
-            recognizer.cancel();
-            recognizer.shutdown();
-            setCurrentState(VoiceRecognitionEventProducer.State.STOPPED);
         }
     }
 
@@ -174,55 +154,16 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
         if (intent != null && intent.getAction() != null) {
             switch (intent.getAction()) {
                 case START_VOICE_RECOGNITION:
-                    startVoiceRecognitionInternal(intent);
+                    // Get setup parameters (recognition threshold and open/close phrases)
+                    mVoiceRecognition.start(intent.getFloatExtra(KEY_THRESHOLD, VoiceRecognitionConfig.DEFAULT_THRESHOLD));
                     break;
                 case STOP_VOICE_RECOGNITION:
-                    stopVoiceRecognitionInternal();
+                    mVoiceRecognition.stop();
                     break;
             }
         }
 
         return START_STICKY;
-    }
-
-    private void startVoiceRecognitionInternal(Intent intent) {
-        // Get setup parameters (recognition threshold and open/close phrases)
-        threshold = intent.getFloatExtra(KEY_THRESHOLD, VoiceRecognitionConfig.DEFAULT_THRESHOLD);
-        openPhrase = intent.getStringExtra(KEY_OPEN);
-        if (openPhrase == null || openPhrase.trim().length() == 0) {
-            openPhrase = getString(R.string.default_open);
-        }
-        closePhrase = intent.getStringExtra(KEY_CLOSE);
-        if (closePhrase == null || closePhrase.trim().length() == 0) {
-            closePhrase = getString(R.string.default_close);
-        }
-
-        // Start voice recognition asynchronously
-        new AsyncTask<Void, Void, Exception>() {
-            @Override
-            protected Exception doInBackground(Void... params) {
-                try {
-                    Assets assets = new Assets(GarDService.this);
-                    File assetDir = assets.syncAssets();
-                    setupRecognizer(assetDir);
-                    return null;
-                } catch (Exception e) {
-                    return e;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(Exception e) {
-                if (e != null) {
-                    setCurrentState(VoiceRecognitionEventProducer.State.ERROR);
-                    stopSelf();
-                    toast("Error, unrecognized word entered.");
-                } else {
-                    switchPhrase(mDoorOne.isOpened());
-                    setCurrentState(VoiceRecognitionEventProducer.State.STARTED);
-                }
-            }
-        }.execute((Void) null);
     }
 
     @Subscribe
@@ -244,33 +185,6 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
             ioioHelper.stop();
             ioioHelper.destroy();
             ioioHelper = null;
-        }
-    }
-
-    @Subscribe
-    public void on(DoorActivation event) {
-        toast(event.message);
-    }
-
-    @Subscribe
-    public void on(DoorToggled event) {
-        switchPhrase(event.opened);
-    }
-
-    @Subscribe
-    public void on(PhraseRecognized event) {
-        mDoorOne.toggle("Command heard, door is in motion");
-    }
-
-    private void switchPhrase(boolean opened) {
-        if (opened) {
-            currentKey = KEY_CLOSE;
-        } else {
-            currentKey = KEY_OPEN;
-        }
-        if (recognizer != null) {
-            recognizer.stop();
-            recognizer.startListening(currentKey);
         }
     }
 
@@ -301,16 +215,14 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
 
         @Override
         public void incompatible() {
-            toast("Incompatible firmware version!");
+            GarD.instance.toast("Incompatible firmware version!");
         }
     }
 
-    public static void startVoiceRecognition(float threshold, String openPhrase, String closePhrase) {
+    public static void startVoiceRecognition(float threshold) {
         Intent i = new Intent(GarD.instance, GarDService.class);
         i.setAction(START_VOICE_RECOGNITION);
         i.putExtra(KEY_THRESHOLD, threshold);
-        i.putExtra(KEY_OPEN, openPhrase);
-        i.putExtra(KEY_CLOSE, closePhrase);
         GarD.instance.startService(i);
     }
 
@@ -327,83 +239,5 @@ public class GarDService extends BaseService implements RecognitionListener, IOI
 
     public static void stop() {
         GarD.instance.stopService(new Intent(GarD.instance, GarDService.class));
-    }
-
-    private void setupRecognizer(File assetsDir) throws IOException {
-        // The recognizer can be configured to perform multiple searches
-        // of different kind and switch between them
-        recognizer = defaultSetup()
-                .setAcousticModel(new File(assetsDir, "en-us-ptm"))
-                .setDictionary(new File(assetsDir, "cmudict-en-us.dict"))
-                .setKeywordThreshold(threshold) // Threshold to tune for keyphrase to balance between false alarms and misses
-                .setBoolean("-allphone_ci", true) // Use context-independent phonetic search, context-dependent is too slow for mobile
-                .getRecognizer();
-
-        recognizer.addListener(this);
-
-        // Create keyword-activation search.
-        recognizer.addKeyphraseSearch(KEY_OPEN, openPhrase);
-        recognizer.addKeyphraseSearch(KEY_CLOSE, closePhrase);
-    }
-
-    private void setCurrentState(int state) {
-        VoiceRecognitionEventProducer.getInstance().setState(state);
-    }
-
-    /**
-     * In partial result we get quick updates about current hypothesis. In
-     * keyword spotting mode we can react here, in other modes we need to wait
-     * for final result in onResult.
-     */
-    @Override
-    public void onPartialResult(Hypothesis hypothesis) {
-        showHypothesis(hypothesis);
-    }
-
-    /**
-     * This callback is called when we stop the recognizer.
-     */
-    @Override
-    public void onResult(Hypothesis hypothesis) {
-    }
-
-    private void showHypothesis(Hypothesis hypothesis) {
-        if (hypothesis != null) {
-            String text = hypothesis.getHypstr();
-            if (text.equals(openPhrase) || text.equals(closePhrase)) {
-                Tattu.post(new PhraseRecognized(text));
-                recognizer.stop();
-                recognizer.startListening(currentKey);
-            }
-        }
-    }
-
-    @Override
-    public void onBeginningOfSpeech() {
-    }
-
-    /**
-     * We stop recognizer here to get a final result
-     */
-    @Override
-    public void onEndOfSpeech() {
-    }
-
-    @Override
-    public void onError(Exception error) {
-        setCurrentState(VoiceRecognitionEventProducer.State.ERROR);
-    }
-
-    @Override
-    public void onTimeout() {
-    }
-
-    public void toast(String message) {
-        if (StringUtils.isNotBlank(message)) {
-            Tattu.runOnUiThread(() -> {
-                Log.i("GarD", message);
-                ToastManager.get().showToast(message, 10000, 1);
-            });
-        }
     }
 }
