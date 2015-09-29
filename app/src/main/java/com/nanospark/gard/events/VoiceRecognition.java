@@ -32,7 +32,7 @@ public class VoiceRecognition implements RecognitionListener {
     private State currentState = State.STOPPED;
     private SpeechRecognizer recognizer;
     private BaseDoor[] mDoors;
-    
+
     @Inject
     private VoiceRecognition() {
         mDoors = BaseDoor.getDoors();

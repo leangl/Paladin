@@ -2,5 +2,7 @@
 <resources>
     <color name="primary_dark">#4f6c74</color>
     <color name="primary">#5e7c87</color>
-    <color name="accent">#f1482f</color>
+    <color name="red">#f1482f</color>
+    <color name="text_tab_selected">@android:color/white</color>
+    <color name="text_tab_unselected">#a4bbc7</color>
 </resources>

@@ -31,6 +31,7 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
         setSupportActionBar(toolbar);
 
         TabLayout tabLayout = (TabLayout)findViewById(R.id.tab);
+        tabLayout.setTabTextColors(getResources().getColorStateList(R.color.tab_selector));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.title_main));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.title_users));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.title_schedules));
