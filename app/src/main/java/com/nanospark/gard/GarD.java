@@ -3,6 +3,7 @@ package com.nanospark.gard;
 import android.app.Application;
 import android.util.Log;
 
+import com.nanospark.gard.door.BaseDoor;
 import com.nanospark.gard.events.DoorActivation;
 import com.nanospark.gard.events.VoiceRecognition;
 import com.nanospark.gard.scheduler.Schedule;
@@ -37,8 +38,8 @@ public class GarD extends Application {
 
         instance = this;
 
-        Door.getInstance(1); // force initialization
-        Door.getInstance(2); // force initialization
+        BaseDoor.getInstance(1); // force initialization
+        BaseDoor.getInstance(2); // force initialization
         VoiceRecognition.getInstance(); // force initialization
 
         //GarDService.start();

@@ -15,10 +15,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.inject.Inject;
-import com.nanospark.gard.Door;
 import com.nanospark.gard.R;
 import com.nanospark.gard.config.TwilioAccount;
 import com.nanospark.gard.config.VoiceRecognitionConfig;
+import com.nanospark.gard.door.DoorOne;
+import com.nanospark.gard.door.DoorTwo;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.DoorToggled;
@@ -65,9 +66,9 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
     private View mTwilioSave;
 
     @Inject
-    private Door.One mDoorOne;
+    private DoorOne mDoorOne;
     @Inject
-    private Door.Two mDoorTwo;
+    private DoorTwo mDoorTwo;
 
     public static final String SCHEDULE_ONE = "scheduleOne";
     public static final String SCHEDULE_TWO = "scheduleTwo";

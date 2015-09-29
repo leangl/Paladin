@@ -1,8 +1,9 @@
 package com.nanospark.gard.events;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.nanospark.gard.Door;
 import com.nanospark.gard.GarD;
+import com.nanospark.gard.door.BaseDoor;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
@@ -30,10 +31,11 @@ public class VoiceRecognition implements RecognitionListener {
 
     private State currentState = State.STOPPED;
     private SpeechRecognizer recognizer;
-    private Door[] mDoors;
-
+    private BaseDoor[] mDoors;
+    
+    @Inject
     private VoiceRecognition() {
-        mDoors = Door.getDoors();
+        mDoors = BaseDoor.getDoors();
         Tattu.register(this);
     }
 
@@ -95,7 +97,7 @@ public class VoiceRecognition implements RecognitionListener {
         recognizer.addListener(this);
 
         // Create keyword-activation search.
-        for (Door door : mDoors) {
+        for (BaseDoor door : mDoors) {
             recognizer.addKeyphraseSearch(KEY_OPEN + door.getId(), door.getOpenPhrase());
             recognizer.addKeyphraseSearch(KEY_CLOSE + door.getId(), door.getClosePhrase());
         }
@@ -106,7 +108,7 @@ public class VoiceRecognition implements RecognitionListener {
     }
 
     @Subscribe
-    public void on(Door.VoiceRecognitionEnabled event) {
+    public void on(BaseDoor.VoiceRecognitionEnabled event) {
         if (VoiceRecognition.State.STARTED.equals(getCurrentState())) {
             // TODO
         }
@@ -142,7 +144,7 @@ public class VoiceRecognition implements RecognitionListener {
     private void showHypothesis(Hypothesis hypothesis) {
         if (hypothesis != null) {
             String text = hypothesis.getHypstr();
-            for (Door door : mDoors) {
+            for (BaseDoor door : mDoors) {
                 if (text.equals(door.getOpenPhrase()) || text.equals(door.getClosePhrase())) {
                     Tattu.post(new PhraseRecognized(door, text));
                     switchPhrase();
@@ -174,7 +176,7 @@ public class VoiceRecognition implements RecognitionListener {
     private void switchPhrase() {
         if (recognizer != null) {
             recognizer.stop();
-            for (Door door : mDoors) {
+            for (BaseDoor door : mDoors) {
                 if (door.isOpened()) {
                     recognizer.startListening(KEY_OPEN + door.getId());
                 } else {
