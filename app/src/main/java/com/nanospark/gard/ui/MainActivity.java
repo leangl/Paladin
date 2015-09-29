@@ -88,7 +88,7 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
             mDoorOne.toggle("Door is in motion");
         });
         mToggleVoiceControl.setOnClickListener(v -> {
-            if (VoiceRecognition.State.STARTED == VoiceRecognition.getInstance().getCurrentState().state) {
+            if (VoiceRecognition.State.STARTED == VoiceRecognition.getInstance().getCurrentState()) {
                 GarDService.stopVoiceRecognition();
             } else {
                 startVoiceRecognition();
@@ -164,13 +164,13 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
 
     @Subscribe
     public void onStateChange(VoiceRecognition.State state) {
-        if (state.state == VoiceRecognition.State.STARTED) {
+        if (state == VoiceRecognition.State.STARTED) {
             stopLoading();
             mToggleVoiceControl.setText("Stop");
             mThreshold.setEnabled(false);
             mOpen.setEnabled(false);
             mClose.setEnabled(false);
-        } else if (state.state == VoiceRecognition.State.STOPPED || state.state == VoiceRecognition.State.ERROR) {
+        } else if (state == VoiceRecognition.State.STOPPED || state == VoiceRecognition.State.ERROR) {
             stopLoading();
             mToggleVoiceControl.setText("Start");
             mThreshold.setEnabled(true);
@@ -218,7 +218,7 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
         mVoiceConfig.save();
 
         double threshold = Math.pow(10, level);
-        GarDService.startVoiceRecognition((float) threshold, openPhrase, closePhrase);
+        GarDService.startVoiceRecognition((float) threshold);
     }
 
     @Override
