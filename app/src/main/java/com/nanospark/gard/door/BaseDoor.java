@@ -1,6 +1,6 @@
-package com.nanospark.gard;
+package com.nanospark.gard.door;
 
-import com.google.inject.Singleton;
+import com.nanospark.gard.GarD;
 import com.nanospark.gard.events.DoorActivation;
 import com.nanospark.gard.events.DoorToggled;
 import com.squareup.otto.Produce;
@@ -18,7 +18,7 @@ import roboguice.RoboGuice;
 /**
  * Created by Leandro on 9/8/2015.
  */
-public abstract class Door {
+public   class BaseDoor {
 
     private Boolean opened = true;
     private int id;
@@ -32,7 +32,7 @@ public abstract class Door {
     private String openPhrase;
     private String closePhrase;
 
-    public Door(int id, Integer outputPinNumber, Integer inputPinNumber) {
+    public BaseDoor(int id, Integer outputPinNumber, Integer inputPinNumber) {
         this.id = id;
         this.outputPinNumber = outputPinNumber;
         this.inputPinNumber = inputPinNumber;
@@ -40,18 +40,18 @@ public abstract class Door {
         Tattu.register(this);
     }
 
-    public static final Door getInstance(Integer id) {
+    public static final BaseDoor getInstance(Integer id) {
         switch (id) {
             case 1:
-                return RoboGuice.getInjector(GarD.instance).getInstance(One.class);
+                return RoboGuice.getInjector(GarD.instance).getInstance(DoorOne.class);
             case 2:
-                return RoboGuice.getInjector(GarD.instance).getInstance(Two.class);
+                return RoboGuice.getInjector(GarD.instance).getInstance(DoorTwo.class);
         }
         throw new IllegalArgumentException("No door with id " + id);
     }
 
-    public static final Door[] getDoors() {
-        return new Door[]{getInstance(1), getInstance(2)};
+    public static final BaseDoor[] getDoors() {
+        return new BaseDoor[]{getInstance(1), getInstance(2)};
     }
 
     public boolean open(String message) {
@@ -181,32 +181,20 @@ public abstract class Door {
         }
     }
 
-    @Singleton
-    public class One extends Door {
-        private One() {
-            super(1, 4, 5);
-        }
-    }
 
-    @Singleton
-    public class Two extends Door {
-        private Two() {
-            super(2, 6, 7);
-        }
-    }
 
     public class VoiceRecognitionEnabled {
-        public final Door door;
+        public final BaseDoor door;
 
-        private VoiceRecognitionEnabled(Door door) {
+        private VoiceRecognitionEnabled(BaseDoor door) {
             this.door = door;
         }
     }
 
     public class VoiceRecognitionDisabled {
-        public final Door door;
+        public final BaseDoor door;
 
-        private VoiceRecognitionDisabled(Door door) {
+        private VoiceRecognitionDisabled(BaseDoor door) {
             this.door = door;
         }
     }

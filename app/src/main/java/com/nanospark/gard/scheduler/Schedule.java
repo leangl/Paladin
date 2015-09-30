@@ -1,6 +1,6 @@
 package com.nanospark.gard.scheduler;
 
-import com.nanospark.gard.Door;
+import com.nanospark.gard.door.BaseDoor;
 
 import java.util.Calendar;
 import java.util.List;
@@ -49,9 +49,9 @@ public class Schedule {
     public boolean trigger() {
         if (isNow()) {
             if (action.equals(ACTION_OPEN_DOOR)) {
-                return Door.getInstance(0).open("Scheduled action taken, door is in motion"); // TODO set door id
+                return BaseDoor.getInstance(0).open("Scheduled action taken, door is in motion"); // TODO set door id
             } else if (action.equals(ACTION_CLOSE_DOOR)) {
-                return Door.getInstance(0).close("Scheduled action taken, door is in motion"); // TODO set door id
+                return BaseDoor.getInstance(0).close("Scheduled action taken, door is in motion"); // TODO set door id
             }
         }
         return false;

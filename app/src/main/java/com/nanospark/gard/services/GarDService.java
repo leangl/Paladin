@@ -7,10 +7,12 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.inject.Inject;
-import com.nanospark.gard.Door;
 import com.nanospark.gard.GarD;
 import com.nanospark.gard.R;
 import com.nanospark.gard.config.VoiceRecognitionConfig;
+import com.nanospark.gard.door.BaseDoor;
+import com.nanospark.gard.door.DoorOne;
+import com.nanospark.gard.door.DoorTwo;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.VoiceRecognition;
@@ -42,9 +44,9 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
     private VoiceRecognition mVoiceRecognition;
 
     @Inject
-    private Door.One mDoorOne;
+    private DoorOne mDoorOne;
     @Inject
-    private Door.Two mDoorTwo;
+    private DoorTwo mDoorTwo;
 
     @Inject
     private MessagesClient mClient;
@@ -77,7 +79,7 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
                         String command = bodyParts[1];
 
                         boolean isOpenCommand = "open".equalsIgnoreCase(command);
-                        if (Door.getInstance(doorNumber).isOpened() != isOpenCommand) {
+                        if (BaseDoor.getInstance(doorNumber).isOpened() != isOpenCommand) {
                             mDoorOne.toggle("Message received, door is in motion");
                             if (isOpenCommand) {
                                 replyMessage = "Open door command received.";
