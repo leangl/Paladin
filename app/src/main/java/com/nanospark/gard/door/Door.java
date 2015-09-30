@@ -1,5 +1,7 @@
 package com.nanospark.gard.door;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.nanospark.gard.GarD;
 import com.nanospark.gard.events.DoorActivation;
 import com.nanospark.gard.events.DoorToggled;
@@ -18,7 +20,7 @@ import roboguice.RoboGuice;
 /**
  * Created by Leandro on 9/8/2015.
  */
-public   class BaseDoor {
+public class Door {
 
     private Boolean opened = true;
     private int id;
@@ -32,7 +34,7 @@ public   class BaseDoor {
     private String openPhrase;
     private String closePhrase;
 
-    public BaseDoor(int id, Integer outputPinNumber, Integer inputPinNumber) {
+    public Door(int id, Integer outputPinNumber, Integer inputPinNumber) {
         this.id = id;
         this.outputPinNumber = outputPinNumber;
         this.inputPinNumber = inputPinNumber;
@@ -40,18 +42,18 @@ public   class BaseDoor {
         Tattu.register(this);
     }
 
-    public static final BaseDoor getInstance(Integer id) {
+    public static final Door getInstance(Integer id) {
         switch (id) {
             case 1:
-                return RoboGuice.getInjector(GarD.instance).getInstance(DoorOne.class);
+                return RoboGuice.getInjector(GarD.instance).getInstance(One.class);
             case 2:
-                return RoboGuice.getInjector(GarD.instance).getInstance(DoorTwo.class);
+                return RoboGuice.getInjector(GarD.instance).getInstance(Two.class);
         }
         throw new IllegalArgumentException("No door with id " + id);
     }
 
-    public static final BaseDoor[] getDoors() {
-        return new BaseDoor[]{getInstance(1), getInstance(2)};
+    public static final Door[] getDoors() {
+        return new Door[]{getInstance(1), getInstance(2)};
     }
 
     public boolean open(String message) {
@@ -182,19 +184,18 @@ public   class BaseDoor {
     }
 
 
-
     public class VoiceRecognitionEnabled {
-        public final BaseDoor door;
+        public final Door door;
 
-        private VoiceRecognitionEnabled(BaseDoor door) {
+        private VoiceRecognitionEnabled(Door door) {
             this.door = door;
         }
     }
 
     public class VoiceRecognitionDisabled {
-        public final BaseDoor door;
+        public final Door door;
 
-        private VoiceRecognitionDisabled(BaseDoor door) {
+        private VoiceRecognitionDisabled(Door door) {
             this.door = door;
         }
     }
@@ -203,4 +204,23 @@ public   class BaseDoor {
     public String toString() {
         return id + "";
     }
+
+    @Singleton
+    public static class One extends Door {
+
+        @Inject
+        private One() {
+            super(1, 4, 5);
+        }
+    }
+
+    @Singleton
+    public static class Two extends Door {
+
+        @Inject
+        private Two() {
+            super(2, 6, 7);
+        }
+    }
+
 }

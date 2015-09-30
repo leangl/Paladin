@@ -3,7 +3,7 @@ package com.nanospark.gard.events;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.nanospark.gard.GarD;
-import com.nanospark.gard.door.BaseDoor;
+import com.nanospark.gard.door.Door;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
@@ -14,6 +14,7 @@ import edu.cmu.pocketsphinx.Assets;
 import edu.cmu.pocketsphinx.Hypothesis;
 import edu.cmu.pocketsphinx.RecognitionListener;
 import edu.cmu.pocketsphinx.SpeechRecognizer;
+import mobi.tattu.utils.StringUtils;
 import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.image.AsyncTask;
 import roboguice.RoboGuice;
@@ -24,23 +25,25 @@ import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
  * Created by Leandro on 21/7/2015.
  */
 @Singleton
-public class VoiceRecognition implements RecognitionListener {
+public class VoiceRecognizer implements RecognitionListener {
+
+    public static final float DEFAULT_THRESHOLD = 1e-40f;
 
     private static final String KEY_OPEN = "open";
     private static final String KEY_CLOSE = "open";
 
     private State currentState = State.STOPPED;
     private SpeechRecognizer recognizer;
-    private BaseDoor[] mDoors;
+    private Door[] mDoors;
 
     @Inject
-    private VoiceRecognition() {
-        mDoors = BaseDoor.getDoors();
+    private VoiceRecognizer() {
+        mDoors = Door.getDoors();
         Tattu.register(this);
     }
 
-    public static final VoiceRecognition getInstance() {
-        return RoboGuice.getInjector(GarD.instance).getInstance(VoiceRecognition.class);
+    public static final VoiceRecognizer getInstance() {
+        return RoboGuice.getInjector(GarD.instance).getInstance(VoiceRecognizer.class);
     }
 
     public void setState(State state) {
@@ -48,7 +51,7 @@ public class VoiceRecognition implements RecognitionListener {
         Tattu.post(this.currentState);
     }
 
-    public void start(float threshold) {
+    public void start() {
         // Start voice recognition asynchronously
         new AsyncTask<Void, Void, Exception>() {
             @Override
@@ -56,7 +59,7 @@ public class VoiceRecognition implements RecognitionListener {
                 try {
                     Assets assets = new Assets(GarD.instance);
                     File assetDir = assets.syncAssets();
-                    setupRecognizer(assetDir, threshold);
+                    setupRecognizer(assetDir, DEFAULT_THRESHOLD);
                     return null;
                 } catch (Exception e) {
                     return e;
@@ -66,11 +69,11 @@ public class VoiceRecognition implements RecognitionListener {
             @Override
             protected void onPostExecute(Exception e) {
                 if (e != null) {
-                    setCurrentState(VoiceRecognition.State.ERROR);
+                    setCurrentState(VoiceRecognizer.State.ERROR);
                     GarD.instance.toast("Error, unrecognized word entered.");
                 } else {
                     switchPhrase();
-                    setCurrentState(VoiceRecognition.State.STARTED);
+                    setCurrentState(VoiceRecognizer.State.STARTED);
                 }
             }
         }.execute((Void) null);
@@ -80,7 +83,7 @@ public class VoiceRecognition implements RecognitionListener {
         if (recognizer != null) {
             recognizer.cancel();
             recognizer.shutdown();
-            setCurrentState(VoiceRecognition.State.STOPPED);
+            setCurrentState(VoiceRecognizer.State.STOPPED);
         }
     }
 
@@ -97,19 +100,21 @@ public class VoiceRecognition implements RecognitionListener {
         recognizer.addListener(this);
 
         // Create keyword-activation search.
-        for (BaseDoor door : mDoors) {
-            recognizer.addKeyphraseSearch(KEY_OPEN + door.getId(), door.getOpenPhrase());
-            recognizer.addKeyphraseSearch(KEY_CLOSE + door.getId(), door.getClosePhrase());
+        for (Door door : mDoors) {
+            if (StringUtils.isNotBlank(door.getOpenPhrase()))
+                recognizer.addKeyphraseSearch(KEY_OPEN + door.getId(), door.getOpenPhrase());
+            if (StringUtils.isNotBlank(door.getClosePhrase()))
+                recognizer.addKeyphraseSearch(KEY_CLOSE + door.getId(), door.getClosePhrase());
         }
     }
 
-    private void setCurrentState(VoiceRecognition.State state) {
+    private void setCurrentState(VoiceRecognizer.State state) {
         setState(state);
     }
 
     @Subscribe
-    public void on(BaseDoor.VoiceRecognitionEnabled event) {
-        if (VoiceRecognition.State.STARTED.equals(getCurrentState())) {
+    public void on(Door.VoiceRecognitionEnabled event) {
+        if (VoiceRecognizer.State.STARTED.equals(getCurrentState())) {
             // TODO
         }
     }
@@ -144,7 +149,7 @@ public class VoiceRecognition implements RecognitionListener {
     private void showHypothesis(Hypothesis hypothesis) {
         if (hypothesis != null) {
             String text = hypothesis.getHypstr();
-            for (BaseDoor door : mDoors) {
+            for (Door door : mDoors) {
                 if (text.equals(door.getOpenPhrase()) || text.equals(door.getClosePhrase())) {
                     Tattu.post(new PhraseRecognized(door, text));
                     switchPhrase();
@@ -166,7 +171,7 @@ public class VoiceRecognition implements RecognitionListener {
 
     @Override
     public void onError(Exception error) {
-        setCurrentState(VoiceRecognition.State.ERROR);
+        setCurrentState(VoiceRecognizer.State.ERROR);
     }
 
     @Override
@@ -176,7 +181,8 @@ public class VoiceRecognition implements RecognitionListener {
     private void switchPhrase() {
         if (recognizer != null) {
             recognizer.stop();
-            for (BaseDoor door : mDoors) {
+            //recognizer.startListening(KEY_OPEN + 1);
+            for (Door door : mDoors) {
                 if (door.isOpened()) {
                     recognizer.startListening(KEY_OPEN + door.getId());
                 } else {

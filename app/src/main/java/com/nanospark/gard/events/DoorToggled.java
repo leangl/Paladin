@@ -1,16 +1,16 @@
 package com.nanospark.gard.events;
 
-import com.nanospark.gard.door.BaseDoor;
+import com.nanospark.gard.door.Door;
 
 /**
  * Created by Leandro on 9/8/2015.
  */
 public class DoorToggled {
 
-    public final BaseDoor door;
+    public final Door door;
     public final boolean opened;
 
-    public DoorToggled(BaseDoor door, boolean opened) {
+    public DoorToggled(Door door, boolean opened) {
         this.door = door;
         this.opened = opened;
     }

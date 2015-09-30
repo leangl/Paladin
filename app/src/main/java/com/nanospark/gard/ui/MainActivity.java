@@ -17,13 +17,11 @@ import android.widget.Toast;
 import com.google.inject.Inject;
 import com.nanospark.gard.R;
 import com.nanospark.gard.config.TwilioAccount;
-import com.nanospark.gard.config.VoiceRecognitionConfig;
-import com.nanospark.gard.door.DoorOne;
-import com.nanospark.gard.door.DoorTwo;
+import com.nanospark.gard.door.Door;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.DoorToggled;
-import com.nanospark.gard.events.VoiceRecognition;
+import com.nanospark.gard.events.VoiceRecognizer;
 import com.nanospark.gard.scheduler.DialogBuilder;
 import com.nanospark.gard.scheduler.Schedule;
 import com.nanospark.gard.scheduler.SchedulerWizard;
@@ -66,17 +64,15 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
     private View mTwilioSave;
 
     @Inject
-    private DoorOne mDoorOne;
+    private Door.One mDoorOne;
     @Inject
-    private DoorTwo mDoorTwo;
+    private Door.Two mDoorTwo;
 
     public static final String SCHEDULE_ONE = "scheduleOne";
     public static final String SCHEDULE_TWO = "scheduleTwo";
 
     private LinearLayout mScheduleOneContainer;
     private LinearLayout mScheduleTwoContainer;
-
-    private VoiceRecognitionConfig mVoiceConfig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,18 +85,15 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
             mDoorOne.toggle("Door is in motion");
         });
         mToggleVoiceControl.setOnClickListener(v -> {
-            if (VoiceRecognition.State.STARTED == VoiceRecognition.getInstance().getCurrentState()) {
+            if (VoiceRecognizer.State.STARTED == VoiceRecognizer.getInstance().getCurrentState()) {
                 GarDService.stopVoiceRecognition();
             } else {
                 startVoiceRecognition();
             }
         });
 
-        mVoiceConfig = VoiceRecognitionConfig.getSavedValue();
-
-        mThreshold.setText(mVoiceConfig.getLevel() + "");
-        mOpen.setText(mVoiceConfig.getOpenPhrase());
-        mClose.setText(mVoiceConfig.getClosePhrase());
+        mOpen.setText(mDoorOne.getOpenPhrase());
+        mClose.setText(mDoorOne.getClosePhrase());
 
         View buttonOne = findViewById(R.id.cardview);
         View buttonTwo = findViewById(R.id.cardview2);
@@ -164,14 +157,14 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
     }
 
     @Subscribe
-    public void onStateChange(VoiceRecognition.State state) {
-        if (state == VoiceRecognition.State.STARTED) {
+    public void onStateChange(VoiceRecognizer.State state) {
+        if (state == VoiceRecognizer.State.STARTED) {
             stopLoading();
             mToggleVoiceControl.setText("Stop");
             mThreshold.setEnabled(false);
             mOpen.setEnabled(false);
             mClose.setEnabled(false);
-        } else if (state == VoiceRecognition.State.STOPPED || state == VoiceRecognition.State.ERROR) {
+        } else if (state == VoiceRecognizer.State.STOPPED || state == VoiceRecognizer.State.ERROR) {
             stopLoading();
             mToggleVoiceControl.setText("Start");
             mThreshold.setEnabled(true);
@@ -204,9 +197,8 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
 
     private void startVoiceRecognition() {
         showLoading(false, "Starting voice recognition...");
-        int level = VoiceRecognitionConfig.DEFAULT_LEVEL;
+        int level = -40;
         try {
-            //todo mThreshold - 40 por defualt
             level = Integer.parseInt(mThreshold.getText().toString());
         } catch (NumberFormatException e) {
             mThreshold.setText(level + "");
@@ -215,8 +207,10 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
         String openPhrase = mOpen.getText().toString().toLowerCase();
         String closePhrase = mClose.getText().toString().toLowerCase();
 
-        mVoiceConfig = new VoiceRecognitionConfig(level, openPhrase, closePhrase);
-        mVoiceConfig.save();
+        mDoorOne.setOpenPhrase("oh mighty computer");
+        mDoorOne.setClosePhrase("hello my dear");
+        mDoorTwo.setOpenPhrase("here are my keys");
+        mDoorTwo.setClosePhrase("go to hell");
 
         double threshold = Math.pow(10, level);
         GarDService.startVoiceRecognition((float) threshold);
