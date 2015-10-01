@@ -3,6 +3,7 @@ package com.nanospark.gard.events;
 import com.nanospark.gard.model.door.Door;
 
 /**
+ * Door command received and activated
  * Created by Leandro on 9/8/2015.
  */
 public class DoorToggled {

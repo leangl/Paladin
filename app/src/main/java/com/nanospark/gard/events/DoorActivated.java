@@ -3,6 +3,7 @@ package com.nanospark.gard.events;
 import com.nanospark.gard.model.door.Door;
 
 /**
+ * Door command sent but not yet confirmed
  * Created by Leandro on 9/8/2015.
  */
 public class DoorActivated {
