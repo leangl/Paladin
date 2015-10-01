@@ -65,6 +65,10 @@ public class Tattu {
         runOnUiThread(() -> bus().register(obj));
     }
 
+    public static void unregister(Object obj) {
+        runOnUiThread(() -> bus().unregister(obj));
+    }
+
     public static Handler createUiHandler() {
         return new Handler(Looper.getMainLooper());
     }
