@@ -91,25 +91,23 @@ public abstract class BaseDrawerActivity extends BaseActivity implements Navigat
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem) {
         mDrawerLayout.closeDrawers();
-        menuItem.setChecked(true);
 
         if (mNavigationView.getMenu().getItem(0).getItemId() == menuItem.getItemId()) {
             for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
                 getSupportFragmentManager().popBackStack();
             }
+            menuItem.setChecked(true);
         } else {
             Fragment fragment = getFragmentForDrawerItem(menuItem.getItemId()); // FIXME es poco eficiente, se pide una instancia sin saber realmente si va a mostrarse
             if (fragment != null) {
                 FragmentManager fm = getSupportFragmentManager();
                 if (fm.getBackStackEntryCount() == 0 || !fragment.getClass().getSimpleName().equals(fm.getBackStackEntryAt(fm.getBackStackEntryCount() - 1).getName())) {
-                    for (int i = 0; i < fm.getBackStackEntryCount(); i++) {
-                        fm.popBackStackImmediate();
-                    }
+                    fm.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                     start(fragment, true);
                 }
+                menuItem.setChecked(true);
             }
         }
-
         return true;
     }
 

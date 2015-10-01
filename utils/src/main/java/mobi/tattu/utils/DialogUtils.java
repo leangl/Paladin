@@ -111,7 +111,7 @@ public class DialogUtils {
 
         List<T> selectedItems = new ArrayList<>(items.size());
 
-        final ArrayAdapter<T> arrayAdapter = new ListAdapter<>(ctx, R.layout.select_dialog_multichoice_material, items, disabled);
+        final ArrayAdapter<T> arrayAdapter = new DialogListAdapter<>(ctx, R.layout.select_dialog_multichoice_material, items, disabled);
         AlertDialog dialog = new AlertDialog.Builder(ctx)
                 .setTitle(title)
                 .setAdapter(arrayAdapter, (d, which) -> {
@@ -146,11 +146,18 @@ public class DialogUtils {
         return dialog;
     }
 
-    private static class ListAdapter<T> extends ArrayAdapter<T> {
+    /**
+     * Adapter que permite deshabilitar uno o mas items
+     */
+    private static class DialogListAdapter<T> extends ArrayAdapter<T> {
 
         private List<T> disabled;
 
-        public ListAdapter(Context context, int resource, List<T> objects, List<T> disabled) {
+        /**
+         * @param objects  Items a mostrar(deben implementar toString)
+         * @param disabled Items de la lista anterior que van a ser deshabilitados
+         */
+        public DialogListAdapter(Context context, int resource, List<T> objects, List<T> disabled) {
             super(context, resource, objects);
             this.disabled = disabled;
         }

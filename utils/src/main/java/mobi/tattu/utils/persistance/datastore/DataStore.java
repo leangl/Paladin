@@ -8,19 +8,21 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.TypeAdapterFactory;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import mobi.tattu.utils.F;
 import mobi.tattu.utils.Tattu;
+import roboguice.RoboGuice;
 
+@Singleton
 public class DataStore {
-
-    private static DataStore sInstance;
 
     private static final String DATA = "data";
     private static final String TIMESTAMP = "timestamp";
@@ -28,15 +30,13 @@ public class DataStore {
     private final Context mCtx;
     private Gson mGson;
 
+    @Inject
     private DataStore() {
         mCtx = Tattu.context;
     }
 
     public static final DataStore getInstance() {
-        if (sInstance == null) {
-            sInstance = new DataStore();
-        }
-        return sInstance;
+        return RoboGuice.getInjector(Tattu.context).getInstance(DataStore.class);
     }
 
     public <T> Set<T> getAll(Class<T> type) {
@@ -52,8 +52,12 @@ public class DataStore {
         return result;
     }
 
-    public <T> T getObject(Object key, Class<T> type) throws ObjectNotFoundException {
-        return fromJson(type, getRootEntry(key, type));
+    public <T> F.Option<T> getObject(Object key, Class<T> type) {
+        try {
+            return F.Option.Some(fromJson(type, getRootEntry(key, type)));
+        } catch (ObjectNotFoundException e) {
+            return F.Option.None();
+        }
     }
 
     public boolean contains(Object object) {
@@ -64,8 +68,12 @@ public class DataStore {
         return getSharedPreferences(type).contains(resolveKey(key));
     }
 
-    public long getTimestamp(Object key, Class<?> type) throws ObjectNotFoundException {
-        return getRootEntry(key, type).get(TIMESTAMP).getAsLong();
+    public F.Option<Long> getTimestamp(Object key, Class<?> type) {
+        try {
+            return F.Option.Some(getRootEntry(key, type).get(TIMESTAMP).getAsLong());
+        } catch (ObjectNotFoundException e) {
+            return F.Option.None();
+        }
     }
 
     private JsonObject getRootEntry(Object key, Class<?> type) throws ObjectNotFoundException {
@@ -107,7 +115,7 @@ public class DataStore {
      * @param type
      * @param <T>
      */
-    public <T> void putAll(Collection<T> objects, Class<T> type) {
+    public <R extends Iterable<T>, T> R putAll(R objects, Class<T> type) {
 
         SharedPreferences.Editor editor = getSharedPreferences(type).edit();
 
@@ -119,6 +127,8 @@ public class DataStore {
         }
 
         editor.commit();
+
+        return objects;
     }
 
     /**

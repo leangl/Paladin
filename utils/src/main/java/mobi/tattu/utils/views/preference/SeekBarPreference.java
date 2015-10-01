@@ -78,10 +78,10 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
 		layout.setPadding(15, 10, 15, 10);
 
 		TextView title = new TextView(ctx);
-		int textColor = ctx.getResources().getColor(R.color.white);
+		int textColor = ctx.getResources().getColor(R.color.seekbar_preference_title_color);
 		title.setId(android.R.id.title);
 		title.setSingleLine();
-		title.setTextAppearance(ctx, android.R.style.TextAppearance_Large);
+		title.setTextAppearance(ctx, android.R.style.TextAppearance_Medium);
 		title.setTextColor(textColor);
 		layout.addView(title);
 
@@ -94,7 +94,7 @@ public class SeekBarPreference extends Preference implements SeekBar.OnSeekBarCh
 		summary = new TextView(ctx);
 		summary.setId(android.R.id.summary);
 		summary.setTextAppearance(ctx, android.R.style.TextAppearance_Small);
-		summary.setTextColor(textColor);
+		summary.setTextColor(R.color.seekbar_preference_summary_color);
 		layout.addView(summary);
 
 		return layout;

@@ -4,10 +4,6 @@ import android.app.Application;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.acra.ACRA;
-import org.acra.ACRAConfiguration;
-
-import mobi.tattu.utils.R;
 import mobi.tattu.utils.Utils;
 
 public class Logger {
@@ -16,7 +12,6 @@ public class Logger {
     }
 
     public static void init(Application app) {
-        initACRA(app);
         Thread.UncaughtExceptionHandler defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler((thread, ex) -> {
             Logger.e("ERROR", ex);
@@ -26,12 +21,7 @@ public class Logger {
         });
     }
 
-    private static void initACRA(Application app) {
-        ACRAConfiguration acraCfg = ACRA.getNewDefaultConfig(app);
-        acraCfg.setResToastText(R.string.crash_toast_text);
-        ACRA.setConfig(acraCfg);
-        ACRA.init(app);
-    }
+
 
     public static void e(Object tag, String message) {
         e(tag, message, null);
@@ -155,17 +145,6 @@ public class Logger {
         return tag.getClass().getSimpleName();
     }
 
-    /**
-     * Agrega la preferencia indicada para ser enviada en el reporte de errores.
-     *
-     * @param preferencesName
-     */
-    public static void logSharedPreference(String preferencesName) {
-        String[] sharedPrefs = ACRA.getConfig().additionalSharedPreferences();
-        String[] newSharedPrefs = new String[sharedPrefs.length + 1];
-        newSharedPrefs[newSharedPrefs.length - 1] = preferencesName;
-        ACRA.getConfig().setAdditionalSharedPreferences(newSharedPrefs);
-    }
 
 
 

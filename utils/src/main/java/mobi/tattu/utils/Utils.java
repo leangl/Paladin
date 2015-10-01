@@ -14,8 +14,6 @@ import android.os.Build;
 import android.support.v4.BuildConfig;
 import android.util.Patterns;
 
-import org.acra.ACRA;
-import org.acra.ACRAConfiguration;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -258,15 +256,10 @@ public class Utils {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
     }
 
-    private static void initACRA(Application app) {
-        ACRAConfiguration acraCfg = ACRA.getNewDefaultConfig(app);
-        acraCfg.setResToastText(android.R.string.httpErrorBadUrl);
-        ACRA.setConfig(acraCfg);
-        ACRA.init(app);
-    }
+
 
     public static void init(Application app) {
-        initACRA(app);
+
         Thread.UncaughtExceptionHandler defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler((thread, ex) -> {
             Logger.e("ERROR", ex);

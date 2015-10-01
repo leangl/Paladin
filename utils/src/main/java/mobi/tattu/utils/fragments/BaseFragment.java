@@ -111,6 +111,10 @@ public class BaseFragment extends RoboFragment implements BaseActivity.OnBackLis
         if (getBaseActivity() != null) getBaseActivity().showLoading(cancelable);
     }
 
+    protected  void showLoading(boolean cancelable, int resId) {
+        if (getBaseActivity() != null) getBaseActivity().showLoading(cancelable, resId);
+    }
+
     protected BaseActivity getBaseActivity() {
         return (BaseActivity) getActivity();
     }

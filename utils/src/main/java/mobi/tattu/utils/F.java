@@ -240,7 +240,7 @@ public class F {
 
         @Override
         public T get() {
-            throw new IllegalStateException("No value");
+            return null;
         }
 
         public Iterator<T> iterator() {
@@ -674,6 +674,34 @@ public class F {
         List<R> r = new ArrayList<>(l.size());
         for (S s : l) r.addAll(f.apply(s));
         return r;
+    }
+
+    /**
+     * A Function with no arguments.
+     */
+    public static interface Action0<R> {
+        public R apply() throws Throwable;
+    }
+
+    /**
+     * A Function with a single argument.
+     */
+    public static interface Action<A, R> {
+        public R apply(A a) throws Throwable;
+    }
+
+    /**
+     * A Function with 2 arguments.
+     */
+    public static interface Action2<A, B, R> {
+        public R apply(A a, B b) throws Throwable;
+    }
+
+    /**
+     * A Function with 3 arguments.
+     */
+    public static interface Action3<A, B, C, R> {
+        public R apply(A a, B b, C c) throws Throwable;
     }
 
 }

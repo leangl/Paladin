@@ -9,9 +9,9 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -20,11 +20,12 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Created by Leandro on 11/6/2015.
+ * Created by Cristian on 11/6/2015.
  */
 public class RetryQueue<T> {
 
-    private static final int MAX_RETRY_DELAY = 60 * 5 * 1000; // 5 minutes
+//    private static final int MAX_RETRY_DELAY = 60 * 5 * 1000; // 5 minutes
+ private static final int MAX_RETRY_DELAY = 30 * 1000; // 30 seconds
     private static final int INITIAL_RETRY_DELAY = 30 * 1000; // 30 seconds
     private int mCurrentRetryDelay = 0;
 
@@ -35,26 +36,31 @@ public class RetryQueue<T> {
     private final List<WeakReference<QueueListener<T>>> mListeners = new ArrayList<>();
     private Gson mGson;
     private SharedPreferences mPrefs;
+    private Class<T> type;
 
     private Handler mHandler;
 
-    public RetryQueue(Context ctx, String name, Action<T> action) {
-        this(ctx, name, false, action);
-    }
 
-    public RetryQueue(Context ctx, String name, boolean persistent, Action<T> action) {
+
+    public RetryQueue(Context ctx, String name, boolean persistent, Action<T> action, Class<T> type)  {
         mQueueName = name;
         mAction = action;
         mPersistent = persistent;
+        mPendingMessages = new ConcurrentLinkedQueue<>();
+        this.type = type;
         if (mPersistent) {
             mPrefs = ctx.getSharedPreferences(name, Context.MODE_PRIVATE);
             mGson = new GsonBuilder().create();
             restorePendingRequestsQueue();
         }
-        mPendingMessages = new ConcurrentLinkedQueue<>();
     }
 
-    public void start() {
+
+    /**
+     * Este metodo se tiene que invocar antes de llamar al metodo {@link RetryQueue#fireRequests()}
+     *
+     */
+    public void init() {
         HandlerThread thread = new HandlerThread(mQueueName, android.os.Process.THREAD_PRIORITY_BACKGROUND);
         thread.start();
         start(thread.getLooper());
@@ -79,22 +85,25 @@ public class RetryQueue<T> {
     private void restorePendingRequestsQueue() {
         String pendingQueueString = mPrefs.getString(mQueueName, null);
         if (pendingQueueString != null) {
-            Type listType = new TypeToken<ArrayList<T>>() {
-            }.getType();
-            List<T> pendingQueue = mGson.fromJson(pendingQueueString, listType);
+
+            List<T> pendingQueue = mGson.fromJson(pendingQueueString, new ListOfJson<T>(type));
             mPendingMessages.addAll(pendingQueue);
         }
-        if (!mPendingMessages.isEmpty()) {
-            fireRequests();
-        }
+
     }
 
+
     private void persistPendingRequests() {
+
         List<T> requests = new ArrayList<>(mPendingMessages.size());
         for (T request : mPendingMessages) {
             requests.add(request);
         }
-        mPrefs.edit().putString(mQueueName, mGson.toJson(requests)).apply();
+        if(requests.size() > 0){
+            mPrefs.edit().putString(mQueueName, mGson.toJson(requests)).commit();
+        }else{
+            mPrefs.edit().clear().commit();
+        }
     }
 
     public String getName() {
@@ -107,10 +116,14 @@ public class RetryQueue<T> {
         if (isPersistent()) {
             persistPendingRequests();
         }
-        fireRequests();
+
     }
 
-    private void fireRequests() {
+    /**
+     * Lanza los requests
+     */
+    public void fireRequests() {
+
         fireRequests(0);
     }
 
@@ -132,28 +145,31 @@ public class RetryQueue<T> {
                 T request = mPendingMessages.peek();
 
                 boolean removeFromQueue = false;
-                try {
-                    mAction.perform(request);
+                boolean result = mAction.perform(request);
+                if(result){
                     removeFromQueue = true;
                     mCurrentRetryDelay = 0;
                     broadcastRequestCompleted(request);
-                } catch (ActionException e) { // if callbacks returns error then retry
+                }else{
                     // initially retry in INITIAL_RETRY_DELAY, the retry exponentially until a max retry delay of MAX_RETRY_DELAY
                     mCurrentRetryDelay = mCurrentRetryDelay >= MAX_RETRY_DELAY ? MAX_RETRY_DELAY : mCurrentRetryDelay > 0 ? mCurrentRetryDelay * 2
                             : INITIAL_RETRY_DELAY;
-                    Log.w("RequestQueue_" + mQueueName, "Error sending request. Retrying in: " + mCurrentRetryDelay, e);
+                    Log.w("RequestQueue_" + mQueueName, "Error sending request. Retrying in: " + mCurrentRetryDelay);
                 }
+
                 if (removeFromQueue) {
                     removeFromPendingQueue();
                 }
                 if (!mPendingMessages.isEmpty()) { // if more pending request, then re run task
                     fireRequests(mCurrentRetryDelay);
+                }else {
+                    stop();
                 }
             }
         }
 
         private void removeFromPendingQueue() {
-            mPendingMessages.poll();
+            mPendingMessages.clear();
             if (isPersistent()) {
                 persistPendingRequests();
             }
@@ -200,10 +216,44 @@ public class RetryQueue<T> {
     }
 
     public interface Action<T> {
-        void perform(T obj) throws ActionException;
+        /**
+         *
+         * @param obj
+         * @return true indica que se tiene que terminar de ejecutar la tarea
+         */
+        boolean perform(T obj) ;
     }
 
     public static class ActionException extends Exception {
     }
+    public class ListOfJson<T> implements ParameterizedType {
 
+        private Class<?> wrapped;
+
+        public ListOfJson(Class<T> wrapper) {
+            this.wrapped = wrapper;
+        }
+
+        @Override
+        public Type[] getActualTypeArguments() {
+            return new Type[]{wrapped};
+        }
+
+        @Override
+        public Type getRawType() {
+            return List.class;
+        }
+
+        @Override
+        public Type getOwnerType() {
+            return null;
+        }
+    }
+
+    public void removeAllRetryQueue(){
+        mPendingMessages.clear();
+        if(isPersistent()){
+            persistPendingRequests();
+        }
+    }
 }

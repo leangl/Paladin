@@ -5,7 +5,6 @@
     <color name="drawer_item_selected">@color/light_blue_A400</color>
     <color name="drawer_item">@color/white</color>
     <color name="divider">@color/grey_600</color>
-    <color name="cardview_background">@color/white</color>
-    <color name="toolbar_background">@color/background_material_dark</color>
-    <color name="activity_main_background">@color/grey_300</color>
+    <color name="seekbar_preference_title_color">@color/black</color>
+    <color name="seekbar_preference_summary_color">@color/grey_700</color>
 </resources>
