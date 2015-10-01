@@ -3,11 +3,11 @@ package com.nanospark.gard;
 import android.app.Application;
 import android.util.Log;
 
-import com.nanospark.gard.door.Door;
-import com.nanospark.gard.events.DoorActivation;
+import com.nanospark.gard.model.door.Door;
+import com.nanospark.gard.events.DoorActivated;
 import com.nanospark.gard.events.VoiceRecognizer;
-import com.nanospark.gard.scheduler.Schedule;
-import com.nanospark.gard.scheduler.SchedulerWizard;
+import com.nanospark.gard.model.scheduler.Schedule;
+import com.nanospark.gard.model.scheduler.SchedulerWizard;
 import com.nanospark.gard.ui.MainActivity;
 import com.squareup.otto.Subscribe;
 
@@ -52,7 +52,7 @@ public class GarD extends Application {
     }
 
     @Subscribe
-    public void on(DoorActivation event) {
+    public void on(DoorActivated event) {
         toast(event.message);
     }
 

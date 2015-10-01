@@ -1,6 +1,6 @@
-package com.nanospark.gard.scheduler;
+package com.nanospark.gard.model.scheduler;
 
-import com.nanospark.gard.door.Door;
+import com.nanospark.gard.model.door.Door;
 
 import java.util.Calendar;
 import java.util.List;

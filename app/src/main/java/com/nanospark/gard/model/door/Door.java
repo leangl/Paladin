@@ -1,10 +1,10 @@
-package com.nanospark.gard.door;
+package com.nanospark.gard.model.door;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.nanospark.gard.GarD;
 import com.nanospark.gard.R;
-import com.nanospark.gard.events.DoorActivation;
+import com.nanospark.gard.events.DoorActivated;
 import com.nanospark.gard.events.DoorToggled;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
@@ -65,7 +65,7 @@ public class Door {
         if (!isOpened()) {
             Log.i("DOOR", "Opening door: " + id);
             Log.i("DOOR", message);
-            Tattu.post(new DoorActivation(this, true, message));
+            Tattu.post(new DoorActivated(this, true, message));
             return true;
         } else {
             Log.w("DOOR", "Door already open: " + id);
@@ -78,7 +78,7 @@ public class Door {
         if (isOpened()) {
             Log.i("DOOR", "Closing door: " + id);
             Log.i("DOOR", message);
-            Tattu.post(new DoorActivation(this, false, message));
+            Tattu.post(new DoorActivated(this, false, message));
             return true;
         } else {
             Log.w("DOOR", "Door already closed: " + id);
@@ -103,7 +103,7 @@ public class Door {
     }
 
     @Subscribe
-    public void on(DoorActivation event) {
+    public void on(DoorActivated event) {
         activatePin = true;
     }
 

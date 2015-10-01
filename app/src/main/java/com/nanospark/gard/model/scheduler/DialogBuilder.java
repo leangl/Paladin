@@ -1,4 +1,4 @@
-package com.nanospark.gard.scheduler;
+package com.nanospark.gard.model.scheduler;
 
 import android.content.Context;
 import android.widget.Toast;

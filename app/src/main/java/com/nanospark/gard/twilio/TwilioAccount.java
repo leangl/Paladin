@@ -1,4 +1,4 @@
-package com.nanospark.gard.config;
+package com.nanospark.gard.twilio;
 
 import java.io.Serializable;
 

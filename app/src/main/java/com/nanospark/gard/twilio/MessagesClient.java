@@ -9,7 +9,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Singleton;
-import com.nanospark.gard.config.TwilioAccount;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

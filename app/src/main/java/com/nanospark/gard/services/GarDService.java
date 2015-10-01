@@ -9,7 +9,7 @@ import android.util.Log;
 import com.google.inject.Inject;
 import com.nanospark.gard.GarD;
 import com.nanospark.gard.R;
-import com.nanospark.gard.door.Door;
+import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.VoiceRecognizer;

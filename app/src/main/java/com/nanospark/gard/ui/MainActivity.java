@@ -16,15 +16,15 @@ import android.widget.Toast;
 
 import com.google.inject.Inject;
 import com.nanospark.gard.R;
-import com.nanospark.gard.config.TwilioAccount;
-import com.nanospark.gard.door.Door;
+import com.nanospark.gard.twilio.TwilioAccount;
+import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.DoorToggled;
 import com.nanospark.gard.events.VoiceRecognizer;
-import com.nanospark.gard.scheduler.DialogBuilder;
-import com.nanospark.gard.scheduler.Schedule;
-import com.nanospark.gard.scheduler.SchedulerWizard;
+import com.nanospark.gard.model.scheduler.DialogBuilder;
+import com.nanospark.gard.model.scheduler.Schedule;
+import com.nanospark.gard.model.scheduler.SchedulerWizard;
 import com.nanospark.gard.services.GarDService;
 import com.squareup.otto.Subscribe;
 

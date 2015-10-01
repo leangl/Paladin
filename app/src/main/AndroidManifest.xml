@@ -51,7 +51,7 @@
         <service android:name=".services.GarDService"/>
 
         <receiver
-            android:name=".scheduler.BootReceiver"
+            android:name=".model.scheduler.BootReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -60,7 +60,7 @@
         </receiver>
 
         <receiver
-            android:name=".scheduler.AlarmReceiver"
+            android:name=".model.scheduler.AlarmReceiver"
             android:enabled="true"
             android:exported="true">
         </receiver>

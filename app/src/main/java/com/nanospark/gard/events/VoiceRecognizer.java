@@ -3,7 +3,7 @@ package com.nanospark.gard.events;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.nanospark.gard.GarD;
-import com.nanospark.gard.door.Door;
+import com.nanospark.gard.model.door.Door;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 

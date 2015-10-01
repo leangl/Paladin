@@ -1,6 +1,6 @@
 package com.nanospark.gard.events;
 
-import com.nanospark.gard.door.Door;
+import com.nanospark.gard.model.door.Door;
 
 /**
  * Created by Leandro on 21/7/2015.

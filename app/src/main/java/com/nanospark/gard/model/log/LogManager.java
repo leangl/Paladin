@@ -1,4 +1,4 @@
-package com.nanospark.gard.log;
+package com.nanospark.gard.model.log;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
