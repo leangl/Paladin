@@ -1,5 +1,8 @@
 package com.nanospark.gard.model.door;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.nanospark.gard.GarD;
@@ -24,6 +27,8 @@ import roboguice.RoboGuice;
  */
 public class Door {
 
+    private static int sAutoCloseMillis = 0;
+
     private Boolean opened = true;
     private int id;
     private int inputPinNumber;
@@ -43,6 +48,7 @@ public class Door {
         this.outputPinNumber = outputPinNumber;
         this.inputPinNumber = inputPinNumber;
         mDataStore = DataStore.getInstance();
+        mAutoCloseHandler = new Handler(Looper.getMainLooper());
         restore();
         Tattu.register(this);
     }
@@ -57,6 +63,15 @@ public class Door {
         throw new IllegalArgumentException("No door with id " + id);
     }
 
+
+    public static void setAutoCloseTimer(int millis) {
+        sAutoCloseMillis = millis;
+    }
+
+    public static int getAutoCloseTimer() {
+        return sAutoCloseMillis;
+    }
+
     public static final Door[] getDoors() {
         return new Door[]{getInstance(1), getInstance(2)};
     }
@@ -65,6 +80,7 @@ public class Door {
         if (!isOpened()) {
             Log.i("DOOR", "Opening door: " + id);
             Log.i("DOOR", message);
+            startAutoClose();
             Tattu.post(new DoorActivated(this, true, message));
             return true;
         } else {
@@ -93,6 +109,29 @@ public class Door {
         Tattu.post(new DoorToggled(this, opened));
     }
 
+    private Handler mAutoCloseHandler;
+
+    private void startAutoClose() {
+        long startTime = System.currentTimeMillis();
+        mAutoCloseHandler.removeCallbacksAndMessages(null);
+        mAutoCloseHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isOpened()) {
+                    close("Auto closing");
+                } else {
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - startTime < 20000) {
+                        mAutoCloseHandler.removeCallbacksAndMessages(null);
+                        mAutoCloseHandler.postDelayed(this, 20000);
+                    } else {
+                        close("Auto closing");
+                    }
+                }
+            }
+        }, sAutoCloseMillis + 10000);
+    }
+
     public void toggle(String message) {
         Log.i("DOOR", "Toggle door: " + id);
         if (this.opened) {
@@ -109,6 +148,10 @@ public class Door {
 
     public boolean isOpened() {
         return this.opened;
+    }
+
+    public boolean isClosed() {
+        return !isOpened();
     }
 
     public boolean isReady() {
