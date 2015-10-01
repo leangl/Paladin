@@ -79,8 +79,6 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_layout);
 
-        //mDoorState.setText(null);
-        //mDoorToggle.setEnabled(false);
         mDoorToggle.setOnClickListener(v -> {
             mDoorOne.toggle("Door is in motion");
         });
@@ -106,14 +104,12 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
         loadSchedule(SCHEDULE_ONE);
         loadSchedule(SCHEDULE_TWO);
 
-        try {
-            TwilioAccount a = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class);
+        TwilioAccount a = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class).get();
+        if (a != null) {
             mTwilioPhone.setText(a.getPhone());
             mTwilioAccount.setText(a.getSid());
             mTwilioToken.setText(a.getToken());
-        } catch (DataStore.ObjectNotFoundException e) {
         }
-
         mTwilioSave.setOnClickListener(v -> saveTwilio());
 
         registerReceiver(mUsbReceiver, new IntentFilter(UsbManager.ACTION_USB_ACCESSORY_DETACHED));
@@ -136,10 +132,9 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
     }
 
     private void loadSchedule(String key) {
-        try {
-            Schedule schedule = DataStore.getInstance().getObject(key, Schedule.class);
+        Schedule schedule = DataStore.getInstance().getObject(key, Schedule.class).get();
+        if (schedule != null) {
             populateListView(schedule.name, schedule);
-        } catch (DataStore.ObjectNotFoundException e1) {
         }
     }
 
@@ -191,8 +186,6 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
     @Subscribe
     public void on(BoardDisconnected event) {
         mBoardLed.setImageResource(R.drawable.led_off);
-        //mDoorState.setText(null);
-        //mDoorToggle.setEnabled(false);
     }
 
     private void startVoiceRecognition() {
@@ -207,10 +200,8 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
         String openPhrase = mOpen.getText().toString().toLowerCase();
         String closePhrase = mClose.getText().toString().toLowerCase();
 
-        mDoorOne.setOpenPhrase("oh mighty computer");
-        mDoorOne.setClosePhrase("hello my dear");
-        mDoorTwo.setOpenPhrase("here are my keys");
-        mDoorTwo.setClosePhrase("go to hell");
+        mDoorOne.setOpenPhrase(openPhrase);
+        mDoorOne.setClosePhrase(closePhrase);
 
         double threshold = Math.pow(10, level);
         GarDService.startVoiceRecognition((float) threshold);

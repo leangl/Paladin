@@ -14,6 +14,7 @@ import edu.cmu.pocketsphinx.Assets;
 import edu.cmu.pocketsphinx.Hypothesis;
 import edu.cmu.pocketsphinx.RecognitionListener;
 import edu.cmu.pocketsphinx.SpeechRecognizer;
+import ioio.lib.spi.Log;
 import mobi.tattu.utils.StringUtils;
 import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.image.AsyncTask;
@@ -27,6 +28,8 @@ import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
 @Singleton
 public class VoiceRecognizer implements RecognitionListener {
 
+    private static final String TAG = VoiceRecognizer.class.getSimpleName();
+
     public static final float DEFAULT_THRESHOLD = 1e-40f;
 
     private static final String KEY_OPEN = "open";
@@ -34,11 +37,10 @@ public class VoiceRecognizer implements RecognitionListener {
 
     private State currentState = State.STOPPED;
     private SpeechRecognizer recognizer;
-    private Door[] mDoors;
+    private Door door;
 
     @Inject
     private VoiceRecognizer() {
-        mDoors = Door.getDoors();
         Tattu.register(this);
     }
 
@@ -51,7 +53,8 @@ public class VoiceRecognizer implements RecognitionListener {
         Tattu.post(this.currentState);
     }
 
-    public void start() {
+    public void start(Door door) {
+        this.door = door;
         // Start voice recognition asynchronously
         new AsyncTask<Void, Void, Exception>() {
             @Override
@@ -100,11 +103,11 @@ public class VoiceRecognizer implements RecognitionListener {
         recognizer.addListener(this);
 
         // Create keyword-activation search.
-        for (Door door : mDoors) {
-            if (StringUtils.isNotBlank(door.getOpenPhrase()))
-                recognizer.addKeyphraseSearch(KEY_OPEN + door.getId(), door.getOpenPhrase());
-            if (StringUtils.isNotBlank(door.getClosePhrase()))
-                recognizer.addKeyphraseSearch(KEY_CLOSE + door.getId(), door.getClosePhrase());
+        if (StringUtils.isNotBlank(door.getOpenPhrase())) {
+            recognizer.addKeyphraseSearch(KEY_OPEN + door.getId(), door.getOpenPhrase());
+        }
+        if (StringUtils.isNotBlank(door.getClosePhrase())) {
+            recognizer.addKeyphraseSearch(KEY_CLOSE + door.getId(), door.getClosePhrase());
         }
     }
 
@@ -149,11 +152,9 @@ public class VoiceRecognizer implements RecognitionListener {
     private void showHypothesis(Hypothesis hypothesis) {
         if (hypothesis != null) {
             String text = hypothesis.getHypstr();
-            for (Door door : mDoors) {
-                if (text.equals(door.getOpenPhrase()) || text.equals(door.getClosePhrase())) {
-                    Tattu.post(new PhraseRecognized(door, text));
-                    switchPhrase();
-                }
+            if (text.equals(door.getOpenPhrase()) || text.equals(door.getClosePhrase())) {
+                Tattu.post(new PhraseRecognized(door, text));
+                switchPhrase();
             }
         }
     }
@@ -181,14 +182,13 @@ public class VoiceRecognizer implements RecognitionListener {
     private void switchPhrase() {
         if (recognizer != null) {
             recognizer.stop();
-            //recognizer.startListening(KEY_OPEN + 1);
-            for (Door door : mDoors) {
-                if (door.isOpened()) {
-                    recognizer.startListening(KEY_OPEN + door.getId());
-                } else {
-                    recognizer.startListening(KEY_CLOSE + door.getId());
-                }
+            boolean result;
+            if (door.isOpened()) {
+                result = recognizer.startListening(KEY_OPEN + door.getId());
+            } else {
+                result = recognizer.startListening(KEY_CLOSE + door.getId());
             }
+            Log.d(TAG, "startListening " + result);
         }
     }
 

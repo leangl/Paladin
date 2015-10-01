@@ -154,7 +154,7 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
             switch (intent.getAction()) {
                 case START_VOICE_RECOGNITION:
                     // Get setup parameters (recognition threshold and open/close phrases)
-                    mVoiceRecognizer.start();
+                    mVoiceRecognizer.start(mDoorOne);
                     break;
                 case STOP_VOICE_RECOGNITION:
                     mVoiceRecognizer.stop();

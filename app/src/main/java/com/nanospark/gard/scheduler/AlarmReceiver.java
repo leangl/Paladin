@@ -20,15 +20,13 @@ public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String key = intent.getStringExtra(KEY_EXTRA_NAME);
-        try {
-            Schedule schedule = DataStore.getInstance().getObject(key, Schedule.class);
+        Schedule schedule = DataStore.getInstance().getObject(key, Schedule.class).get();
+        if (schedule != null) {
             if (schedule.trigger()) {
                 Log.i("Scheduler", "Schedule triggered: " + schedule);
             } else {
                 Log.e("Scheduler", "Schedule not triggered: " + schedule);
             }
-        } catch (DataStore.ObjectNotFoundException e) {
-            Log.e("Scheduler", "Schedule not found.", e);
         }
     }
 

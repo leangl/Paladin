@@ -3,6 +3,7 @@ package com.nanospark.gard.door;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.nanospark.gard.GarD;
+import com.nanospark.gard.R;
 import com.nanospark.gard.events.DoorActivation;
 import com.nanospark.gard.events.DoorToggled;
 import com.squareup.otto.Produce;
@@ -15,6 +16,7 @@ import ioio.lib.api.exception.ConnectionLostException;
 import ioio.lib.spi.Log;
 import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.ToastManager;
+import mobi.tattu.utils.persistance.datastore.DataStore;
 import roboguice.RoboGuice;
 
 /**
@@ -31,13 +33,16 @@ public class Door {
     private boolean activatePin;
     private Boolean lastState;
     private boolean voiceEnabled;
-    private String openPhrase;
-    private String closePhrase;
+    private Config config;
+
+    @Inject
+    private DataStore mDataStore;
 
     public Door(int id, Integer outputPinNumber, Integer inputPinNumber) {
         this.id = id;
         this.outputPinNumber = outputPinNumber;
         this.inputPinNumber = inputPinNumber;
+        mDataStore = DataStore.getInstance();
         restore();
         Tattu.register(this);
     }
@@ -136,29 +141,36 @@ public class Door {
     }
 
     public String getOpenPhrase() {
-        return openPhrase;
+        return config.openPhrase;
     }
 
     public void setOpenPhrase(String openPhrase) {
-        this.openPhrase = openPhrase;
+        this.config.openPhrase = openPhrase;
         persist();
     }
 
     public String getClosePhrase() {
-        return closePhrase;
+        return config.closePhrase;
     }
 
     public void setClosePhrase(String closePhrase) {
-        this.closePhrase = closePhrase;
+        this.config.closePhrase = closePhrase;
         persist();
     }
 
     private void restore() {
-        // TODO
+        config = mDataStore.getObject(getId(), Config.class).get();
+        if (config == null) {
+            config = new Config();
+            config.openPhrase = GarD.instance.getString(R.string.default_open);
+            config.closePhrase = GarD.instance.getString(R.string.default_close);
+        }
     }
 
     private void persist() {
-        // TODO save state
+        if (config != null) {
+            mDataStore.putObject(getId(), config);
+        }
     }
 
     public void setup(IOIO ioio) throws ConnectionLostException {
@@ -221,6 +233,11 @@ public class Door {
         private Two() {
             super(2, 6, 7);
         }
+    }
+
+    public static class Config {
+        public String openPhrase;
+        public String closePhrase;
     }
 
 }

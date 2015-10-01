@@ -53,20 +53,17 @@ public class MessagesClient {
     }
 
     private RequestInterceptor mBasicAuthInterceptor = request -> {
-        try {
-            TwilioAccount account = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class);
+        TwilioAccount account = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class).get();
+        if (account != null) {
             String credentials = account.getSid() + ":" + account.getToken();
             String string = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
             request.addHeader("Authorization", string);
-        } catch (DataStore.ObjectNotFoundException e) {
-            Log.e("TWILIO", "Account not set!");
         }
-
     };
 
     public Observable<Void> sendMessage(String message, String to) {
-        try {
-            TwilioAccount account = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class);
+        TwilioAccount account = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class).get();
+        if (account != null) {
             if (!account.isValid()) {
                 Log.e("TWILIO", "Account not set!");
                 return Observable.error(new Exception());
@@ -76,7 +73,7 @@ public class MessagesClient {
                 Log.i("TWILIO", "Messages sent: " + message + " to " + to);
                 return null;
             });
-        } catch (DataStore.ObjectNotFoundException e) {
+        } else {
             Log.e("TWILIO", "Account not set!");
             return Observable.error(new Exception());
         }
@@ -90,8 +87,8 @@ public class MessagesClient {
      * @return
      */
     public Observable<JsonObject> getNewMessage() {
-        try {
-            TwilioAccount account = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class);
+        TwilioAccount account = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class).get();
+        if (account != null) {
             if (!account.isValid()) {
                 Log.e("TWILIO", "Account not set!");
                 return Observable.error(new Exception());
@@ -107,15 +104,15 @@ public class MessagesClient {
                             try {
                                 Date timestamp = formatter.parse(messageObj.get("date_sent").getAsString());
                                 boolean after = true;
-                                try {
-                                    Calendar lastCal = Calendar.getInstance();
-                                    lastCal.setTime(DataStore.getInstance().getObject("LAST_TIMESTAMP", Date.class));
+                                Calendar lastCal = Calendar.getInstance();
+                                Date lastTimestamp = DataStore.getInstance().getObject("LAST_TIMESTAMP", Date.class).get();
+                                if (lastTimestamp != null) {
+                                    lastCal.setTime(lastTimestamp);
 
                                     Calendar messageCal = Calendar.getInstance();
                                     messageCal.setTime(timestamp);
 
                                     after = messageCal.after(lastCal);
-                                } catch (DataStore.ObjectNotFoundException e) {
                                 }
                                 if (after) {
                                     DataStore.getInstance().putObject("LAST_TIMESTAMP", timestamp);
@@ -130,7 +127,7 @@ public class MessagesClient {
                 }
                 return null;
             });
-        } catch (DataStore.ObjectNotFoundException e) {
+        } else {
             Log.e("TWILIO", "Account not set!");
             return Observable.error(new Exception());
         }
