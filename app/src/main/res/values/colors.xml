@@ -5,7 +5,13 @@
     <color name="red">#f1482f</color>
     <color name="text_tab_selected">@android:color/white</color>
     <color name="text_tab_unselected">#a4bbc7</color>
-    <color name="cardview_background">@color/white</color>
+    <color name="cardview_background">#ffffff</color>
     <color name="toolbar_background">@color/background_material_dark</color>
-    <color name="activity_main_background">@color/grey_300</color>
+    <color name="activity_main_background">#eeeeee</color>
+    <color name="door_one_background">#be2f2f</color>
+    <color name="door_one_switch_background">#b11010</color>
+    <color name="text_color_bold">#6e6e6e</color>
+    <color name="door_two_background">#a6e04b</color>
+    <color name="door_two_switch_background">#8dc63f</color>
+
 </resources>

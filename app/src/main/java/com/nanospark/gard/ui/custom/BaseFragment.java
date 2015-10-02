@@ -5,4 +5,12 @@ package com.nanospark.gard.ui.custom;
  */
 public abstract class BaseFragment extends mobi.tattu.utils.fragments.BaseFragment {
 
+    public int getColorFromResource(int color){
+        return getBaseActivity().getColorFromResource(color);
+    }
+
+    public BaseActivity getBaseActivity(){
+        return (BaseActivity)getActivity();
+    }
+
 }

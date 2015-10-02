@@ -11,5 +11,7 @@
         <item name="colorAccent">@android:color/white</item>
 
     </style>
-
+    <style name="ToolbarSubTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle">
+        <item name="android:textSize">10sp</item>
+    </style>
 </resources>

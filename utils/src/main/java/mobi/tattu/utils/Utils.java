@@ -14,7 +14,6 @@ import android.os.Build;
 import android.support.v4.BuildConfig;
 import android.util.Patterns;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -499,5 +498,7 @@ public class Utils {
         }
         return Boolean.TRUE;
     }
+
+
 }
 

@@ -1,5 +1,6 @@
 package com.nanospark.gard.ui.custom;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -27,7 +28,9 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.title_toolbar);
-        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+        toolbar.setSubtitle(R.string.subtile_toolbar);
+        toolbar.setSubtitleTextColor(getColorFromResource(R.color.white));
+        toolbar.setTitleTextColor(getColorFromResource(R.color.white));
         setSupportActionBar(toolbar);
 
         TabLayout tabLayout = (TabLayout)findViewById(R.id.tab);
@@ -35,7 +38,7 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
         tabLayout.addTab(tabLayout.newTab().setText(R.string.title_main));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.title_users));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.title_schedules));
-        tabLayout.addTab(tabLayout.newTab().setText(R.string.title_settings));
+
 
         this.mViewPager = (ViewPager) findViewById(R.id.view_pager);
         BasePagerAdapter basePagerAdapter = new BasePagerAdapter(getSupportFragmentManager(),tabLayout.getTabCount());
@@ -95,6 +98,20 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
         @Override
         public int getCount() {
             return this.mCount;
+        }
+    }
+
+
+    /**
+     *
+     * @param color del R.color.blue
+     * @return color tomado del resources
+     */
+    public int getColorFromResource(int color){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ){
+            return  getResources().getColor(color,getTheme());
+        }else{
+            return  getResources().getColor(color);
         }
     }
 }
