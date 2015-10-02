@@ -2,21 +2,17 @@ package com.nanospark.gard.services;
 
 import android.app.Notification;
 import android.content.Intent;
-import android.os.Handler;
 import android.support.v7.app.NotificationCompat;
-import android.util.Log;
 
 import com.google.inject.Inject;
 import com.nanospark.gard.GarD;
 import com.nanospark.gard.R;
-import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.VoiceRecognizer;
-import com.nanospark.gard.twilio.MessagesClient;
+import com.nanospark.gard.model.door.Door;
+import com.nanospark.gard.sms.MessagesClient;
 import com.squareup.otto.Subscribe;
-
-import java.util.concurrent.TimeUnit;
 
 import ioio.lib.api.exception.ConnectionLostException;
 import ioio.lib.util.BaseIOIOLooper;
@@ -38,97 +34,30 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
     // service started flag
     private boolean started;
 
-    private VoiceRecognizer mVoiceRecognizer;
-
     @Inject
     private Door.One mDoorOne;
     @Inject
     private Door.Two mDoorTwo;
-
     @Inject
     private MessagesClient mClient;
-    private Handler smsHandler;
+    @Inject
+    private VoiceRecognizer mVoiceRecognizer;
 
     private IOIOAndroidApplicationHelper ioioHelper;
 
     private Notification mNotification;
 
-    private static long MESSAGES_CHECK_TIME = TimeUnit.SECONDS.toMillis(5);
-    private static long MESSAGES_RETRY_TIME = TimeUnit.SECONDS.toMillis(30);
-
-    /**
-     * Periondically checks Twilio Messages Log for new messages
-     */
-    private Runnable checkMessages = new Runnable() {
-        @Override
-        public void run() {
-            mClient.getNewMessage().subscribe(message -> {
-                // if new message is received
-                if (message != null) {
-                    // check if the body matches the current door status
-                    String body = message.get("body").getAsString();
-                    String from = message.get("from").getAsString();
-                    String replyMessage = null;
-
-                    try {
-                        String[] bodyParts = body.split(" ");
-                        int doorNumber = Integer.parseInt(bodyParts[0]);
-                        String command = bodyParts[1];
-
-                        boolean isOpenCommand = "open".equalsIgnoreCase(command);
-                        if (Door.getInstance(doorNumber).isOpened() != isOpenCommand) {
-                            mDoorOne.toggle("Message received, door is in motion");
-                            if (isOpenCommand) {
-                                replyMessage = "Open door command received.";
-                            } else {
-                                replyMessage = "Close door command received.";
-                            }
-                        } else {
-                            if (isOpenCommand) {
-                                replyMessage = "The door is already open.";
-                            } else {
-                                replyMessage = "The door is already closed.";
-                            }
-                        }
-                    } catch (Exception e) {
-                        Log.e("TWILIO", "Invalid command: " + body);
-                        replyMessage = "Invalid command. Format has to be: {door} {command}";
-                    }
-
-                    mClient.sendMessage(replyMessage, from).subscribe(success -> {
-                        Log.i("TWILIO", "Reply sent successfully");
-                    }, error -> {
-                        Log.e("TWILIO", "Error sending reply.", error);
-                    });
-                }
-                // Reschedule message log check
-                if (smsHandler != null) {
-                    smsHandler.removeCallbacksAndMessages(null);
-                    smsHandler.postDelayed(checkMessages, MESSAGES_CHECK_TIME);
-                }
-            }, error -> {
-                smsHandler.removeCallbacksAndMessages(null);
-                smsHandler.postDelayed(checkMessages, MESSAGES_RETRY_TIME);
-            });
-        }
-    };
-
     @Override
     public void onCreate() {
         super.onCreate();
-        smsHandler = new Handler();
-        mVoiceRecognizer = VoiceRecognizer.getInstance();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        stopIOIO();
         mVoiceRecognizer.stop();
-
-        if (smsHandler != null) {
-            smsHandler.removeCallbacksAndMessages(null);
-            smsHandler = null;
-        }
+        mClient.stop();
     }
 
     @Override
@@ -143,9 +72,7 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
                     .build();
             startForeground(123, mNotification);
 
-            // Start checking for incoming SMS messages
-            smsHandler.removeCallbacksAndMessages(null);
-            smsHandler.postDelayed(checkMessages, MESSAGES_CHECK_TIME);
+            mClient.start();
         }
 
         startIOIO();

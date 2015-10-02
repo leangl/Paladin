@@ -116,10 +116,14 @@ public class VoiceRecognizer implements RecognitionListener {
     }
 
     @Subscribe
-    public void on(Door.VoiceRecognitionEnabled event) {
-        if (VoiceRecognizer.State.STARTED.equals(getCurrentState())) {
-            // TODO
-        }
+    public void on(VoiceRecognitionEnabled event) {
+        stop();
+        start(event.door);
+    }
+
+    @Subscribe
+    public void on(VoiceRecognitionDisabled event) {
+        stop();
     }
 
     @Subscribe
