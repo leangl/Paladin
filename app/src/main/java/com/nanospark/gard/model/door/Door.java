@@ -9,6 +9,8 @@ import com.nanospark.gard.GarD;
 import com.nanospark.gard.R;
 import com.nanospark.gard.events.DoorActivated;
 import com.nanospark.gard.events.DoorToggled;
+import com.nanospark.gard.events.VoiceRecognitionDisabled;
+import com.nanospark.gard.events.VoiceRecognitionEnabled;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
@@ -235,23 +237,6 @@ public class Door {
                 confirm(!state);
             }
             Thread.sleep(100);
-        }
-    }
-
-
-    public class VoiceRecognitionEnabled {
-        public final Door door;
-
-        private VoiceRecognitionEnabled(Door door) {
-            this.door = door;
-        }
-    }
-
-    public class VoiceRecognitionDisabled {
-        public final Door door;
-
-        private VoiceRecognitionDisabled(Door door) {
-            this.door = door;
         }
     }
 
