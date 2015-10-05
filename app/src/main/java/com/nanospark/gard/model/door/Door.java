@@ -173,7 +173,7 @@ public class Door {
         return id;
     }
 
-    private void disableVoiceRecognition() {
+    public void disableVoiceRecognition() {
         this.voiceEnabled = false;
         Tattu.post(new VoiceRecognitionDisabled(this));
         persist();

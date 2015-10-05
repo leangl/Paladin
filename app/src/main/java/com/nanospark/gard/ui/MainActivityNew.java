@@ -13,4 +13,5 @@ public class MainActivityNew extends BaseActivity {
         super.onCreate(savedInstanceState);
 
     }
+
 }

@@ -1,181 +1,186 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="10dp">
+    android:layout_margin="10dp"
+    android:orientation="vertical">
 
     <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/cardview_door"
-        card_view:cardCornerRadius="4dp"
-        card_view:cardBackgroundColor="@color/cardview_background"
-        card_view:cardUseCompatPadding="false"
-        card_view:contentPadding="0dp"
-        card_view:cardPreventCornerOverlap="false"
-        >
-    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        card_view:cardBackgroundColor="@color/cardview_background"
+        card_view:cardCornerRadius="4dp"
+        card_view:cardPreventCornerOverlap="false"
+        card_view:cardUseCompatPadding="false"
+        card_view:contentPadding="0dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/door_label"
-            android:id="@+id/textview_title_door"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_margin="10dp"
-            android:textStyle="bold"
-            android:textColor="@color/text_color_bold"
-            android:textSize="19sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@string/last_opened_label"
-            android:id="@+id/textView9"
-            android:layout_below="@+id/textview_title_door"
-            android:layout_alignLeft="@+id/textview_title_door"
-            android:layout_alignStart="@+id/textview_title_door"
-            android:textSize="14sp"
-            android:layout_marginBottom="10dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="13:34 Tue"
-            android:id="@+id/textview_last_opened"
-            android:layout_alignTop="@+id/textView9"
-            android:layout_toRightOf="@+id/textView9"
-            android:layout_toEndOf="@+id/textView9"
-            android:layout_marginLeft="5dp"
-            android:textStyle="bold"
-            android:textColor="@color/text_color_bold" />
-
-        <LinearLayout
-            android:orientation="vertical"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_below="@+id/textView9"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:background="@color/door_one_background"
-            android:id="@+id/container_center">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true">
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/imageview_icon_door"
-                android:src="@drawable/door_open"
-                android:layout_weight="0.3"
-                android:scaleType="center" />
+            <TextView
+                android:id="@+id/textview_title_door"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="10dp"
+                android:text="@string/door_label"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/text_color_bold"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/textview_title_door"
+                android:layout_alignStart="@+id/textview_title_door"
+                android:layout_below="@+id/textview_title_door"
+                android:layout_marginBottom="10dp"
+                android:text="@string/last_opened_label"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/textview_last_opened"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/textView9"
+                android:layout_marginLeft="5dp"
+                android:layout_toEndOf="@+id/textView9"
+                android:layout_toRightOf="@+id/textView9"
+                android:text="13:34 Tue"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/text_color_bold"
+                android:textStyle="bold" />
 
             <LinearLayout
-                android:orientation="horizontal"
-                android:id="@+id/container_switch"
+                android:id="@+id/container_center"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@color/door_one_switch_background">
+                android:layout_height="200dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/textView9"
+                android:background="@color/door_one_background"
+                android:orientation="vertical">
 
-                <TextView
+                <ImageView
+                    android:id="@+id/imageview_icon_door"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="Opened"
-                    android:id="@+id/textview_open"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:textColor="@color/white"
-                    android:layout_marginLeft="10dp"
-                    android:textStyle="bold"
-                    android:layout_marginRight="5dp" />
+                    android:layout_weight="0.3"
+                    android:scaleType="center"
+                    android:src="@drawable/door_open" />
 
-                <android.support.v7.widget.SwitchCompat
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/container_switch"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/switch_open"
-                    android:checked="false"
-                    android:layout_marginRight="10dp" />
+                    android:layout_weight="1"
+                    android:background="@color/door_one_switch_background"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textview_open"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="Opened"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/white"
+                        android:textStyle="bold" />
+
+                    <android.support.v7.widget.SwitchCompat
+                        android:id="@+id/switch_open"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="10dp"
+                        android:checked="false"
+                        />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/imageview_icon_sound"
-            android:layout_below="@+id/container_center"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_margin="10dp"
-            android:src="@drawable/ic_sound_" />
+            <ImageView
+                android:id="@+id/imageview_icon_sound"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_no_sound_"
+                android:layout_above="@+id/textView2"
+                android:layout_alignLeft="@+id/textView9"
+                android:layout_alignStart="@+id/textView9"
+                android:layout_below="@+id/container_center" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@string/open_label"
-            android:id="@+id/textView10"
-            android:layout_alignBottom="@+id/imageview_icon_sound"
-            android:layout_toRightOf="@+id/imageview_icon_sound"
-            android:layout_toEndOf="@+id/imageview_icon_sound"
-            android:layout_marginLeft="13dp"
-            android:textSize="15sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@string/close_label"
-            android:id="@+id/textView11"
-            android:textSize="15sp"
-            android:layout_below="@+id/textView10"
-            android:layout_alignLeft="@+id/textView10"
-            android:layout_alignStart="@+id/textView10"
-            android:layout_marginTop="5dp" />
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_alignEnd="@+id/textview_title_door"
+                android:layout_alignRight="@+id/textview_title_door"
+                android:text="@string/open_label"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_above="@+id/textView2"
+                android:layout_alignTop="@+id/edittext_open_voice"
+                android:gravity="center_vertical" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Open Door"
-            android:id="@+id/textview_open_door_voice"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:textColor="@color/text_color_bold"
-            android:layout_alignTop="@+id/textView10"
-            android:layout_alignLeft="@+id/textview_last_opened"
-            android:layout_alignStart="@+id/textview_last_opened" />
+            <EditText
+                android:id="@+id/edittext_open_voice"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_below="@+id/container_center"
+                android:layout_toEndOf="@+id/textView"
+                android:layout_toRightOf="@+id/textView"
+                android:hint="@string/default_open"
+                android:inputType="text"
+                android:background="@drawable/edittexttheme_edit_text_holo_light"
+                android:gravity="center_vertical" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Close Door"
-            android:id="@+id/textview_close_door_voice"
-            android:textSize="15sp"
-            android:layout_alignTop="@+id/textView11"
-            android:layout_alignLeft="@+id/textview_open_door_voice"
-            android:layout_alignStart="@+id/textview_open_door_voice"
-            android:textStyle="bold"
-            android:textColor="@color/text_color_bold" />
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_alignBottom="@+id/edittext_close_voice"
+                android:layout_alignLeft="@+id/textView"
+                android:layout_alignStart="@+id/textView"
+                android:layout_below="@+id/edittext_open_voice"
+                android:text="@string/close_label"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:gravity="center_vertical" />
 
-        <View
-            android:layout_width="match_parent"
-            android:id="@+id/space"
-            android:layout_height="10dp"
-            android:layout_below="@+id/textView11"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            <EditText
+                android:id="@+id/edittext_close_voice"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_below="@+id/edittext_open_voice"
+                android:layout_toEndOf="@+id/textView2"
+                android:layout_toRightOf="@+id/textView2"
+                android:hint="@string/default_close"
+                android:inputType="text"
+                android:gravity="center_vertical"
+                android:background="@drawable/edittexttheme_edit_text_holo_light"
 
-    </RelativeLayout>
+                />
+
+            <View
+                android:id="@+id/space"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/edittext_close_voice" />
+
+        </RelativeLayout>
     </android.support.v7.widget.CardView>
 </RelativeLayout>

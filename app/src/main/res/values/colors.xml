@@ -13,5 +13,7 @@
     <color name="text_color_bold">#6e6e6e</color>
     <color name="door_two_background">#a6e04b</color>
     <color name="door_two_switch_background">#8dc63f</color>
+    <color name="secondary_text_default_material_dark">#b3b16f6f</color>
+    <color name="edittexttheme_color">#6e6e6e</color>
 
 </resources>

@@ -44,7 +44,7 @@
             android:enabled="true"
             android:exported="true">
         </receiver>
-        <activity android:name=".ui.MainActivityNew">
+        <activity android:name=".ui.MainActivityNew" android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

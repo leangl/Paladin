@@ -3,9 +3,9 @@ package com.nanospark.gard;
 import android.app.Application;
 import android.util.Log;
 
-import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.events.DoorActivated;
 import com.nanospark.gard.events.VoiceRecognizer;
+import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.scheduler.Schedule;
 import com.nanospark.gard.model.scheduler.SchedulerWizard;
 import com.nanospark.gard.ui.MainActivity;
@@ -24,6 +24,9 @@ import roboguice.RoboGuice;
  */
 public class GarD extends Application {
 
+    public final static int DOOR_ONE_ID = 1;
+    public final static int DOOR_TWO_ID = 2;
+
     static {
         RoboGuice.setUseAnnotationDatabases(false);
     }
@@ -38,8 +41,8 @@ public class GarD extends Application {
 
         instance = this;
 
-        Door.getInstance(1); // force initialization
-        Door.getInstance(2); // force initialization
+        Door.getInstance(DOOR_ONE_ID); // force initialization
+        Door.getInstance(DOOR_TWO_ID); // force initialization
         VoiceRecognizer.getInstance(); // force initialization
 
         //GarDService.start();
