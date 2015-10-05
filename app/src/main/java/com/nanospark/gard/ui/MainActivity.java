@@ -80,7 +80,7 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
         setContentView(R.layout.main_layout);
 
         mDoorToggle.setOnClickListener(v -> {
-            mDoorOne.toggle("Door is in motion");
+            mDoorOne.toggle("Door is in motion", true);
         });
         mToggleVoiceControl.setOnClickListener(v -> {
             if (VoiceRecognizer.State.STARTED == VoiceRecognizer.getInstance().getCurrentState()) {

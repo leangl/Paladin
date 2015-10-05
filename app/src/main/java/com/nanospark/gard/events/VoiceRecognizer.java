@@ -133,7 +133,7 @@ public class VoiceRecognizer implements RecognitionListener {
 
     @Subscribe
     public void on(PhraseRecognized event) {
-        event.door.toggle("Command heard, door is in motion");
+        event.door.toggle("Command heard, door is in motion", true);
     }
 
     /**

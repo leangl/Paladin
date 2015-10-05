@@ -44,6 +44,7 @@ public class Door {
     private Config config;
     private Handler mAutoCloseHandler;
     private Handler mActivationTimeoutHandler;
+    private boolean mPendingConfirmation;
 
     @Inject
     private DataStore mDataStore;
@@ -71,7 +72,6 @@ public class Door {
         throw new IllegalArgumentException("No door with id " + id);
     }
 
-
     public static void setAutoCloseTimer(int millis) {
         sAutoCloseMillis = millis;
     }
@@ -84,21 +84,26 @@ public class Door {
         return new Door[]{getInstance(1), getInstance(2)};
     }
 
-    public boolean open(String message) {
+    public boolean open(String message, boolean forced) {
+        Log.i(toString(), "Command received with message: " + message);
+        if (mPendingConfirmation && !forced) {
+            Log.i(toString(), "Another command pending, ignored...");
+            return false;
+        }
         if (!isOpened()) {
-            Log.i("DOOR", "Opening door: " + id);
-            Log.i("DOOR", message);
+            Log.i(toString(), "Opening door: " + id);
+            Log.i(toString(), message);
             startAutoClose();
             Tattu.post(new DoorActivated(this, true, message));
             return true;
         } else {
-            Log.w("DOOR", "Door already open: " + id);
+            Log.w(toString(), "Door already open: " + id);
             ToastManager.get().showToast("The door is already open.", 1);
             return false;
         }
     }
 
-    public boolean close(String message) {
+    public boolean close(String message, boolean forced) {
         if (isOpened()) {
             Log.i("DOOR", "Closing door: " + id);
             Log.i("DOOR", message);
@@ -114,6 +119,7 @@ public class Door {
     public void confirm(boolean opened) {
         Log.i("DOOR", "Confirmed door: " + id + " - opened: " + opened);
         this.opened = opened;
+        mPendingConfirmation = false;
         mActivationTimeoutHandler.removeCallbacksAndMessages(null);
         Tattu.post(new DoorToggled(this, opened));
     }
@@ -125,32 +131,33 @@ public class Door {
             @Override
             public void run() {
                 if (isOpened()) {
-                    close("Auto closing");
+                    close("Auto closing", false);
                 } else {
                     long currentTime = System.currentTimeMillis();
                     if (currentTime - startTime < 20000) {
                         mAutoCloseHandler.removeCallbacksAndMessages(null);
                         mAutoCloseHandler.postDelayed(this, 20000);
                     } else {
-                        close("Auto closing");
+                        close("Auto closing", false);
                     }
                 }
             }
         }, sAutoCloseMillis + 10000);
     }
 
-    public void toggle(String message) {
+    public void toggle(String message, boolean forced) {
         Log.i("DOOR", "Toggle door: " + id);
         if (this.opened) {
-            close(message);
+            close(message, forced);
         } else {
-            open(message);
+            open(message, forced);
         }
     }
 
     @Subscribe
     public void on(DoorActivated event) {
         activatePin = true;
+        mPendingConfirmation = true;
         mActivationTimeoutHandler.removeCallbacksAndMessages(null);
         mActivationTimeoutHandler.postDelayed(new Runnable() {
 

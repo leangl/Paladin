@@ -91,11 +91,11 @@ public class MainFragment extends com.nanospark.gard.ui.custom.BaseFragment {
         ((SwitchCompat)cardView.findViewById(R.id.switch_open)).setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 // TODO: 04/10/15 Preguntar a lea que hay que pasarle
-                door.open("Open");
+                door.open("Open", true);
                 textView.setText(R.string.opened_label);
                 imageViewDoor.setImageResource(R.drawable.door_open);
             } else {
-                door.close(getString(R.string.closed_label));
+                door.close(getString(R.string.closed_label), true);
                 textView.setText(R.string.closed_label);
                 imageViewDoor.setImageResource(R.drawable.door_closed);
             }

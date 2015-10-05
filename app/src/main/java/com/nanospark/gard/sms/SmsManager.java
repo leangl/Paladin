@@ -227,13 +227,13 @@ public class SmsManager {
                 if (smsCommand.door.isOpened()) {
                     return "The door is already open.";
                 }
-                smsCommand.door.toggle("Message received, door is in motion");
+                smsCommand.door.toggle("Message received, door is in motion", false);
                 return "Open door command received.";
             } else if (smsCommand.is(SmsCommand.CLOSE)) {
                 if (smsCommand.door.isClosed()) {
                     return "The door is already closed.";
                 }
-                smsCommand.door.toggle("Message received, door is in motion");
+                smsCommand.door.toggle("Message received, door is in motion", false);
                 return "Close door command received.";
             }
         }
