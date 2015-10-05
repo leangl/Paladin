@@ -8,6 +8,7 @@ import com.google.inject.Singleton;
 import com.nanospark.gard.GarD;
 import com.nanospark.gard.R;
 import com.nanospark.gard.events.DoorActivated;
+import com.nanospark.gard.events.DoorActivationFailed;
 import com.nanospark.gard.events.DoorToggled;
 import com.nanospark.gard.events.VoiceRecognitionDisabled;
 import com.nanospark.gard.events.VoiceRecognitionEnabled;
@@ -175,6 +176,7 @@ public class Door {
                     mActivationTimeoutHandler.postDelayed(this, 20000);
                 } else {
                     Log.d(Door.this.toString(), "Retry failed: " + action);
+                    Tattu.post(new DoorActivationFailed(event.door, event.opened));
                     mSmsManager.sendDoorAlert("Paladin was unable to " + action + " your door.", event.opened);
                 }
             }
