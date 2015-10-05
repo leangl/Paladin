@@ -20,6 +20,7 @@ public class Schedule {
     public int hourOfDay;
     public int minute;
     public long timeStamp;
+    public int doorId;
 
     @Override
     public boolean equals(Object o) {
@@ -49,9 +50,9 @@ public class Schedule {
     public boolean trigger() {
         if (isNow()) {
             if (action.equals(ACTION_OPEN_DOOR)) {
-                return Door.getInstance(0).open("Scheduled action taken, door is in motion", false); // TODO set door id
+                return Door.getInstance(doorId).open("Scheduled action taken, door is in motion", false);
             } else if (action.equals(ACTION_CLOSE_DOOR)) {
-                return Door.getInstance(0).close("Scheduled action taken, door is in motion", false); // TODO set door id
+                return Door.getInstance(doorId).close("Scheduled action taken, door is in motion", false);
             }
         }
         return false;
