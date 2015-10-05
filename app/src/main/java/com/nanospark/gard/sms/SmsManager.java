@@ -42,6 +42,8 @@ import static com.nanospark.gard.sms.twilio.TwilioApi.DATE_FORMAT;
 @Singleton
 public class SmsManager {
 
+    private static final String TAG = SmsManager.class.getSimpleName();
+
     private static long MESSAGES_CHECK_TIME = TimeUnit.SECONDS.toMillis(5);
     private static long MESSAGES_RETRY_TIME = TimeUnit.SECONDS.toMillis(30);
 
@@ -316,16 +318,27 @@ public class SmsManager {
 
     }
 
+    @Subscribe
+    public void on(DoorToggled event) {
+        sendDoorAlert(event.door.getId() + " is " + (event.opened ? "open" : "closed"), event.opened);
+    }
+
     /**
      * Send SMS message to users configured to receive door status alerts
      */
-    @Subscribe
-    public void on(DoorToggled event) {
+    public void sendDoorAlert(String alert, boolean isOpen) {
+        int count = 0;
         for (User user : mUserManager.getAll()) {
-            if (StringUtils.isNotBlank(user.getPhone()) && user.getNotify().notify(event.opened)) {
-                sendMessage(event.door.getId() + " is " + (event.opened ? "open" : "closed"), user.getPhone());
+            if (StringUtils.isNotBlank(user.getPhone()) && user.getNotify().notify(isOpen)) {
+                count++;
+                sendMessage(alert, user.getPhone()).subscribe(success -> {
+                    Log.d(TAG, "SMS success");
+                }, error -> {
+                    Log.e(TAG, "SMS error", error);
+                });
             }
         }
+        Log.d(TAG, "Sending alert to #" + count);
     }
 
 }

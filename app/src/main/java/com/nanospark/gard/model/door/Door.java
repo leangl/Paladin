@@ -11,6 +11,7 @@ import com.nanospark.gard.events.DoorActivated;
 import com.nanospark.gard.events.DoorToggled;
 import com.nanospark.gard.events.VoiceRecognitionDisabled;
 import com.nanospark.gard.events.VoiceRecognitionEnabled;
+import com.nanospark.gard.sms.SmsManager;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
@@ -41,9 +42,13 @@ public class Door {
     private Boolean lastState;
     private boolean voiceEnabled;
     private Config config;
+    private Handler mAutoCloseHandler;
+    private Handler mActivationTimeoutHandler;
 
     @Inject
     private DataStore mDataStore;
+    @Inject
+    private SmsManager mSmsManager;
 
     public Door(int id, Integer outputPinNumber, Integer inputPinNumber) {
         this.id = id;
@@ -51,6 +56,7 @@ public class Door {
         this.inputPinNumber = inputPinNumber;
         mDataStore = DataStore.getInstance();
         mAutoCloseHandler = new Handler(Looper.getMainLooper());
+        mActivationTimeoutHandler = new Handler(Looper.getMainLooper());
         restore();
         Tattu.register(this);
     }
@@ -108,10 +114,9 @@ public class Door {
     public void confirm(boolean opened) {
         Log.i("DOOR", "Confirmed door: " + id + " - opened: " + opened);
         this.opened = opened;
+        mActivationTimeoutHandler.removeCallbacksAndMessages(null);
         Tattu.post(new DoorToggled(this, opened));
     }
-
-    private Handler mAutoCloseHandler;
 
     private void startAutoClose() {
         long startTime = System.currentTimeMillis();
@@ -146,6 +151,25 @@ public class Door {
     @Subscribe
     public void on(DoorActivated event) {
         activatePin = true;
+        mActivationTimeoutHandler.removeCallbacksAndMessages(null);
+        mActivationTimeoutHandler.postDelayed(new Runnable() {
+
+            private int increment = 0;
+
+            @Override
+            public void run() {
+                increment++;
+                String action = event.opened ? "open" : "close";
+                if (increment < 3) {
+                    Log.d(Door.this.toString(), "Retrying command: " + action);
+                    activatePin = true;
+                    mActivationTimeoutHandler.postDelayed(this, 20000);
+                } else {
+                    Log.d(Door.this.toString(), "Retry failed: " + action);
+                    mSmsManager.sendDoorAlert("Paladin was unable to " + action + " your door.", event.opened);
+                }
+            }
+        }, 20000);
     }
 
     public boolean isOpened() {
@@ -242,12 +266,11 @@ public class Door {
 
     @Override
     public String toString() {
-        return id + "";
+        return "Door" + id;
     }
 
     @Singleton
     public static class One extends Door {
-
         @Inject
         private One() {
             super(1, 4, 5);
@@ -256,7 +279,6 @@ public class Door {
 
     @Singleton
     public static class Two extends Door {
-
         @Inject
         private Two() {
             super(2, 6, 7);
