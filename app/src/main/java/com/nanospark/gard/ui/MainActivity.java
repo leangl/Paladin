@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.google.inject.Inject;
 import com.nanospark.gard.R;
-import com.nanospark.gard.sms.TwilioAccount;
+import com.nanospark.gard.sms.twilio.TwilioAccount;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;

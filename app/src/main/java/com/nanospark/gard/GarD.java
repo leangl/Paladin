@@ -8,6 +8,7 @@ import com.nanospark.gard.events.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.scheduler.Schedule;
 import com.nanospark.gard.model.scheduler.SchedulerWizard;
+import com.nanospark.gard.services.GarDService;
 import com.nanospark.gard.ui.MainActivity;
 import com.squareup.otto.Subscribe;
 
@@ -45,7 +46,7 @@ public class GarD extends Application {
         Door.getInstance(DOOR_TWO_ID); // force initialization
         VoiceRecognizer.getInstance(); // force initialization
 
-        //GarDService.start();
+        GarDService.start();
 
         Set<Schedule> schedules = DataStore.getInstance().getAll(Schedule.class);
         for (Schedule schedule : schedules) {

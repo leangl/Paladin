@@ -1,4 +1,4 @@
-package com.nanospark.gard.sms;
+package com.nanospark.gard.sms.twilio;
 
 import java.io.Serializable;
 

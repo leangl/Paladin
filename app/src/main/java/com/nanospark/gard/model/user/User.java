@@ -1,5 +1,7 @@
 package com.nanospark.gard.model.user;
 
+import com.nanospark.gard.model.door.Door;
+
 import java.util.List;
 
 import mobi.tattu.utils.StringUtils;
@@ -78,8 +80,20 @@ public class User {
         return notify != null && !notify.equals(Notify.NONE);
     }
 
+    public boolean isAllowedTime(Door door) {
+        return true; // TODO
+    }
+
     public enum Notify {
         OPEN, CLOSE, ALL, NONE
+    }
+
+    public static boolean isUsernameValid(String username) {
+        return StringUtils.isNotBlank(username) && username.length() <= 20;
+    }
+
+    public boolean isPasswordCorrect(String password) {
+        return password.equalsIgnoreCase(this.password);
     }
 
 }

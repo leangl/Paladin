@@ -11,7 +11,7 @@ import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
-import com.nanospark.gard.sms.MessagesClient;
+import com.nanospark.gard.sms.SmsManager;
 import com.squareup.otto.Subscribe;
 
 import ioio.lib.api.exception.ConnectionLostException;
@@ -39,7 +39,7 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
     @Inject
     private Door.Two mDoorTwo;
     @Inject
-    private MessagesClient mClient;
+    private SmsManager mClient;
     @Inject
     private VoiceRecognizer mVoiceRecognizer;
 

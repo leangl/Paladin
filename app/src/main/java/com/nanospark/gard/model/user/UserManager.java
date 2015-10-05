@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 
+import mobi.tattu.utils.F;
 import mobi.tattu.utils.persistance.datastore.DataStore;
 
 /**
@@ -32,6 +33,23 @@ public class UserManager {
         User user = new User();
         user.setName(username);
         return mDataStore.contains(user);
+    }
+
+    public User find(F.Predicate<User> p) {
+        for (User user : getAll()) {
+            if (p.test(user)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    public User findByName(String username) {
+        return find((user) -> user.getName().trim().equalsIgnoreCase(username.trim()));
+    }
+
+    public User findByPhone(String phone) {
+        return find((user) -> user.getPhone().trim().equalsIgnoreCase(phone.trim()));
     }
 
 }
