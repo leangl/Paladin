@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.nanospark.gard.events.DoorToggled;
+import com.nanospark.gard.events.SmsSuspended;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.user.User;
 import com.nanospark.gard.model.user.UserManager;
@@ -20,9 +21,11 @@ import com.nanospark.gard.sms.twilio.TwilioApi;
 import com.squareup.otto.Subscribe;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -49,6 +52,8 @@ public class SmsManager {
 
     private TwilioApi mApi;
     private Handler smsHandler;
+    private boolean mSmsSuspended = false;
+    private List<Long> mLastSentTimestamps;
 
     @Inject
     private UserManager mUserManager;
@@ -66,6 +71,7 @@ public class SmsManager {
 
         mApi = restAdapter.create(TwilioApi.class);
         smsHandler = new Handler();
+        mLastSentTimestamps = new ArrayList<>(20);
 
         Tattu.register(this);
     }
@@ -91,7 +97,26 @@ public class SmsManager {
         }
     };
 
+    public void disableSms() {
+        mSmsSuspended = true;
+        Tattu.post(new SmsSuspended());
+    }
+
+    public void enableSms() {
+        mSmsSuspended = false;
+    }
+
+    public boolean isSmsSuspended() {
+        return mSmsSuspended;
+    }
+
     public Observable<Void> sendMessage(String message, String to) {
+
+        if (exceededLimit()) {
+            disableSms();
+            return Observable.empty();
+        }
+
         TwilioAccount account = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class).get();
         if (account != null) {
             if (!account.isValid()) {
@@ -101,12 +126,28 @@ public class SmsManager {
 
             return mApi.sendMessage(account.getSid(), message, account.getPhone(), to).map(result -> {
                 Log.i("TWILIO", "Messages sent: " + message + " to " + to);
+                mLastSentTimestamps.add(System.currentTimeMillis());
                 return null;
             });
         } else {
             Log.e("TWILIO", "Account not set!");
             return Observable.error(new Exception());
         }
+    }
+
+    private boolean exceededLimit() {
+        long currentTime = System.currentTimeMillis();
+        if (mLastSentTimestamps.size() >= 4) {
+            long delta = currentTime - mLastSentTimestamps.get(mLastSentTimestamps.size() - 4);
+            if (delta < TimeUnit.MINUTES.toMillis(1)) return true;
+        }
+
+        if (mLastSentTimestamps.size() >= 20) {
+            long delta = currentTime - mLastSentTimestamps.get(mLastSentTimestamps.size() - 20);
+            if (delta < TimeUnit.MINUTES.toMillis(10)) return true;
+        }
+
+        return false;
     }
 
     /**
