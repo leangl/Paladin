@@ -25,7 +25,27 @@
 
         <activity
             android:name=".ui.MainActivity"
+            android:label="Paladin Beta"
             android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"
+                android:resource="@xml/accessory_filter"/>
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter"/>
         </activity>
 
         <service android:name=".services.GarDService"/>
@@ -44,7 +64,10 @@
             android:enabled="true"
             android:exported="true">
         </receiver>
-        <activity android:name=".ui.MainActivityNew" android:windowSoftInputMode="stateHidden">
+
+        <activity
+            android:name=".ui.MainActivityNew"
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
