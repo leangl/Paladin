@@ -93,7 +93,7 @@ public class User {
     }
 
     public boolean isPasswordCorrect(String password) {
-        return password.equalsIgnoreCase(this.password);
+        return password != null && password.equalsIgnoreCase(this.password);
     }
 
 }

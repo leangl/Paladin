@@ -201,7 +201,7 @@ public class SmsManager {
         }
     };
 
-    private String handle(SmsCommand smsCommand) {
+    private String handle(SmsCommand smsCommand) throws Exception {
         if (smsCommand.user == null) {
             pendingCommands.put(smsCommand.from, smsCommand);
             return "Seems like you're using a different phone, please text your user name and pass code now to process command";
@@ -212,21 +212,24 @@ public class SmsManager {
         if (!smsCommand.user.isAllowedTime(smsCommand.door)) {
             return "You are not authorized to control the door during this time frame";
         }
-        boolean isOpenCommand = "open".equalsIgnoreCase(smsCommand.command);
-        if (smsCommand.door.isOpened() != isOpenCommand) {
-            smsCommand.door.toggle("Message received, door is in motion");
-            if (isOpenCommand) {
+        if (smsCommand.is(SmsCommand.STATUS)) {
+            return smsCommand.door.getId() + " is " + (smsCommand.door.isOpened() ? "open" : "closed");
+        } else {
+            if (smsCommand.is(SmsCommand.OPEN)) {
+                if (smsCommand.door.isOpened()) {
+                    return "The door is already open.";
+                }
+                smsCommand.door.toggle("Message received, door is in motion");
                 return "Open door command received.";
-            } else {
+            } else if (smsCommand.is(SmsCommand.CLOSE)) {
+                if (smsCommand.door.isClosed()) {
+                    return "The door is already closed.";
+                }
+                smsCommand.door.toggle("Message received, door is in motion");
                 return "Close door command received.";
             }
-        } else {
-            if (isOpenCommand) {
-                return "The door is already open.";
-            } else {
-                return "The door is already closed.";
-            }
         }
+        throw new Exception("Invalid command " + smsCommand.command);
     }
 
     private String handleAuthentication(String from, String body) throws Exception {
@@ -254,6 +257,10 @@ public class SmsManager {
     }
 
     private static class SmsCommand {
+
+        public static final String OPEN = "open";
+        public static final String CLOSE = "close";
+        public static final String STATUS = "status";
 
         private long timestamp;
         private Door door;
@@ -295,6 +302,10 @@ public class SmsManager {
                 return false;
             }
             return true;
+        }
+
+        public boolean is(String command) {
+            return command.equalsIgnoreCase(this.command);
         }
 
     }
