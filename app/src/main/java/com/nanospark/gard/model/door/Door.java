@@ -156,6 +156,8 @@ public class Door {
 
     @Subscribe
     public void on(DoorActivated event) {
+        if (event.door != this) return;
+
         activatePin = true;
         mPendingConfirmation = true;
         mActivationTimeoutHandler.removeCallbacksAndMessages(null);
@@ -282,6 +284,11 @@ public class Door {
         private One() {
             super(1, 4, 5);
         }
+
+        @Subscribe
+        public void on(DoorActivated event) {
+            super.on(event);
+        }
     }
 
     @Singleton
@@ -289,6 +296,11 @@ public class Door {
         @Inject
         private Two() {
             super(2, 6, 7);
+        }
+
+        @Subscribe
+        public void on(DoorActivated event) {
+            super.on(event);
         }
     }
 

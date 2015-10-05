@@ -38,7 +38,7 @@ public class GarD extends Application {
     public void onCreate() {
         super.onCreate();
         Tattu.init(this, MainActivity.class);
-        Tattu.bus().register(this);
+        Tattu.register(this);
 
         instance = this;
 
