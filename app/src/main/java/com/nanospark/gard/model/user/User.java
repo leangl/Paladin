@@ -85,7 +85,24 @@ public class User {
     }
 
     public enum Notify {
-        OPEN, CLOSE, ALL, NONE
+        OPEN(true, false), CLOSE(false, true), ALL(true, true), NONE(false, false);
+
+        private boolean open;
+        private boolean close;
+
+        Notify(boolean open, boolean close) {
+            this.open = open;
+            this.close = close;
+        }
+
+        public boolean notify(boolean isOpen) {
+            if (isOpen) {
+                return open;
+            } else {
+                return close;
+            }
+        }
+
     }
 
     public static boolean isUsernameValid(String username) {

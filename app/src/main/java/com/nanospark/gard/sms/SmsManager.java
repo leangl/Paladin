@@ -11,11 +11,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.nanospark.gard.events.DoorToggled;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.user.User;
 import com.nanospark.gard.model.user.UserManager;
 import com.nanospark.gard.sms.twilio.TwilioAccount;
 import com.nanospark.gard.sms.twilio.TwilioApi;
+import com.squareup.otto.Subscribe;
 
 import java.text.ParseException;
 import java.util.Calendar;
@@ -24,6 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import mobi.tattu.utils.StringUtils;
+import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.persistance.datastore.DataStore;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
@@ -60,6 +64,8 @@ public class SmsManager {
 
         mApi = restAdapter.create(TwilioApi.class);
         smsHandler = new Handler();
+
+        Tattu.register(this);
     }
 
     public void start() {
@@ -308,6 +314,18 @@ public class SmsManager {
             return command.equalsIgnoreCase(this.command);
         }
 
+    }
+
+    /**
+     * Send SMS message to users configured to receive door status alerts
+     */
+    @Subscribe
+    public void on(DoorToggled event) {
+        for (User user : mUserManager.getAll()) {
+            if (StringUtils.isNotBlank(user.getPhone()) && user.getNotify().notify(event.opened)) {
+                sendMessage(event.door.getId() + " is " + (event.opened ? "open" : "closed"), user.getPhone());
+            }
+        }
     }
 
 }
