@@ -12,7 +12,8 @@
     <string name="title_settings">Settings</string>
     <string name="title_schedules">Schedules</string>
     <string name="title_main">Main</string>
-    <string name="door_label">Front Door</string>
+    <string name="front_door_label">Front Door</string>
+    <string name="back_door_label">Back Door</string>
     <string name="last_opened_label">Last opened: </string>
     <string name="open_label">Open:</string>
     <string name="close_label">Close:</string>

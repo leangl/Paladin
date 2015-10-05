@@ -82,9 +82,11 @@ public class BaseActivity extends RoboActionBarActivity {
 
     public void showLoading(boolean cancelable, String message) {
         if (progressDialog == null) {
-            progressDialog = ProgressDialog.show(this, null, message, true, cancelable);
-            progressDialog.setOnCancelListener(dialog -> progressDialog = null);
-            progressDialog.setOnDismissListener(dialog -> progressDialog = null);
+            runOnUiThread(() -> {
+                progressDialog = ProgressDialog.show(this, null, message, true, cancelable);
+                progressDialog.setOnCancelListener(dialog -> progressDialog = null);
+                progressDialog.setOnDismissListener(dialog -> progressDialog = null);
+            });
         } else {
             Log.d("baseActivity", "Already showing progress dialog.");
         }
