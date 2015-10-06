@@ -9,6 +9,7 @@ import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.scheduler.Schedule;
 import com.nanospark.gard.model.scheduler.SchedulerWizard;
 import com.nanospark.gard.services.GarDService;
+import com.nanospark.gard.sms.SmsManager;
 import com.nanospark.gard.ui.MainActivity;
 import com.squareup.otto.Subscribe;
 
@@ -42,9 +43,11 @@ public class GarD extends Application {
 
         instance = this;
 
-        Door.getInstance(DOOR_ONE_ID); // force initialization
-        Door.getInstance(DOOR_TWO_ID); // force initialization
-        VoiceRecognizer.getInstance(); // force initialization
+        // force initialization of singletons TODO find a cleaner way
+        Door.getInstance(DOOR_ONE_ID);
+        Door.getInstance(DOOR_TWO_ID);
+        VoiceRecognizer.getInstance();
+        SmsManager.getInstance();
 
         GarDService.start();
 

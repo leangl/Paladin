@@ -11,6 +11,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.nanospark.gard.GarD;
 import com.nanospark.gard.events.DoorToggled;
 import com.nanospark.gard.events.SmsSuspended;
 import com.nanospark.gard.model.door.Door;
@@ -18,6 +19,7 @@ import com.nanospark.gard.model.user.User;
 import com.nanospark.gard.model.user.UserManager;
 import com.nanospark.gard.sms.twilio.TwilioAccount;
 import com.nanospark.gard.sms.twilio.TwilioApi;
+import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
 import java.text.ParseException;
@@ -35,6 +37,7 @@ import mobi.tattu.utils.persistance.datastore.DataStore;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
+import roboguice.RoboGuice;
 import rx.Observable;
 
 import static com.nanospark.gard.sms.twilio.TwilioApi.DATE_FORMAT;
@@ -74,6 +77,10 @@ public class SmsManager {
         mLastSentTimestamps = new ArrayList<>(20);
 
         Tattu.register(this);
+    }
+
+    public static final SmsManager getInstance() {
+        return RoboGuice.getInjector(GarD.instance).getInstance(SmsManager.class);
     }
 
     public void start() {
@@ -380,6 +387,14 @@ public class SmsManager {
             }
         }
         Log.d(TAG, "Sending alert to #" + count);
+    }
+
+    @Produce
+    public SmsSuspended produceSuspended() {
+        if (mSmsSuspended) {
+            return new SmsSuspended();
+        }
+        return null;
     }
 
 }

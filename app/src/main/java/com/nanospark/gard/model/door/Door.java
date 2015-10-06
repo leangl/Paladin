@@ -106,19 +106,19 @@ public class Door {
 
     public boolean close(String message, boolean forced) {
         if (isOpened()) {
-            Log.i("DOOR", "Closing door: " + id);
-            Log.i("DOOR", message);
+            Log.i(toString(), "Closing door: " + id);
+            Log.i(toString(), message);
             Tattu.post(new DoorActivated(this, false, message));
             return true;
         } else {
-            Log.w("DOOR", "Door already closed: " + id);
+            Log.w(toString(), "Door already closed: " + id);
             ToastManager.get().showToast("The door is already closed.", 1);
             return false;
         }
     }
 
     public void confirm(boolean opened) {
-        Log.i("DOOR", "Confirmed door: " + id + " - opened: " + opened);
+        Log.i(toString(), "Confirmed door: " + id + " - opened: " + opened);
         this.opened = opened;
         mPendingConfirmation = false;
         mActivationTimeoutHandler.removeCallbacksAndMessages(null);
@@ -147,7 +147,7 @@ public class Door {
     }
 
     public void toggle(String message, boolean forced) {
-        Log.i("DOOR", "Toggle door: " + id);
+        Log.i(toString(), "Toggle door: " + id);
         if (this.opened) {
             close(message, forced);
         } else {
@@ -199,9 +199,8 @@ public class Door {
     public DoorToggled produce() {
         if (isReady()) {
             return new DoorToggled(this, this.opened);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public int getId() {
