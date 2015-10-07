@@ -100,6 +100,7 @@ public class Door {
         } else {
             Log.w(toString(), "Door already open: " + id);
             ToastManager.get().showToast("The door is already open.", 1);
+
             return false;
         }
     }

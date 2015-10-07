@@ -99,12 +99,12 @@ public class BaseFragment extends RoboFragment implements BaseActivity.OnBackLis
         return getBaseActivity().popBackStack();
     }
 
-    protected void stopLoading() {
-        if (getBaseActivity() != null) getBaseActivity().stopLoading();
-    }
-
     protected void showLoading() {
         showLoading(false);
+    }
+
+    protected void stopLoading() {
+        if (getBaseActivity() != null) getBaseActivity().stopLoading();
     }
 
     protected void showLoading(boolean cancelable) {
