@@ -61,7 +61,7 @@
         </receiver>
 
         <activity
-            android:name=".ui.MainActivityNew"
+            android:name=".ui.activity.MainActivityNew"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -84,6 +84,7 @@
                 android:resource="@xml/device_filter"/>
 
         </activity>
+        <activity android:name=".ui.activity.LogActivity"/>
     </application>
 
 </manifest>

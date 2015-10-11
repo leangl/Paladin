@@ -8,8 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.nanospark.gard.R;
+import com.nanospark.gard.ui.custom.BaseFragment;
 
-import mobi.tattu.utils.fragments.BaseFragment;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,4 +35,8 @@ public class SettingsFragment extends BaseFragment {
     }
 
 
+    @Override
+    public boolean showHomeIcon() {
+        return false;
+    }
 }

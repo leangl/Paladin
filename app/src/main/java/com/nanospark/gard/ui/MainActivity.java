@@ -16,16 +16,16 @@ import android.widget.Toast;
 
 import com.google.inject.Inject;
 import com.nanospark.gard.R;
-import com.nanospark.gard.sms.twilio.TwilioAccount;
-import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.DoorToggled;
 import com.nanospark.gard.events.VoiceRecognizer;
+import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.scheduler.DialogBuilder;
 import com.nanospark.gard.model.scheduler.Schedule;
 import com.nanospark.gard.model.scheduler.SchedulerWizard;
 import com.nanospark.gard.services.GarDService;
+import com.nanospark.gard.sms.twilio.TwilioAccount;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
@@ -38,6 +38,7 @@ import roboguice.inject.InjectView;
 /**
  * Created by Leandro on 19/7/2015.
  */
+@Deprecated
 public class MainActivity extends mobi.tattu.utils.activities.BaseActivity implements SchedulerWizard.BuilderWizardScheludedListener {
 
     @InjectView(R.id.board_led)

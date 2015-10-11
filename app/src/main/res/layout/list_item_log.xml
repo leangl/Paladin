@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:gravity="center_horizontal"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    android:layout_marginTop="4dp"
+    android:background="@color/white">
+
+    <ImageView
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:id="@+id/imageview_lock"
+        android:src="@drawable/ic_lock_2"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginRight="15dp"
+
+        android:layout_marginBottom="10dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text=" Mon 13, 14:26"
+        android:id="@+id/textView_title"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/imageview_lock"
+        android:layout_marginTop="5dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="opened 23 sec"
+        android:id="@+id/textView_subtitle"
+        android:layout_below="@+id/textView_title"
+        android:layout_toEndOf="@+id/imageview_lock"
+        android:layout_toRightOf="@+id/imageview_lock"
+        android:paddingLeft="7dp"
+        android:layout_marginTop="5dp"
+        android:visibility="invisible"
+        android:layout_marginBottom="5dp" />
+
+</RelativeLayout>

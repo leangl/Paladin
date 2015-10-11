@@ -152,5 +152,8 @@ public abstract class BaseDoorFragment extends BaseFragment {
         return this.mCardView;
     }
 
-
+    @Override
+    public boolean showHomeIcon() {
+        return false;
+    }
 }

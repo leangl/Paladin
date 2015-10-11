@@ -1,4 +1,4 @@
-package com.nanospark.gard.ui;
+package com.nanospark.gard.ui.activity;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -20,6 +20,16 @@ public class MainActivityNew extends BaseActivity {
         super.onCreate(savedInstanceState);
     }
 
+    @Override
+    public int getLayout() {
+        return R.layout.activity_main_tab;
+    }
+
+    @Override
+    public boolean containsTab() {
+        return true;
+    }
+
     @Subscribe
     public void on(SmsSuspended smsSuspended){
         DialogFragment dialogFragment = DialogFragment.newInstance(getString(R.string.sms_suspend_message),getString(R.string.warning_label),true);
@@ -36,7 +46,6 @@ public class MainActivityNew extends BaseActivity {
             }
         });
         dialogFragment.show(getSupportFragmentManager(),DialogFragment.class.getCanonicalName());
-
     }
 
 

@@ -2,20 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <include layout="@layout/toolbar"/>
 
-    <include layout="@layout/toolbar"></include>
-
-    <android.support.design.widget.TabLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tab"
-        android:fillViewport="true"
-        android:background="@color/primary"
-        />
+        android:layout_height="match_parent"
+        android:id="@+id/main_content"></FrameLayout>
 
-    <android.support.v4.view.ViewPager
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/view_pager"
-        android:background="@color/activity_main_background" />
 </LinearLayout>

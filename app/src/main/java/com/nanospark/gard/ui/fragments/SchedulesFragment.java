@@ -34,4 +34,8 @@ public class SchedulesFragment extends BaseFragment {
     }
 
 
+    @Override
+    public boolean showHomeIcon() {
+        return false;
+    }
 }

@@ -23,4 +23,6 @@
     <string name="start_voice_recognition_label">Starting voice recognition...</string>
     <string name="sms_suspend_message">Excessive text message use, text message control and notifications  have been suspended.  Tap OK to re-enable or  CANCEL to leave  suspended (you can re-enable later under Settings-Enable SMS  control).</string>
     <string name="warning_label">Warning</string>
+    <string name="opened_for_label">opened for </string>
+    <string name="closed_for_label">closed for </string>
 </resources>

@@ -34,4 +34,8 @@ public class UsersFragment extends BaseFragment {
     }
 
 
+    @Override
+    public boolean showHomeIcon() {
+        return false;
+    }
 }

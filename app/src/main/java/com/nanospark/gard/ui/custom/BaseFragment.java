@@ -12,6 +12,9 @@ public abstract class BaseFragment extends mobi.tattu.utils.fragments.BaseFragme
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Tattu.bus().register(this);
+        if(showHomeIcon()){
+            getBaseActivity().showHomeIcon();
+        }
     }
 
     public int getColorFromResource(int color){
@@ -29,4 +32,6 @@ public abstract class BaseFragment extends mobi.tattu.utils.fragments.BaseFragme
         super.onDetach();
         Tattu.bus().unregister(this);
     }
+
+    public abstract boolean showHomeIcon();
 }

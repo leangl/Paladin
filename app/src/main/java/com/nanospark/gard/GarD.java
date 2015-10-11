@@ -11,6 +11,8 @@ import com.nanospark.gard.model.scheduler.SchedulerWizard;
 import com.nanospark.gard.services.GarDService;
 import com.nanospark.gard.sms.SmsManager;
 import com.nanospark.gard.ui.MainActivity;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.squareup.otto.Subscribe;
 
 import java.util.Set;
@@ -55,6 +57,8 @@ public class GarD extends Application {
         for (Schedule schedule : schedules) {
             SchedulerWizard.initializeAlarm(this, schedule);
         }
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
+        ImageLoader.getInstance().init(config);
 
     }
 
