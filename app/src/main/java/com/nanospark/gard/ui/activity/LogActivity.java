@@ -16,7 +16,7 @@ public class LogActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        start(LogFragment.newInstance(),false);
+        start(LogFragment.newInstance(), false);
         showHomeIcon();
     }
 

@@ -5,7 +5,9 @@ import com.google.inject.Singleton;
 import com.nanospark.gard.events.DoorToggled;
 import com.squareup.otto.Subscribe;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.persistance.datastore.DataStore;
@@ -23,8 +25,32 @@ public class LogManager {
         Tattu.register(this);
     }
 
-    public Set<Log> getLogs() {
-        return mDataStore.getAll(Log.class);
+    public ArrayList<Log> getLogs() {
+        ArrayList<Log> resLogs = new ArrayList<>();
+
+        resLogs.add(createLog(1, Log.EVENT_OPEN, getDate(Calendar.HOUR,2)));
+        resLogs.add(createLog(1, Log.EVENT_CLOSE, getDate(Calendar.HOUR,4)));
+        resLogs.add(createLog(1, Log.EVENT_OPEN, getDate(Calendar.HOUR,4)));
+        resLogs.add(createLog(1, Log.EVENT_CLOSE, getDate(Calendar.HOUR,5)));
+        resLogs.add(createLog(1, Log.EVENT_OPEN, getDate(Calendar.HOUR,6)));
+
+        return resLogs;
+    }
+
+    private Log createLog(int id,String event,Date date){
+        Log log = new Log();
+        log.setDate(date);
+        log.setDoorId(id);
+        log.setEvent(event);
+
+        return  log;
+
+    }
+    private Date getDate(int fields,int value){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(fields,value);
+        calendar.set(Calendar.MINUTE,value);
+        return calendar.getTime();
     }
 
     @Subscribe

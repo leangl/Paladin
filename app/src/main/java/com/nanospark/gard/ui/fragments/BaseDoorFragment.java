@@ -32,28 +32,29 @@ public abstract class BaseDoorFragment extends BaseFragment {
     private EditText mEditTextClose;
     private boolean mDoorOpened;
     private CardView mCardView;
+    private TextView mTextViewLastOpened;
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.door_layout, container, false);
-        mCardView = (CardView) view.findViewById(R.id.cardview_door);
+        this.mCardView = (CardView) view.findViewById(R.id.cardview_door);
         init();
         return view;
 
     }
 
     private void init() {
-        mTextviewOpen = (TextView) mCardView.findViewById(R.id.textview_open);
-        mImageViewDoor = (ImageView) mCardView.findViewById(R.id.imageview_icon_door);
+        this.mTextviewOpen = (TextView) mCardView.findViewById(R.id.textview_open);
+        this.mImageViewDoor = (ImageView) mCardView.findViewById(R.id.imageview_icon_door);
 
-        mSwitchCompat = (SwitchCompat) mCardView.findViewById(R.id.switch_open);
-        mImageViewVoice = (ImageView) mCardView.findViewById(R.id.imageview_icon_sound);
-        mEditTextOpen = (EditText) mCardView.findViewById(R.id.edittext_open_voice);
-        mEditTextClose = (EditText) mCardView.findViewById(R.id.edittext_close_voice);
+        this.mSwitchCompat = (SwitchCompat) mCardView.findViewById(R.id.switch_open);
+        this.mImageViewVoice = (ImageView) mCardView.findViewById(R.id.imageview_icon_sound);
+        this.mEditTextOpen = (EditText) mCardView.findViewById(R.id.edittext_open_voice);
+        this.mEditTextClose = (EditText) mCardView.findViewById(R.id.edittext_close_voice);
 
-        mImageViewVoice.setOnClickListener(v -> {
+        this.mImageViewVoice.setOnClickListener(v -> {
             mImageViewVoice = (ImageView) v;
             if (VoiceRecognizer.State.STARTED == VoiceRecognizer.getInstance().getCurrentState()) {
                 getDoor().disableVoiceRecognition();
@@ -63,16 +64,16 @@ public abstract class BaseDoorFragment extends BaseFragment {
 
             }
         });
-        mEditTextOpen.setOnFocusChangeListener((v, hasFocus) -> {
+        this.mEditTextOpen.setOnFocusChangeListener((v, hasFocus) -> {
             EditText editText = (EditText) v;
             getDoor().setOpenPhrase(editText.getText().toString());
         });
-        mEditTextClose.setOnFocusChangeListener((v, hasFocus) -> {
+        this.mEditTextClose.setOnFocusChangeListener((v, hasFocus) -> {
             EditText editText = (EditText) v;
             getDoor().setOpenPhrase(editText.getText().toString());
         });
 
-        mSwitchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        this.mSwitchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 showLoading(false, R.string.opened_label);
                 getDoor().open(getString(R.string.opened_label), true);
@@ -84,20 +85,16 @@ public abstract class BaseDoorFragment extends BaseFragment {
             }
         });
 
-        if (mDoorOpened) {
+        if (this.mDoorOpened) {
             defaultView(R.string.opened_label, R.drawable.door_open, mDoorOpened);
         } else {
             defaultView(R.string.close_label, R.drawable.door_closed, false);
 
         }
-        mEditTextOpen.setText(getDoor().getOpenPhrase());
-        mEditTextClose.setText(getDoor().getClosePhrase());
-
-
-
+        this.mEditTextOpen.setText(getDoor().getOpenPhrase());
+        this.mEditTextClose.setText(getDoor().getClosePhrase());
     }
-
-    private void defaultView(int text, int drawable, boolean checked) {
+   private void defaultView(int text, int drawable, boolean checked) {
         if (mTextviewOpen != null) {
             mTextviewOpen.setText(text);
             mImageViewDoor.setImageResource(drawable);

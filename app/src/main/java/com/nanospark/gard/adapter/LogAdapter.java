@@ -27,9 +27,11 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
 
     private final String SPACE = " ";
     private final String COMMA = ",";
+    private final String SEPARATOR_HOUR = ":";
     private Context mContext;
     private ArrayList<Log> mLogArrayList;
-    private TextView textView;
+    private TextView mSubTitleTextView;
+    private Calendar mCalendarOpen;
 
     public LogAdapter(ArrayList<Log> logArrayList){
         this.mLogArrayList = logArrayList;
@@ -45,27 +47,56 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Log log = mLogArrayList.get(position);
-        String subTitle = mContext.getResources().getString(R.string.opened_label) + " for ";
+        Log log = this.mLogArrayList.get(position);
+        Calendar calendarClose = Calendar.getInstance();
+        calendarClose.setTime(log.getDate());
+
         if(log.getEvent().equals(Log.EVENT_CLOSE)){
-            String uri = "drawable://" + R.drawable.ic_unlock_2;
+            String uri = "drawable://" + R.drawable.ic_lock_2;
             ImageLoader.getInstance().displayImage(uri, holder.mLockImageView);
-            textView.setText("Abierto por " + position);
-            textView.setVisibility(View.VISIBLE);
+            this.mSubTitleTextView.setText(getOpenedFor(mCalendarOpen, calendarClose));
+            mSubTitleTextView.setVisibility(View.VISIBLE);
+        }
+        mSubTitleTextView = holder.mSubTitleTextView;
+        if(position  == getItemCount() -1){
+            mSubTitleTextView.setText(getOpenedFor(mCalendarOpen,calendarClose));
+            mSubTitleTextView.setVisibility(View.VISIBLE);
         }
         StringBuilder builder = getDate(log);
         holder.mTitleTextView.setText(Html.fromHtml(builder.toString()));
-        textView = holder.mSubTitleTextView;
-        if(position == getItemCount() -1 ){
-            textView.setText("Abierto por " + position);
-            textView.setVisibility(View.VISIBLE);
+
+    }
+    private String getOpenedFor(Calendar dateOpen,Calendar dateClose){
+        StringBuilder builder = new StringBuilder();
+        int hour = diff(dateOpen.get(Calendar.HOUR_OF_DAY),dateClose.get(Calendar.HOUR_OF_DAY));
+        int minutes = diff(dateOpen.get(Calendar.MINUTE), dateClose.get(Calendar.MINUTE));
+        int seconds = diff(dateOpen.get(Calendar.SECOND),dateClose.get(Calendar.SECOND));
+
+        builder.append(getString(R.string.opened_for_label));
+        builder.append(SPACE);
+        appendHour(builder, hour, R.string.hours_label);
+        appendHour(builder, minutes, R.string.minutes_label);
+        appendHour(builder,seconds,R.string.seconds_label);
+
+        return builder.toString();
+    }
+    private void appendHour(StringBuilder builder,int value,int text){
+        if(value > 0){
+            builder.append(value);
+            builder.append(SPACE);
+            builder.append(getString(text));
+            builder.append(SPACE);
         }
     }
 
+    private int diff(int valueMax, int valueMin){
+        return  (valueMax - valueMin) * -1;
+    }
     @NonNull
     private StringBuilder getDate(Log log) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(log.getDate());
+        mCalendarOpen = calendar;
         String dayOfWeek = calendar.getDisplayName(Calendar.DAY_OF_WEEK,Calendar.SHORT, Locale.US);
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
         StringBuilder builder = new StringBuilder();
@@ -85,7 +116,7 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
         int minute = calendar.get(Calendar.MINUTE);
         StringBuilder builder = new StringBuilder();
         builder.append(hour > 9 ? hour : "0" + hour );
-        builder.append(":");
+        builder.append(SEPARATOR_HOUR);
         builder.append(minute > 9 ? minute : "0" + minute);
         return builder.toString();
     }
@@ -113,4 +144,7 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
         }
     }
 
+    private String getString(int text){
+        return mContext.getString(text);
+    }
 }

@@ -13,7 +13,7 @@
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:id="@+id/imageview_lock"
-        android:src="@drawable/ic_lock_2"
+        android:src="@drawable/ic_unlock_2"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"

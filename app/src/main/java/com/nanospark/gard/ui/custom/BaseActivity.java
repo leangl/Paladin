@@ -19,6 +19,8 @@ import com.nanospark.gard.ui.fragments.SchedulesFragment;
 import com.nanospark.gard.ui.fragments.SettingsFragment;
 import com.nanospark.gard.ui.fragments.UsersFragment;
 
+import mobi.tattu.utils.Utils;
+
 /**
  * Created by cristian on 23/09/15.
  */
@@ -159,6 +161,7 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
             getSupportActionBar().setHomeButtonEnabled(true);
             getSupportActionBar().setShowHideAnimationEnabled(true);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(Utils.getDrawableResources(this,R.drawable.ic_action_navigation_arrow_back));
 
         }
 

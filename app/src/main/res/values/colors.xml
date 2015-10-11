@@ -3,7 +3,7 @@
     <color name="primary_dark">#4f6c74</color>
     <color name="primary">#5e7c87</color>
     <color name="red">#f1482f</color>
-    <color name="text_tab_selected">@android:color/white</color>
+    <color name="text_tab_selected">@color/white</color>
     <color name="text_tab_unselected">#a4bbc7</color>
     <color name="cardview_background">#ffffff</color>
     <color name="toolbar_background">@color/background_material_dark</color>
@@ -15,5 +15,7 @@
     <color name="door_two_switch_background">#8dc63f</color>
     <color name="secondary_text_default_material_dark">#b3b16f6f</color>
     <color name="edittexttheme_color">#6e6e6e</color>
+    <color name="white">#ffffff</color>
+
 
 </resources>

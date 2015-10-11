@@ -25,4 +25,7 @@
     <string name="warning_label">Warning</string>
     <string name="opened_for_label">opened for </string>
     <string name="closed_for_label">closed for </string>
+    <string name="hours_label">hours</string>
+    <string name="minutes_label">minutes</string>
+    <string name="seconds_label">seconds</string>
 </resources>
