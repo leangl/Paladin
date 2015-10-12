@@ -53,7 +53,7 @@ public class LogManager {
         return log;
 
     }
-    
+
     private Date getDate(int fields, int value) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(fields, value);

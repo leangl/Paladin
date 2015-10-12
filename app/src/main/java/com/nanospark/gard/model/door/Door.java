@@ -33,7 +33,7 @@ public class Door {
 
     private static int sAutoCloseMillis = 0;
 
-    private Boolean opened = true;
+    private Boolean opened = null;
     private int id;
     private int inputPinNumber;
     private int outputPinNumber;
@@ -91,6 +91,11 @@ public class Door {
             Log.i(toString(), "Another command pending, ignored...");
             return false;
         }
+        if (!isReady()) {
+            Log.w(toString(), "Door not ready: " + id);
+            ToastManager.get().showToast("The door is not ready.", 1);
+            return false;
+        }
         if (!isOpened()) {
             Log.i(toString(), "Opening door: " + id);
             Log.i(toString(), message);
@@ -106,6 +111,11 @@ public class Door {
     }
 
     public boolean close(String message, boolean forced) {
+        if (!isReady()) {
+            Log.w(toString(), "Door not ready: " + id);
+            ToastManager.get().showToast("The door is not ready.", 1);
+            return false;
+        }
         if (isOpened()) {
             Log.i(toString(), "Closing door: " + id);
             Log.i(toString(), message);
@@ -149,9 +159,9 @@ public class Door {
 
     public void toggle(String message, boolean forced) {
         Log.i(toString(), "Toggle door: " + id);
-        if (this.opened) {
+        if (isOpened()) {
             close(message, forced);
-        } else {
+        } else if (isClosed()) {
             open(message, forced);
         }
     }
@@ -185,11 +195,11 @@ public class Door {
     }
 
     public boolean isOpened() {
-        return this.opened;
+        return isReady() && this.opened;
     }
 
     public boolean isClosed() {
-        return !isOpened();
+        return isReady() && !isOpened();
     }
 
     public boolean isReady() {

@@ -14,8 +14,8 @@ import com.nanospark.gard.R;
 import com.nanospark.gard.model.log.Log;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -29,11 +29,11 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
     private final String COMMA = ",";
     private final String SEPARATOR_HOUR = ":";
     private Context mContext;
-    private ArrayList<Log> mLogArrayList;
+    private List<Log> mLogArrayList;
     private TextView mSubTitleTextView;
     private Calendar mCalendarOpen;
 
-    public LogAdapter(ArrayList<Log> logArrayList){
+    public LogAdapter(List<Log> logArrayList){
         this.mLogArrayList = logArrayList;
     }
     @Override
