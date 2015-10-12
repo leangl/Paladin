@@ -7,6 +7,7 @@ import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -27,13 +28,12 @@ public class LogManager {
     }
 
     public List<Log> getLogs() {
-        // TODO descomentar esto y borrar lo de abajo
-        //List<Log> logs = new ArrayList<>(mDataStore.getAll(Log.class));
-        //Collections.sort(logs, (l1, l2) -> l1.getDate().compareTo(l2.getDate()));
-        //Collections.reverse(logs);
-        //return logs;
+        List<Log> logs = new ArrayList<>(mDataStore.getAll(Log.class));
+        Collections.sort(logs, (l1, l2) -> l1.getDate().compareTo(l2.getDate()));
+        Collections.reverse(logs);
+        return logs;
 
-        ArrayList<Log> resLogs = new ArrayList<>();
+        /*ArrayList<Log> resLogs = new ArrayList<>();
 
         resLogs.add(createLog(1, Log.EVENT_OPEN, getDate(Calendar.HOUR, 2)));
         resLogs.add(createLog(1, Log.EVENT_CLOSE, getDate(Calendar.HOUR, 4)));
@@ -41,7 +41,7 @@ public class LogManager {
         resLogs.add(createLog(1, Log.EVENT_CLOSE, getDate(Calendar.HOUR, 5)));
         resLogs.add(createLog(1, Log.EVENT_OPEN, getDate(Calendar.HOUR, 6)));
 
-        return resLogs;
+        return resLogs;*/
     }
 
     private Log createLog(int id, String event, Date date) {

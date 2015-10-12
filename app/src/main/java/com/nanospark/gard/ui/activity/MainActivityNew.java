@@ -1,14 +1,24 @@
 package com.nanospark.gard.ui.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 
 import com.nanospark.gard.R;
+import com.nanospark.gard.events.BoardConnected;
+import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.SmsSuspended;
+import com.nanospark.gard.services.GarDService;
 import com.nanospark.gard.sms.SmsManager;
 import com.nanospark.gard.ui.custom.BaseActivity;
 import com.nanospark.gard.ui.fragments.DialogFragment;
 import com.squareup.otto.Subscribe;
+
+import mobi.tattu.utils.Tattu;
 
 /**
  * Created by cristian on 23/09/15.
@@ -18,6 +28,7 @@ public class MainActivityNew extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        registerReceiver(mUsbReceiver, new IntentFilter(UsbManager.ACTION_USB_ACCESSORY_DETACHED));
     }
 
     @Override
@@ -31,8 +42,8 @@ public class MainActivityNew extends BaseActivity {
     }
 
     @Subscribe
-    public void on(SmsSuspended smsSuspended){
-        DialogFragment dialogFragment = DialogFragment.newInstance(getString(R.string.sms_suspend_message),getString(R.string.warning_label),true);
+    public void on(SmsSuspended smsSuspended) {
+        DialogFragment dialogFragment = DialogFragment.newInstance(getString(R.string.sms_suspend_message), getString(R.string.warning_label), true);
         dialogFragment.setDialogFragmentListener(new DialogFragment.DialogFragmentListener() {
             @Override
             public void onPositiveButton(DialogInterface dialog) {
@@ -45,9 +56,44 @@ public class MainActivityNew extends BaseActivity {
                 dialog.dismiss();
             }
         });
-        dialogFragment.show(getSupportFragmentManager(),DialogFragment.class.getCanonicalName());
+        dialogFragment.show(getSupportFragmentManager(), DialogFragment.class.getCanonicalName());
     }
 
+    private void checkBoardConnected(Intent i) {
+        if (UsbManager.ACTION_USB_ACCESSORY_ATTACHED.equals(i.getAction())) {
+            Tattu.post(new BoardConnected());
+        }
+    }
 
+    BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Tattu.post(new BoardDisconnected());
+        }
+    };
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        checkBoardConnected(intent);
+        setIntent(intent);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkBoardConnected(getIntent());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        GarDService.start(); // restart ioio
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mUsbReceiver);
+    }
 }

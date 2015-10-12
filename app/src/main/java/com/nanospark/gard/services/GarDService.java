@@ -12,6 +12,7 @@ import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.sms.SmsManager;
+import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
 import ioio.lib.api.exception.ConnectionLostException;
@@ -46,6 +47,8 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
     private IOIOAndroidApplicationHelper ioioHelper;
 
     private Notification mNotification;
+
+    private boolean mBoardConnected = false;
 
     @Override
     public void onCreate() {
@@ -94,8 +97,22 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
 
     @Subscribe
     public void on(BoardConnected e) {
-        //toast("Board connected!");
-        //startIOIO();
+        mBoardConnected = true;
+    }
+
+    @Subscribe
+    public void on(BoardDisconnected e) {
+        mBoardConnected = false;
+    }
+
+    @Produce
+    public BoardConnected produceConnected() {
+        return mBoardConnected ? new BoardConnected() : null;
+    }
+
+    @Produce
+    public BoardDisconnected produceDisconnected() {
+        return !mBoardConnected ? new BoardDisconnected() : null;
     }
 
     private void startIOIO() {
@@ -166,4 +183,5 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
     public static void stop() {
         GarD.instance.stopService(new Intent(GarD.instance, GarDService.class));
     }
+
 }
