@@ -8,7 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.inject.Inject;
 import com.nanospark.gard.R;
@@ -24,6 +23,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 
+import mobi.tattu.utils.ToastManager;
 import mobi.tattu.utils.image.AsyncTask;
 
 /**
@@ -128,7 +128,8 @@ public class LogFragment extends BaseFragment {
         protected void onPostExecute(Boolean aBoolean) {
             stopLoading();
             if(!aBoolean){
-                Toast.makeText(getBaseActivity(), R.string.error_save_log_msg, Toast.LENGTH_SHORT).show();
+                ToastManager.get().showToast( R.string.error_save_log_msg);
+                
             }
         }
     }
