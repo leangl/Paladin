@@ -15,8 +15,8 @@ import com.nanospark.gard.Utils;
 import com.nanospark.gard.model.log.Log;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by cristian on 10/10/15.
@@ -25,11 +25,11 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
 
 
     private Context mContext;
-    private ArrayList<Log> mLogArrayList;
+    private List<Log> mLogArrayList;
     private TextView mSubTitleTextView;
     private Calendar mCalendarOpen;
 
-    public LogAdapter(ArrayList<Log> logArrayList) {
+    public LogAdapter(List<Log> logArrayList) {
         this.mLogArrayList = logArrayList;
     }
 

@@ -13,13 +13,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.nanospark.gard.R;
+import com.nanospark.gard.model.log.Log;
 import com.nanospark.gard.ui.activity.LogActivity;
 import com.nanospark.gard.ui.fragments.MainFragment;
 import com.nanospark.gard.ui.fragments.SchedulesFragment;
 import com.nanospark.gard.ui.fragments.SettingsFragment;
 import com.nanospark.gard.ui.fragments.UsersFragment;
 
+import mobi.tattu.utils.ToastManager;
 import mobi.tattu.utils.Utils;
+import mobi.tattu.utils.persistance.datastore.DataStore;
 
 /**
  * Created by cristian on 23/09/15.
@@ -144,7 +147,11 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_log:
-                startActivity(new Intent(this, LogActivity.class));
+                if(DataStore.getInstance().getAll(Log.class).isEmpty()){
+                    ToastManager.get().showToast(R.string.no_record_msg);
+                }else{
+                    startActivity(new Intent(this, LogActivity.class));
+                }
                 break;
             case android.R.id.home:
                 onBackPressed();

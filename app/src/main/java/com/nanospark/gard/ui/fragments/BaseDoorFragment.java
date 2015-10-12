@@ -15,6 +15,8 @@ import android.widget.TextView;
 import com.google.inject.Inject;
 import com.nanospark.gard.R;
 import com.nanospark.gard.Utils;
+import com.nanospark.gard.events.BoardConnected;
+import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.DoorActivated;
 import com.nanospark.gard.events.DoorActivationFailed;
 import com.nanospark.gard.events.VoiceRecognizer;
@@ -22,6 +24,7 @@ import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.log.Log;
 import com.nanospark.gard.model.log.LogManager;
 import com.nanospark.gard.ui.custom.BaseFragment;
+import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -71,7 +74,7 @@ public abstract class BaseDoorFragment extends BaseFragment {
             if (VoiceRecognizer.State.STARTED == VoiceRecognizer.getInstance().getCurrentState()) {
                 getDoor().disableVoiceRecognition();
             } else {
-                showLoading(false, R.string.start_voice_recognition_label);
+                showLoading(false, R.string.start_voice_recognition_msg);
                 getDoor().enableVoiceRecognition();
 
             }
@@ -134,7 +137,7 @@ public abstract class BaseDoorFragment extends BaseFragment {
             Log log = logArrayListAux.get(sizeAux -1);
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(log.getDate());
-            this.mTextViewLastOpened.setText(Html.fromHtml(Utils.getDateLog(calendar,true).toString()));
+            this.mTextViewLastOpened.setText(Html.fromHtml(Utils.getDateLog(calendar, true).toString()));
         }
 
     }
@@ -188,5 +191,15 @@ public abstract class BaseDoorFragment extends BaseFragment {
     @Override
     public boolean showHomeIcon() {
         return false;
+    }
+
+    @Subscribe
+    public void on(BoardConnected boardConnected){
+        this.mSwitchCompat.setEnabled(true);
+    }
+
+    @Subscribe
+    public void on(BoardDisconnected boardDisconnected){
+        this.mSwitchCompat.setEnabled(false);
     }
 }

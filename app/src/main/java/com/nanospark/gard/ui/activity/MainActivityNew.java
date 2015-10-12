@@ -19,6 +19,7 @@ import com.nanospark.gard.ui.fragments.DialogFragment;
 import com.squareup.otto.Subscribe;
 
 import mobi.tattu.utils.Tattu;
+import mobi.tattu.utils.ToastManager;
 
 /**
  * Created by cristian on 23/09/15.
@@ -43,7 +44,7 @@ public class MainActivityNew extends BaseActivity {
 
     @Subscribe
     public void on(SmsSuspended smsSuspended) {
-        DialogFragment dialogFragment = DialogFragment.newInstance(getString(R.string.sms_suspend_message), getString(R.string.warning_label), true);
+        DialogFragment dialogFragment = DialogFragment.newInstance(getString(R.string.sms_suspend_msg), getString(R.string.warning_label), true);
         dialogFragment.setDialogFragmentListener(new DialogFragment.DialogFragmentListener() {
             @Override
             public void onPositiveButton(DialogInterface dialog) {
@@ -62,6 +63,7 @@ public class MainActivityNew extends BaseActivity {
     private void checkBoardConnected(Intent i) {
         if (UsbManager.ACTION_USB_ACCESSORY_ATTACHED.equals(i.getAction())) {
             Tattu.post(new BoardConnected());
+            ToastManager.get().showToast(R.string.board_connected_msg);
         }
     }
 
@@ -69,6 +71,7 @@ public class MainActivityNew extends BaseActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Tattu.post(new BoardDisconnected());
+            ToastManager.get().showToast(R.string.board_disconnected_msg);
         }
     };
 

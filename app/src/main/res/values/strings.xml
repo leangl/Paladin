@@ -20,16 +20,19 @@
     <string name="subtile_toolbar">by NANOSPARK</string>
     <string name="opened_label">Opened</string>
     <string name="closed_label">Closed</string>
-    <string name="start_voice_recognition_label">Starting voice recognition...</string>
-    <string name="sms_suspend_message">Excessive text message use, text message control and notifications  have been suspended.  Tap OK to re-enable or  CANCEL to leave  suspended (you can re-enable later under Settings-Enable SMS  control).</string>
+    <string name="start_voice_recognition_msg">Starting voice recognition...</string>
+    <string name="sms_suspend_msg">Excessive text message use, text message control and notifications  have been suspended.  Tap OK to re-enable or  CANCEL to leave  suspended (you can re-enable later under Settings-Enable SMS  control).</string>
     <string name="warning_label">Warning</string>
     <string name="opened_for_label">opened for </string>
     <string name="closed_for_label">closed for </string>
     <string name="hours_label">hours</string>
     <string name="minutes_label">minutes</string>
     <string name="seconds_label">seconds</string>
-    <string name="save_file_log_label">Saving File</string>
-    <string name="error_save_log">Error creating file</string>
+    <string name="save_file_log_msg">Saving File</string>
+    <string name="error_save_log_msg">Error creating file</string>
     <string name="date_label">Date</string>
     <string name="event_label">Event</string>
+    <string name="board_disconnected_msg">Board has been disconnected.</string>
+    <string name="board_connected_msg">Board has been connected.</string>
+    <string name="no_record_msg">No records to display</string>
 </resources>

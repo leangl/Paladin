@@ -21,8 +21,8 @@ import com.nanospark.gard.ui.custom.BaseFragment;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import mobi.tattu.utils.image.AsyncTask;
 
@@ -33,7 +33,7 @@ public class LogFragment extends BaseFragment {
 
     @Inject
     private LogManager mLogManager;
-    private ArrayList<Log> mLogArrayList;
+    private List<Log> mLogArrayList;
 
     public static LogFragment newInstance() {
         LogFragment fragment = new LogFragment();
@@ -81,7 +81,7 @@ public class LogFragment extends BaseFragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            showLoading(true,R.string.save_file_log_label);
+            showLoading(true,R.string.save_file_log_msg);
         }
 
         @Override
@@ -128,7 +128,7 @@ public class LogFragment extends BaseFragment {
         protected void onPostExecute(Boolean aBoolean) {
             stopLoading();
             if(!aBoolean){
-                Toast.makeText(getBaseActivity(), R.string.error_save_log, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseActivity(), R.string.error_save_log_msg, Toast.LENGTH_SHORT).show();
             }
         }
     }
