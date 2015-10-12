@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.SwitchCompat;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +12,19 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.inject.Inject;
 import com.nanospark.gard.R;
+import com.nanospark.gard.Utils;
 import com.nanospark.gard.events.DoorActivated;
 import com.nanospark.gard.events.DoorActivationFailed;
 import com.nanospark.gard.events.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
+import com.nanospark.gard.model.log.Log;
+import com.nanospark.gard.model.log.LogManager;
 import com.nanospark.gard.ui.custom.BaseFragment;
+
+import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by cristian on 07/10/15.
@@ -33,6 +41,8 @@ public abstract class BaseDoorFragment extends BaseFragment {
     private boolean mDoorOpened;
     private CardView mCardView;
     private TextView mTextViewLastOpened;
+    @Inject
+    private LogManager mLogManager;
 
 
     @Nullable
@@ -48,6 +58,7 @@ public abstract class BaseDoorFragment extends BaseFragment {
     private void init() {
         this.mTextviewOpen = (TextView) mCardView.findViewById(R.id.textview_open);
         this.mImageViewDoor = (ImageView) mCardView.findViewById(R.id.imageview_icon_door);
+        this.mTextViewLastOpened = (TextView) mCardView.findViewById(R.id.textview_last_opened);
 
         this.mSwitchCompat = (SwitchCompat) mCardView.findViewById(R.id.switch_open);
         this.mImageViewVoice = (ImageView) mCardView.findViewById(R.id.imageview_icon_sound);
@@ -95,8 +106,10 @@ public abstract class BaseDoorFragment extends BaseFragment {
         }
         this.mEditTextOpen.setText(getDoor().getOpenPhrase());
         this.mEditTextClose.setText(getDoor().getClosePhrase());
+        setTextViewLastOpened();
     }
-   private void defaultView(int text, int drawable, boolean checked) {
+
+    private void defaultView(int text, int drawable, boolean checked) {
         if (mTextviewOpen != null) {
             mTextviewOpen.setText(text);
             mImageViewDoor.setImageResource(drawable);
@@ -104,6 +117,26 @@ public abstract class BaseDoorFragment extends BaseFragment {
         }
     }
 
+    private void setTextViewLastOpened(){
+        ArrayList<Log> arrayList = mLogManager.getLogs();
+        int size = arrayList.size();
+        ArrayList<Log> logArrayListAux = new ArrayList<>();
+        for(int i = 0 ; i < size ; i++){
+            Log log = arrayList.get(i);
+            if(getDoor().getId() == log.getDoorId()){
+                logArrayListAux.add(log);
+            }
+        }
+
+        int sizeAux = logArrayListAux.size();
+        if(sizeAux > 0){
+            Log log = logArrayListAux.get(sizeAux -1);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(log.getDate());
+            this.mTextViewLastOpened.setText(Html.fromHtml(Utils.getDateLog(calendar,true).toString()));
+        }
+
+    }
 
     public void handlerVoiceState(VoiceRecognizer.State state) {
         if ((getDoor() != null && state.door != null) && getDoor().getId() == state.door.getId()) {

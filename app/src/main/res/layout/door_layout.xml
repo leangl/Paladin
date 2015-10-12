@@ -58,7 +58,6 @@
                 android:layout_marginLeft="5dp"
                 android:layout_toEndOf="@+id/textView9"
                 android:layout_toRightOf="@+id/textView9"
-                android:text="13:34 Tue"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/text_color_bold"
                 android:textStyle="bold" />

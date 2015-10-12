@@ -28,4 +28,8 @@
     <string name="hours_label">hours</string>
     <string name="minutes_label">minutes</string>
     <string name="seconds_label">seconds</string>
+    <string name="save_file_log_label">Saving File</string>
+    <string name="error_save_log">Error creating file</string>
+    <string name="date_label">Date</string>
+    <string name="event_label">Event</string>
 </resources>

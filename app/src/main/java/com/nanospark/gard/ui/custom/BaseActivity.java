@@ -161,7 +161,7 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
             getSupportActionBar().setHomeButtonEnabled(true);
             getSupportActionBar().setShowHideAnimationEnabled(true);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(Utils.getDrawableResources(this,R.drawable.ic_action_navigation_arrow_back));
+          getSupportActionBar().setHomeAsUpIndicator(Utils.getDrawableResources(this, R.drawable.ic_action_navigation_arrow_back));
 
         }
 
