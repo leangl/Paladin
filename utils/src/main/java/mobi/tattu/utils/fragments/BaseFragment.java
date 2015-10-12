@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.activities.BaseActivity;
 import mobi.tattu.utils.annotations.SaveState;
 import mobi.tattu.utils.log.Logger;
@@ -125,6 +126,18 @@ public class BaseFragment extends RoboFragment implements BaseActivity.OnBackLis
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        Tattu.register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Tattu.unregister(this);
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
         getBaseActivity().removeOnBackListener(this);
@@ -139,7 +152,6 @@ public class BaseFragment extends RoboFragment implements BaseActivity.OnBackLis
     public void changeTitleActionBar(String title) {
         getBaseActivity().changeTitleActionBar(title);
     }
-
 
     public void snackbar(int resId) {
         getBaseActivity().snackbar(resId);

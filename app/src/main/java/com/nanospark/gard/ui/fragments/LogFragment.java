@@ -15,7 +15,7 @@ import com.nanospark.gard.model.log.Log;
 import com.nanospark.gard.model.log.LogManager;
 import com.nanospark.gard.ui.custom.BaseFragment;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by cristian on 10/10/15.
@@ -24,7 +24,7 @@ public class LogFragment extends BaseFragment {
 
     @Inject
     private LogManager mLogManager;
-    private ArrayList<Log> mLogArrayList;
+    private List<Log> mLogArrayList;
 
     public static LogFragment newInstance() {
         LogFragment fragment = new LogFragment();

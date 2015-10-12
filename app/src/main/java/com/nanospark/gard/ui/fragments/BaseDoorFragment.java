@@ -75,13 +75,15 @@ public abstract class BaseDoorFragment extends BaseFragment {
 
         this.mSwitchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                showLoading(false, R.string.opened_label);
-                getDoor().open(getString(R.string.opened_label), true);
-                defaultView(R.string.opened_label, R.drawable.door_open, true);
+                if (getDoor().open(getString(R.string.opened_label), true)) {
+                    showLoading(false, R.string.opened_label);
+                    defaultView(R.string.opened_label, R.drawable.door_open, true);
+                }
             } else {
-                getDoor().close(getString(R.string.closed_label), true);
-                defaultView(R.string.closed_label, R.drawable.door_closed, false);
-
+                if (getDoor().close(getString(R.string.closed_label), true)) {
+                    showLoading(false, R.string.closed_label);
+                    defaultView(R.string.closed_label, R.drawable.door_closed, false);
+                }
             }
         });
 
