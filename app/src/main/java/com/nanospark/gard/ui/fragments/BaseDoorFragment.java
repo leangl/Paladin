@@ -25,6 +25,7 @@ import com.nanospark.gard.ui.custom.BaseFragment;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by cristian on 07/10/15.
@@ -118,11 +119,11 @@ public abstract class BaseDoorFragment extends BaseFragment {
     }
 
     private void setTextViewLastOpened(){
-        ArrayList<Log> arrayList = mLogManager.getLogs();
-        int size = arrayList.size();
+       List<Log> logList = mLogManager.getLogs();
+        int size = logList.size();
         ArrayList<Log> logArrayListAux = new ArrayList<>();
         for(int i = 0 ; i < size ; i++){
-            Log log = arrayList.get(i);
+            Log log = logList.get(i);
             if(getDoor().getId() == log.getDoorId()){
                 logArrayListAux.add(log);
             }
