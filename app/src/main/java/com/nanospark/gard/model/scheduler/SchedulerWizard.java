@@ -5,9 +5,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v4.app.FragmentActivity;
 import android.widget.TimePicker;
-
-import com.nanospark.gard.ui.MainActivity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,7 +37,7 @@ public class SchedulerWizard implements TimePickerFragment.TimePickerFragmentLis
         if (launcherClock) {
             TimePickerFragment newFragment = new TimePickerFragment();
             newFragment.setTimePickerFragmentListener(this);
-            newFragment.show(((MainActivity) mContext).getSupportFragmentManager(), "timePicker");
+            newFragment.show(((FragmentActivity) mContext).getSupportFragmentManager(), "timePicker");
             launcherClock = false;
         } else {
             initializeAlarm(mContext, mSchedule);

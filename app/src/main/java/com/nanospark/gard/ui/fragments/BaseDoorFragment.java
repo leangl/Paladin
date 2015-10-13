@@ -17,8 +17,8 @@ import com.nanospark.gard.R;
 import com.nanospark.gard.Utils;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
-import com.nanospark.gard.events.DoorActivated;
 import com.nanospark.gard.events.DoorActivationFailed;
+import com.nanospark.gard.events.DoorToggled;
 import com.nanospark.gard.events.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.log.Log;
@@ -57,6 +57,14 @@ public abstract class BaseDoorFragment extends BaseFragment {
         init();
         return view;
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (getDoor().isReady()) {
+            this.handlerDoorState(new DoorToggled(getDoor(), getDoor().isOpened()));
+        }
     }
 
     private void init() {
@@ -111,6 +119,7 @@ public abstract class BaseDoorFragment extends BaseFragment {
         this.mEditTextOpen.setText(getDoor().getOpenPhrase());
         this.mEditTextClose.setText(getDoor().getClosePhrase());
         setTextViewLastOpened();
+
     }
 
     private void defaultView(int text, int drawable, boolean checked) {
@@ -121,20 +130,20 @@ public abstract class BaseDoorFragment extends BaseFragment {
         }
     }
 
-    private void setTextViewLastOpened(){
-       List<Log> logList = mLogManager.getLogs();
+    private void setTextViewLastOpened() {
+        List<Log> logList = mLogManager.getLogs();
         int size = logList.size();
         ArrayList<Log> logArrayListAux = new ArrayList<>();
-        for(int i = 0 ; i < size ; i++){
+        for (int i = 0; i < size; i++) {
             Log log = logList.get(i);
-            if(getDoor().getId() == log.getDoorId()){
+            if (getDoor().getId() == log.getDoorId()) {
                 logArrayListAux.add(log);
             }
         }
 
         int sizeAux = logArrayListAux.size();
-        if(sizeAux > 0){
-            Log log = logArrayListAux.get(sizeAux -1);
+        if (sizeAux > 0) {
+            Log log = logArrayListAux.get(sizeAux - 1);
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(log.getDate());
             this.mTextViewLastOpened.setText(Html.fromHtml(Utils.getDateLog(calendar, true).toString()));
@@ -157,9 +166,9 @@ public abstract class BaseDoorFragment extends BaseFragment {
     }
 
 
-    public void handlerDoorState(DoorActivated doorActivated) {
-        if (getDoor() != null && getDoor().getId() == doorActivated.door.getId()) {
-            mDoorOpened = doorActivated.opened;
+    public void handlerDoorState(DoorToggled event) {
+        if (getDoor() != null && getDoor().getId() == event.door.getId()) {
+            mDoorOpened = event.opened;
             stopLoading();
             if (mDoorOpened) {
                 defaultView(R.string.opened_label, R.drawable.door_open, true);
@@ -194,12 +203,12 @@ public abstract class BaseDoorFragment extends BaseFragment {
     }
 
     @Subscribe
-    public void on(BoardConnected boardConnected){
+    public void on(BoardConnected boardConnected) {
         this.mSwitchCompat.setEnabled(true);
     }
 
     @Subscribe
-    public void on(BoardDisconnected boardDisconnected){
+    public void on(BoardDisconnected boardDisconnected) {
         this.mSwitchCompat.setEnabled(false);
     }
 }

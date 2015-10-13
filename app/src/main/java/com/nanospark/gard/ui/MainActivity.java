@@ -218,6 +218,9 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
     protected void onStart() {
         super.onStart();
         checkBoardConnected(getIntent());
+        if (mDoorOne.isReady()) {
+            on(new DoorToggled(mDoorOne, mDoorOne.isOpened()));
+        }
     }
 
     @Override

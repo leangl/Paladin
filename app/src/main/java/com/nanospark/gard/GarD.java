@@ -10,7 +10,7 @@ import com.nanospark.gard.model.scheduler.Schedule;
 import com.nanospark.gard.model.scheduler.SchedulerWizard;
 import com.nanospark.gard.services.GarDService;
 import com.nanospark.gard.sms.SmsManager;
-import com.nanospark.gard.ui.MainActivity;
+import com.nanospark.gard.ui.activity.MainActivityNew;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.squareup.otto.Subscribe;
@@ -40,7 +40,7 @@ public class GarD extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Tattu.init(this, MainActivity.class);
+        Tattu.init(this, MainActivityNew.class);
         Tattu.register(this);
 
         instance = this;

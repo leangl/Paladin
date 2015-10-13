@@ -22,6 +22,7 @@ import ioio.lib.util.IOIOLooperProvider;
 import ioio.lib.util.android.IOIOAndroidApplicationHelper;
 import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.services.BaseService;
+import roboguice.util.Ln;
 
 /**
  * Created by Leandro on 21/7/2015.
@@ -98,20 +99,24 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
     @Subscribe
     public void on(BoardConnected e) {
         mBoardConnected = true;
+        Ln.d("BoardConnected");
     }
 
     @Subscribe
     public void on(BoardDisconnected e) {
         mBoardConnected = false;
+        Ln.d("BoardDisconnected");
     }
 
     @Produce
     public BoardConnected produceConnected() {
+        Ln.d("Produce BoardConnected? " + mBoardConnected);
         return mBoardConnected ? new BoardConnected() : null;
     }
 
     @Produce
     public BoardDisconnected produceDisconnected() {
+        Ln.d("Produce BoardDisconnected? " + !mBoardConnected);
         return !mBoardConnected ? new BoardDisconnected() : null;
     }
 

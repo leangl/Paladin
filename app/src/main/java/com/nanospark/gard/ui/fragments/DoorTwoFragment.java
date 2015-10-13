@@ -9,8 +9,8 @@ import android.widget.TextView;
 
 import com.nanospark.gard.GarD;
 import com.nanospark.gard.R;
-import com.nanospark.gard.events.DoorActivated;
 import com.nanospark.gard.events.DoorActivationFailed;
+import com.nanospark.gard.events.DoorToggled;
 import com.nanospark.gard.events.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.squareup.otto.Subscribe;
@@ -45,8 +45,8 @@ public class DoorTwoFragment extends BaseDoorFragment {
         handlerVoiceState(state);
     }
     @Subscribe
-    public void on(DoorActivated doorActivated) {
-        handlerDoorState(doorActivated);
+    public void on(DoorToggled event) {
+        handlerDoorState(event);
     }
 
     @Subscribe
