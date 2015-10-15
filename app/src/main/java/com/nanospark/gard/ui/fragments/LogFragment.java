@@ -1,5 +1,7 @@
 package com.nanospark.gard.ui.fragments;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
@@ -35,6 +37,7 @@ public class LogFragment extends BaseFragment {
     private LogManager mLogManager;
     private List<Log> mLogArrayList;
 
+
     public static LogFragment newInstance() {
         LogFragment fragment = new LogFragment();
         return fragment;
@@ -53,7 +56,7 @@ public class LogFragment extends BaseFragment {
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         view.findViewById(R.id.fab_save).setOnClickListener(v -> {
             saveLogCsv();
-        });
+         });
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getBaseActivity());
         LogAdapter logAdapter = new LogAdapter(mLogArrayList);
@@ -68,12 +71,20 @@ public class LogFragment extends BaseFragment {
         logAsyncTask.execute();
     }
 
+    private void exportCsv(File file){
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+        shareIntent.setType("text/plain");
+        startActivity(Intent.createChooser(shareIntent, "Send To"));
+    }
+
     @Override
     public boolean showHomeIcon() {
         return true;
     }
 
-    public class LogAsyncTask extends AsyncTask<Void,Void,Boolean>{
+    public class LogAsyncTask extends AsyncTask<Void,Void,File>{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -81,19 +92,21 @@ public class LogFragment extends BaseFragment {
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected File doInBackground(Void... params) {
+            File result = null;
             File folder = new File(Environment.getExternalStorageDirectory() + "/Paladin");
             if (!folder.exists()) {
                 folder.mkdir();
             }
-            String filename = folder.toString() + "/" + "Log.csv";
+           String fileName = folder.toString() + "/" + "Log.csv";
             int size = mLogArrayList.size();
             FileWriter fileWriter = null;
             try {
-                fileWriter = new FileWriter(filename);
+                fileWriter = new FileWriter(fileName);
 
                 StringBuilder builder = new StringBuilder();
-
+                builder.append(getString(R.string.door_label));
+                builder.append(Utils.COMMA);
                 builder.append(getString(R.string.event_label));
                 builder.append(Utils.COMMA);
                 builder.append(getString(R.string.date_label));
@@ -105,28 +118,34 @@ public class LogFragment extends BaseFragment {
                     Log log = mLogArrayList.get(i);
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(log.getDate());
+
+                    builder.append(log.getDoorId());
+                    builder.append(Utils.COMMA);
+
                     builder.append(log.getEvent());
                     builder.append(Utils.COMMA);
+
                     builder.append(Utils.getDateLog(calendar,false).toString());
                     builder.append(Utils.NEW_LINE_FILE);
                     fileWriter.write(builder.toString());
                 }
                 fileWriter.close();
-
+                result = new File(fileName);
             } catch (IOException io) {
                 android.util.Log.e("Log",io.getMessage(),io);
-                return false;
+                return result;
             }
-            return true;
+            return result;
         }
 
         @Override
-        protected void onPostExecute(Boolean aBoolean) {
+        protected void onPostExecute(File file) {
             stopLoading();
-            if(!aBoolean){
+            if(file == null){
                 ToastManager.get().showToast( R.string.error_save_log_msg);
-                
+
             }
+            exportCsv(file);
         }
     }
 }

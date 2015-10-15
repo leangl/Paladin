@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
-        android:src="@drawable/ic_save_logs"
+        android:src="@drawable/ic_share"
         app:rippleColor="@color/white"
         android:layout_gravity="bottom"
         android:layout_weight="0.33"
@@ -27,6 +27,7 @@
         android:layout_alignParentEnd="true"
         android:layout_margin="30dp"
         app:elevation="4dp"
-        app:backgroundTint="@color/red"/>
+        app:backgroundTint="@color/red"
+        android:scaleType="center"/>
 
 </RelativeLayout>

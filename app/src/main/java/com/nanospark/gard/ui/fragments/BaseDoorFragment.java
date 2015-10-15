@@ -70,6 +70,8 @@ public abstract class BaseDoorFragment extends BaseFragment {
         this.mEditTextClose = (EditText) mCardView.findViewById(R.id.edittext_close_voice);
 
         this.mImageViewVoice.setOnClickListener(v -> {
+            getDoor().setOpenPhrase(mEditTextOpen.getText().toString().toLowerCase());
+            getDoor().setClosePhrase(mEditTextClose.getText().toString().toLowerCase());
             mImageViewVoice = (ImageView) v;
             if (VoiceRecognizer.State.STARTED == VoiceRecognizer.getInstance().getCurrentState()) {
                 getDoor().disableVoiceRecognition();
@@ -78,18 +80,9 @@ public abstract class BaseDoorFragment extends BaseFragment {
                 getDoor().enableVoiceRecognition();
             }
         });
-        this.mEditTextOpen.setOnFocusChangeListener((v, hasFocus) -> {
-            EditText editText = (EditText) v;
-            getDoor().setOpenPhrase(editText.getText().toString());
-        });
-        this.mEditTextClose.setOnFocusChangeListener((v, hasFocus) -> {
-            EditText editText = (EditText) v;
-            getDoor().setOpenPhrase(editText.getText().toString());
-        });
         this.mImageViewDoor.setOnClickListener(v -> {
             getDoor().toggle("Door is in motion", true);
         });
-
         stateView();
         this.mEditTextOpen.setText(getDoor().getOpenPhrase());
         this.mEditTextClose.setText(getDoor().getClosePhrase());
