@@ -127,14 +127,13 @@ public abstract class BaseDoorFragment extends BaseFragment {
     }
 
     public void handlerVoiceState(VoiceRecognizer.State state) {
+        stopLoading();
         if (state == VoiceRecognizer.State.STARTED) {
             mImageViewVoice.setImageResource(R.drawable.ic_sound_);
-            stopLoading();
         } else if (state == VoiceRecognizer.State.STOPPED || state == VoiceRecognizer.State.ERROR) {
             if (mImageViewVoice != null) {
                 mImageViewVoice.setImageResource(R.drawable.ic_no_sound_);
             }
-            stopLoading();
         }
     }
 
@@ -172,8 +171,10 @@ public abstract class BaseDoorFragment extends BaseFragment {
     }
 
     @Subscribe
-    public void on(VoiceRecognizer.State state) {
-        handlerVoiceState(state);
+    public void on(VoiceRecognizer.StateChanged event) {
+        if (event.door.equals(getDoor())) {
+            handlerVoiceState(event.state);
+        }
     }
 
     @Subscribe

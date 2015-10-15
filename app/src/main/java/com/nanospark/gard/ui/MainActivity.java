@@ -153,14 +153,14 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
     }
 
     @Subscribe
-    public void onStateChange(VoiceRecognizer.State state) {
-        if (state == VoiceRecognizer.State.STARTED) {
+    public void on(VoiceRecognizer.StateChanged event) {
+        if (event.state == VoiceRecognizer.State.STARTED) {
             stopLoading();
             mToggleVoiceControl.setText("Stop");
             mThreshold.setEnabled(false);
             mOpen.setEnabled(false);
             mClose.setEnabled(false);
-        } else if (state == VoiceRecognizer.State.STOPPED || state == VoiceRecognizer.State.ERROR) {
+        } else if (event.state == VoiceRecognizer.State.STOPPED || event.state == VoiceRecognizer.State.ERROR) {
             stopLoading();
             mToggleVoiceControl.setText("Start");
             mThreshold.setEnabled(true);
