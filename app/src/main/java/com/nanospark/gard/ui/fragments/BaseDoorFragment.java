@@ -71,7 +71,6 @@ public abstract class BaseDoorFragment extends BaseFragment {
         this.mImageViewDoor = (ImageView) mCardView.findViewById(R.id.imageview_icon_door);
         this.mTextViewLastOpened = (TextView) mCardView.findViewById(R.id.textview_last_opened);
 
-//        this.mSwitchCompat = (SwitchCompat) mCardView.findViewById(R.id.switch_open);
         this.mImageViewVoice = (ImageView) mCardView.findViewById(R.id.imageview_icon_sound);
         this.mEditTextOpen = (EditText) mCardView.findViewById(R.id.edittext_open_voice);
         this.mEditTextClose = (EditText) mCardView.findViewById(R.id.edittext_close_voice);
@@ -194,11 +193,9 @@ public abstract class BaseDoorFragment extends BaseFragment {
 
     @Subscribe
     public void on(BoardConnected boardConnected){
-//        this.mSwitchCompat.setEnabled(true);
     }
 
     @Subscribe
     public void on(BoardDisconnected boardDisconnected){
-//        this.mSwitchCompat.setEnabled(false);
     }
 }
