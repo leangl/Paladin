@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import com.nanospark.gard.GarD;
 import com.nanospark.gard.R;
+import com.nanospark.gard.events.BoardConnected;
+import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.DoorActivationFailed;
 import com.nanospark.gard.events.DoorToggled;
 import com.nanospark.gard.events.VoiceRecognizer;
@@ -28,7 +30,7 @@ public class DoorTwoFragment extends BaseDoorFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view =  super.onCreateView(inflater, container, savedInstanceState);
+        View view = super.onCreateView(inflater, container, savedInstanceState);
         getCardView().findViewById(R.id.container_center).setBackgroundColor(getColorFromResource(R.color.door_two_background));
         TextView textView = (TextView) getCardView().findViewById(R.id.textview_title_door);
         textView.setText(R.string.door_two_label);
@@ -43,16 +45,27 @@ public class DoorTwoFragment extends BaseDoorFragment {
 
     @Subscribe
     public void on(VoiceRecognizer.State state) {
-        handlerVoiceState(state);
+        super.on(state);
     }
+
     @Subscribe
     public void on(DoorToggled event) {
-        handlerDoorState(event);
+        super.on(event);
     }
 
     @Subscribe
     public void on(DoorActivationFailed doorActivationFailed) {
-        handlerDoorState(doorActivationFailed);
+        super.on(doorActivationFailed);
+    }
+
+    @Subscribe
+    public void on(BoardConnected event) {
+        super.on(event);
+    }
+
+    @Subscribe
+    public void on(BoardDisconnected event) {
+        super.on(event);
     }
 
 }

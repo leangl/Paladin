@@ -25,28 +25,23 @@ import com.nanospark.gard.model.log.LogManager;
 import com.nanospark.gard.ui.custom.BaseFragment;
 import com.squareup.otto.Subscribe;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 /**
  * Created by cristian on 07/10/15.
  */
 public abstract class BaseDoorFragment extends BaseFragment {
 
-
     private ImageView mImageViewVoice;
     private ImageView mImageViewDoor;
     private TextView mTextviewOpen;
-
     private EditText mEditTextOpen;
     private EditText mEditTextClose;
-    private boolean mDoorOpened;
     private CardView mCardView;
     private TextView mTextViewLastOpened;
+
     @Inject
     private LogManager mLogManager;
-
 
     @Nullable
     @Override
@@ -55,7 +50,6 @@ public abstract class BaseDoorFragment extends BaseFragment {
         this.mCardView = (CardView) view.findViewById(R.id.cardview_door);
         init();
         return view;
-
     }
 
     @Override
@@ -82,7 +76,6 @@ public abstract class BaseDoorFragment extends BaseFragment {
             } else {
                 showLoading(false, R.string.start_voice_recognition_msg);
                 getDoor().enableVoiceRecognition();
-
             }
         });
         this.mEditTextOpen.setOnFocusChangeListener((v, hasFocus) -> {
@@ -93,7 +86,6 @@ public abstract class BaseDoorFragment extends BaseFragment {
             EditText editText = (EditText) v;
             getDoor().setOpenPhrase(editText.getText().toString());
         });
-
         this.mImageViewDoor.setOnClickListener(v -> {
             getDoor().toggle("Door is in motion", true);
         });
@@ -102,15 +94,17 @@ public abstract class BaseDoorFragment extends BaseFragment {
         this.mEditTextOpen.setText(getDoor().getOpenPhrase());
         this.mEditTextClose.setText(getDoor().getClosePhrase());
         setTextViewLastOpened();
-
     }
 
     private void stateView() {
-        if (this.mDoorOpened) {
-            defaultView(R.string.opened_label, R.drawable.ic_door_opened);
+        if (getDoor().isReady()) {
+            if (getDoor().isOpened()) {
+                defaultView(R.string.opened_label, R.drawable.ic_door_opened);
+            } else {
+                defaultView(R.string.closed_label, R.drawable.ic_door_closed);
+            }
         } else {
-            defaultView(R.string.closed_label, R.drawable.ic_door_closed);
-
+            defaultView(R.string.unknown_label, R.drawable.ic_door_opened);
         }
     }
 
@@ -122,55 +116,39 @@ public abstract class BaseDoorFragment extends BaseFragment {
     }
 
     private void setTextViewLastOpened() {
-        List<Log> logList = mLogManager.getLogs();
-        int size = logList.size();
-        ArrayList<Log> logArrayListAux = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            Log log = logList.get(i);
-            if (getDoor().getId() == log.getDoorId()) {
-                logArrayListAux.add(log);
-            }
-        }
-
-        int sizeAux = logArrayListAux.size();
-        if (sizeAux > 0) {
-            Log log = logArrayListAux.get(sizeAux - 1);
+        Log mLastLog = mLogManager.getLastLog(getDoor());
+        if (mLastLog != null) {
             Calendar calendar = Calendar.getInstance();
-            calendar.setTime(log.getDate());
+            calendar.setTime(mLastLog.getDate());
             this.mTextViewLastOpened.setText(Html.fromHtml(Utils.getDateLog(calendar, true).toString()));
+        } else {
+            this.mTextViewLastOpened.setVisibility(View.INVISIBLE);
         }
-
     }
 
     public void handlerVoiceState(VoiceRecognizer.State state) {
-        if ((getDoor() != null && state.door != null) && getDoor().getId() == state.door.getId()) {
-            if (state == VoiceRecognizer.State.STARTED) {
-                mImageViewVoice.setImageResource(R.drawable.ic_sound_);
-                stopLoading();
-            } else if (state == VoiceRecognizer.State.STOPPED || state == VoiceRecognizer.State.ERROR) {
-                if (mImageViewVoice != null) {
-                    mImageViewVoice.setImageResource(R.drawable.ic_no_sound_);
-                }
-                stopLoading();
+        if (state == VoiceRecognizer.State.STARTED) {
+            mImageViewVoice.setImageResource(R.drawable.ic_sound_);
+            stopLoading();
+        } else if (state == VoiceRecognizer.State.STOPPED || state == VoiceRecognizer.State.ERROR) {
+            if (mImageViewVoice != null) {
+                mImageViewVoice.setImageResource(R.drawable.ic_no_sound_);
             }
+            stopLoading();
         }
     }
 
-
     public void handlerDoorState(DoorToggled event) {
-        if (getDoor() != null && getDoor().getId() == event.door.getId()) {
-            mDoorOpened = event.opened;
+        if (getDoor().getId() == event.door.getId()) {
             stateView();
         }
     }
 
     public void handlerDoorState(DoorActivationFailed doorActivationFailed) {
-        if (getDoor() != null && getDoor().getId() == doorActivationFailed.door.getId()) {
-            mDoorOpened = doorActivationFailed.opened;
+        if (getDoor().getId() == doorActivationFailed.door.getId()) {
             stateView();
         }
     }
-
 
     public abstract Door getDoor();
 
@@ -184,10 +162,27 @@ public abstract class BaseDoorFragment extends BaseFragment {
     }
 
     @Subscribe
-    public void on(BoardConnected boardConnected){
+    public void on(BoardConnected boardConnected) {
+        this.handlerDoorState(new DoorToggled(getDoor(), getDoor().isOpened()));
     }
 
     @Subscribe
-    public void on(BoardDisconnected boardDisconnected){
+    public void on(BoardDisconnected boardDisconnected) {
+        this.handlerDoorState(new DoorToggled(getDoor(), getDoor().isOpened()));
+    }
+
+    @Subscribe
+    public void on(VoiceRecognizer.State state) {
+        handlerVoiceState(state);
+    }
+
+    @Subscribe
+    public void on(DoorToggled event) {
+        handlerDoorState(event);
+    }
+
+    @Subscribe
+    public void on(DoorActivationFailed doorActivationFailed) {
+        handlerDoorState(doorActivationFailed);
     }
 }

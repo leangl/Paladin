@@ -50,7 +50,6 @@ public class VoiceRecognizer implements RecognitionListener {
 
     public void setState(State state) {
         this.currentState = state;
-        this.currentState.door = door;
         Tattu.post(this.currentState);
     }
 
@@ -204,10 +203,6 @@ public class VoiceRecognizer implements RecognitionListener {
 
     public enum State {
         STARTED, STOPPED, ERROR;
-        public Door door;
-
-
-
     }
 
 }

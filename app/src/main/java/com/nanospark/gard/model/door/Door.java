@@ -7,6 +7,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.nanospark.gard.GarD;
 import com.nanospark.gard.R;
+import com.nanospark.gard.events.BoardConnected;
+import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.DoorActivated;
 import com.nanospark.gard.events.DoorActivationFailed;
 import com.nanospark.gard.events.DoorToggled;
@@ -192,6 +194,14 @@ public class Door {
         }, 20000);
     }
 
+    private void on(BoardDisconnected event) {
+        this.opened = null;
+    }
+
+    private void on(BoardConnected event) {
+        // TODO check door state
+    }
+
     public boolean isOpened() {
         return isReady() && this.opened;
     }
@@ -292,6 +302,16 @@ public class Door {
             super.on(event);
         }
 
+        @Subscribe
+        public void on(BoardConnected event) {
+            super.on(event);
+        }
+
+        @Subscribe
+        public void on(BoardDisconnected event) {
+            super.on(event);
+        }
+
     }
 
     @Singleton
@@ -303,6 +323,16 @@ public class Door {
 
         @Subscribe
         public void on(DoorActivated event) {
+            super.on(event);
+        }
+
+        @Subscribe
+        public void on(BoardConnected event) {
+            super.on(event);
+        }
+
+        @Subscribe
+        public void on(BoardDisconnected event) {
             super.on(event);
         }
 

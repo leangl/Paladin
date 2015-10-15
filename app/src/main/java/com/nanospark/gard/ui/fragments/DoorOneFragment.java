@@ -1,6 +1,8 @@
 package com.nanospark.gard.ui.fragments;
 
 import com.nanospark.gard.GarD;
+import com.nanospark.gard.events.BoardConnected;
+import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.DoorActivationFailed;
 import com.nanospark.gard.events.DoorToggled;
 import com.nanospark.gard.events.VoiceRecognizer;
@@ -13,11 +15,9 @@ import com.squareup.otto.Subscribe;
 public class DoorOneFragment extends BaseDoorFragment {
 
     public static DoorOneFragment newInstance() {
-
         DoorOneFragment fragment = new DoorOneFragment();
         return fragment;
     }
-
 
     @Override
     public Door getDoor() {
@@ -26,19 +26,27 @@ public class DoorOneFragment extends BaseDoorFragment {
 
     @Subscribe
     public void on(VoiceRecognizer.State state) {
-        handlerVoiceState(state);
-
+        super.on(state);
     }
 
     @Subscribe
     public void on(DoorToggled event) {
-        handlerDoorState(event);
-
+        super.on(event);
     }
 
     @Subscribe
     public void on(DoorActivationFailed doorActivationFailed) {
-        handlerDoorState(doorActivationFailed);
+        super.on(doorActivationFailed);
+    }
+
+    @Subscribe
+    public void on(BoardConnected event) {
+        super.on(event);
+    }
+
+    @Subscribe
+    public void on(BoardDisconnected event) {
+        super.on(event);
     }
 
 }

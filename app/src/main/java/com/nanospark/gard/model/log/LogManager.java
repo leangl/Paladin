@@ -3,6 +3,7 @@ package com.nanospark.gard.model.log;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.nanospark.gard.events.DoorToggled;
+import com.nanospark.gard.model.door.Door;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
@@ -42,6 +43,17 @@ public class LogManager {
         resLogs.add(createLog(1, Log.EVENT_OPEN, getDate(Calendar.HOUR, 6)));
 
         return resLogs;*/
+    }
+
+    public Log getLastLog(Door door) {
+        List<Log> logList = getLogs();
+        for (int i = 0; i < logList.size(); i++) {
+            Log log = logList.get(i);
+            if (door.getId() == log.getDoorId()) {
+               return log;
+            }
+        }
+        return null;
     }
 
     private Log createLog(int id, String event, Date date) {

@@ -53,7 +53,6 @@ public class LogFragment extends BaseFragment {
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         view.findViewById(R.id.fab_save).setOnClickListener(v -> {
             saveLogCsv();
-            exportCsv();
         });
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getBaseActivity());
@@ -67,9 +66,6 @@ public class LogFragment extends BaseFragment {
     private void saveLogCsv() {
         LogAsyncTask logAsyncTask = new LogAsyncTask();
         logAsyncTask.execute();
-    }
-
-    private void exportCsv() {
     }
 
     @Override
