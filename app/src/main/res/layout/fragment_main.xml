@@ -12,16 +12,26 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/door_one_container"
-        android:layout_weight="1">
+        >
+        <include layout="@layout/door_layout"/>
     </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/door_two_container"
-        android:layout_weight="1">
-
+        >
+        <include layout="@layout/door_layout"/>
     </FrameLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/weather_conatainer"
+        android:layout_marginBottom="10dp">
+        <include layout="@layout/door_layout"/>
+        </FrameLayout>
+
+
 </LinearLayout>
 
 </ScrollView>

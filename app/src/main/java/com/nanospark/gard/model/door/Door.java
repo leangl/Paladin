@@ -105,7 +105,6 @@ public class Door {
         } else {
             Log.w(toString(), "Door already open: " + id);
             ToastManager.get().showToast("The door is already open.", 1);
-            Tattu.post(new DoorActivated(this, false, message));
             return false;
         }
     }

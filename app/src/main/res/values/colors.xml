@@ -16,6 +16,8 @@
     <color name="secondary_text_default_material_dark">#b3b16f6f</color>
     <color name="edittexttheme_color">#6e6e6e</color>
     <color name="white">#ffffff</color>
+    <color name="door_one_text_open_color">#be2f2f</color>
+    <color name="door_two_text_open_color">#a6e04b</color>
 
 
 </resources>

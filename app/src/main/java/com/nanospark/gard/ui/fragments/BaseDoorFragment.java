@@ -3,7 +3,6 @@ package com.nanospark.gard.ui.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.SwitchCompat;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +38,7 @@ public abstract class BaseDoorFragment extends BaseFragment {
     private ImageView mImageViewVoice;
     private ImageView mImageViewDoor;
     private TextView mTextviewOpen;
-    private SwitchCompat mSwitchCompat;
+
     private EditText mEditTextOpen;
     private EditText mEditTextClose;
     private boolean mDoorOpened;
@@ -64,7 +63,7 @@ public abstract class BaseDoorFragment extends BaseFragment {
         this.mImageViewDoor = (ImageView) mCardView.findViewById(R.id.imageview_icon_door);
         this.mTextViewLastOpened = (TextView) mCardView.findViewById(R.id.textview_last_opened);
 
-        this.mSwitchCompat = (SwitchCompat) mCardView.findViewById(R.id.switch_open);
+//        this.mSwitchCompat = (SwitchCompat) mCardView.findViewById(R.id.switch_open);
         this.mImageViewVoice = (ImageView) mCardView.findViewById(R.id.imageview_icon_sound);
         this.mEditTextOpen = (EditText) mCardView.findViewById(R.id.edittext_open_voice);
         this.mEditTextClose = (EditText) mCardView.findViewById(R.id.edittext_close_voice);
@@ -88,19 +87,10 @@ public abstract class BaseDoorFragment extends BaseFragment {
             getDoor().setOpenPhrase(editText.getText().toString());
         });
 
-        this.mSwitchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                if (getDoor().open(getString(R.string.opened_label), true)) {
-                    showLoading(false, R.string.opened_label);
-                    defaultView(R.string.opened_label, R.drawable.door_open, true);
-                }
-            } else {
-                if (getDoor().close(getString(R.string.closed_label), true)) {
-                    showLoading(false, R.string.closed_label);
-                    defaultView(R.string.closed_label, R.drawable.door_closed, false);
-                }
-            }
+        this.mImageViewDoor.setOnClickListener(v -> {
+           getDoor().toggle("Door is in motion", true);
         });
+
 
         if (this.mDoorOpened) {
             defaultView(R.string.opened_label, R.drawable.door_open, mDoorOpened);
@@ -117,7 +107,7 @@ public abstract class BaseDoorFragment extends BaseFragment {
         if (mTextviewOpen != null) {
             mTextviewOpen.setText(text);
             mImageViewDoor.setImageResource(drawable);
-            mSwitchCompat.setChecked(checked);
+//            mSwitchCompat.setChecked(checked);
         }
     }
 
@@ -195,11 +185,11 @@ public abstract class BaseDoorFragment extends BaseFragment {
 
     @Subscribe
     public void on(BoardConnected boardConnected){
-        this.mSwitchCompat.setEnabled(true);
+//        this.mSwitchCompat.setEnabled(true);
     }
 
     @Subscribe
     public void on(BoardDisconnected boardDisconnected){
-        this.mSwitchCompat.setEnabled(false);
+//        this.mSwitchCompat.setEnabled(false);
     }
 }

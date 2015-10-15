@@ -1,28 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+            android:fillViewport="true">
 
 
-    <LinearLayout
+    <RelativeLayout
         android:orientation="horizontal" android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/grey_300">
+        android:background="@color/grey_300"
+        android:gravity="center_vertical">
 
 
         <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:id="@+id/door_one_container"
-            android:layout_weight="1">
+            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/space"
+            android:layout_toStartOf="@+id/space"
+            android:visibility="visible">
+            <include layout="@layout/door_layout"
+                ></include>
         </FrameLayout>
 
         <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:id="@+id/door_two_container"
-            android:layout_weight="1">
-
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/space"
+            android:layout_toEndOf="@+id/space"
+            android:visibility="visible">
+            <include layout="@layout/door_layout"
+                ></include>
         </FrameLayout>
-    </LinearLayout>
+
+        <android.support.v4.widget.Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/space"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="20dp"/>
+
+        <FrameLayout
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/door_two_container"
+            android:layout_toEndOf="@+id/door_two_container"
+            android:id="@+id/weather_conatainer">
+        </FrameLayout>
+    </RelativeLayout>
 </ScrollView>
