@@ -36,4 +36,5 @@
     <string name="board_disconnected_msg">Board has been disconnected.</string>
     <string name="board_connected_msg">Board has been connected.</string>
     <string name="no_record_msg">No records to display</string>
+    <string name="door_label">Door</string>
 </resources>
