@@ -103,10 +103,10 @@ public class VoiceRecognizer implements RecognitionListener {
 
         // Create keyword-activation search.
         if (StringUtils.isNotBlank(door.getOpenPhrase())) {
-            recognizer.addKeyphraseSearch(KEY_OPEN + door.getId(), door.getOpenPhrase());
+            recognizer.addKeyphraseSearch(KEY_OPEN + door.getId(), door.getOpenPhrase().toLowerCase());
         }
         if (StringUtils.isNotBlank(door.getClosePhrase())) {
-            recognizer.addKeyphraseSearch(KEY_CLOSE + door.getId(), door.getClosePhrase());
+            recognizer.addKeyphraseSearch(KEY_CLOSE + door.getId(), door.getClosePhrase().toLowerCase());
         }
     }
 
