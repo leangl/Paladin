@@ -44,8 +44,8 @@ public class DoorTwoFragment extends BaseDoorFragment {
     }
 
     @Subscribe
-    public void on(VoiceRecognizer.State state) {
-        super.on(state);
+    public void on(VoiceRecognizer.StateChanged event) {
+        super.on(event);
     }
 
     @Subscribe

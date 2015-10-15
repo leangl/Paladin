@@ -48,11 +48,6 @@ public class VoiceRecognizer implements RecognitionListener {
         return RoboGuice.getInjector(GarD.instance).getInstance(VoiceRecognizer.class);
     }
 
-    public void setState(State state) {
-        this.currentState = state;
-        Tattu.post(this.currentState);
-    }
-
     public void start(Door door) {
         this.door = door;
         // Start voice recognition asynchronously
@@ -83,10 +78,14 @@ public class VoiceRecognizer implements RecognitionListener {
     }
 
     public void stop() {
+        stop(true);
+    }
+
+    private void stop(boolean sendEvent) {
         if (recognizer != null) {
             recognizer.cancel();
             recognizer.shutdown();
-            setCurrentState(VoiceRecognizer.State.STOPPED);
+            if (sendEvent) setCurrentState(VoiceRecognizer.State.STOPPED);
         }
     }
 
@@ -112,12 +111,13 @@ public class VoiceRecognizer implements RecognitionListener {
     }
 
     private void setCurrentState(VoiceRecognizer.State state) {
-        setState(state);
+        this.currentState = state;
+        Tattu.post(new StateChanged(this.door, this.currentState));
     }
 
     @Subscribe
     public void on(VoiceRecognitionEnabled event) {
-        stop();
+        stop(false);
         start(event.door);
     }
 
@@ -199,6 +199,16 @@ public class VoiceRecognizer implements RecognitionListener {
     @Produce
     public State getCurrentState() {
         return this.currentState;
+    }
+
+    public class StateChanged {
+        public final Door door;
+        public final State state;
+
+        public StateChanged(Door door, State state) {
+            this.door = door;
+            this.state = state;
+        }
     }
 
     public enum State {
