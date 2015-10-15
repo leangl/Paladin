@@ -56,7 +56,7 @@ public class LogFragment extends BaseFragment {
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         view.findViewById(R.id.fab_save).setOnClickListener(v -> {
             saveLogCsv();
-         });
+        });
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getBaseActivity());
         LogAdapter logAdapter = new LogAdapter(mLogArrayList);
@@ -71,7 +71,7 @@ public class LogFragment extends BaseFragment {
         logAsyncTask.execute();
     }
 
-    private void exportCsv(File file){
+    private void exportCsv(File file) {
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
@@ -84,11 +84,11 @@ public class LogFragment extends BaseFragment {
         return true;
     }
 
-    public class LogAsyncTask extends AsyncTask<Void,Void,File>{
+    public class LogAsyncTask extends AsyncTask<Void, Void, File> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            showLoading(true,R.string.save_file_log_msg);
+            showLoading(true, R.string.save_file_log_msg);
         }
 
         @Override
@@ -98,7 +98,7 @@ public class LogFragment extends BaseFragment {
             if (!folder.exists()) {
                 folder.mkdir();
             }
-           String fileName = folder.toString() + "/" + "Log.csv";
+            String fileName = folder.toString() + "/" + "Log.csv";
             int size = mLogArrayList.size();
             FileWriter fileWriter = null;
             try {
@@ -125,14 +125,14 @@ public class LogFragment extends BaseFragment {
                     builder.append(log.getEvent());
                     builder.append(Utils.COMMA);
 
-                    builder.append(Utils.getDateLog(calendar,false).toString());
+                    builder.append(Utils.getDateLog(calendar, false).toString());
                     builder.append(Utils.NEW_LINE_FILE);
                     fileWriter.write(builder.toString());
                 }
                 fileWriter.close();
                 result = new File(fileName);
             } catch (IOException io) {
-                android.util.Log.e("Log",io.getMessage(),io);
+                android.util.Log.e("Log", io.getMessage(), io);
                 return result;
             }
             return result;
@@ -141,11 +141,11 @@ public class LogFragment extends BaseFragment {
         @Override
         protected void onPostExecute(File file) {
             stopLoading();
-            if(file == null){
-                ToastManager.get().showToast( R.string.error_save_log_msg);
-
+            if (file == null) {
+                ToastManager.get().showToast(R.string.error_save_log_msg);
+            } else {
+                exportCsv(file);
             }
-            exportCsv(file);
         }
     }
 }
