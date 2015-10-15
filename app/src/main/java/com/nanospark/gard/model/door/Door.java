@@ -13,7 +13,6 @@ import com.nanospark.gard.events.DoorToggled;
 import com.nanospark.gard.events.VoiceRecognitionDisabled;
 import com.nanospark.gard.events.VoiceRecognitionEnabled;
 import com.nanospark.gard.sms.SmsManager;
-import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
 import ioio.lib.api.DigitalInput;
@@ -205,14 +204,6 @@ public class Door {
         return this.opened != null;
     }
 
-    @Produce
-    public DoorToggled produce() {
-        if (isReady()) {
-            return new DoorToggled(this, this.opened);
-        }
-        return null;
-    }
-
     public int getId() {
         return id;
     }
@@ -300,6 +291,7 @@ public class Door {
         public void on(DoorActivated event) {
             super.on(event);
         }
+
     }
 
     @Singleton
@@ -313,6 +305,7 @@ public class Door {
         public void on(DoorActivated event) {
             super.on(event);
         }
+
     }
 
     public static class Config {

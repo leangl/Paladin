@@ -30,11 +30,10 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            
-            <intent-filter>
+
+            <!--intent-filter>
                 <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"/>
             </intent-filter>
             <intent-filter>
@@ -46,7 +45,7 @@
                 android:resource="@xml/accessory_filter"/>
             <meta-data
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
-                android:resource="@xml/device_filter"/>
+                android:resource="@xml/device_filter"/-->
         </activity>
 
         <service android:name=".services.GarDService"/>
@@ -68,7 +67,8 @@
 
         <activity
             android:name=".ui.activity.MainActivityNew"
-            android:windowSoftInputMode="stateHidden">
+            android:windowSoftInputMode="stateHidden"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

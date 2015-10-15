@@ -1,8 +1,8 @@
 package com.nanospark.gard.ui.fragments;
 
 import com.nanospark.gard.GarD;
-import com.nanospark.gard.events.DoorActivated;
 import com.nanospark.gard.events.DoorActivationFailed;
+import com.nanospark.gard.events.DoorToggled;
 import com.nanospark.gard.events.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.squareup.otto.Subscribe;
@@ -31,8 +31,8 @@ public class DoorOneFragment extends BaseDoorFragment {
     }
 
     @Subscribe
-    public void on(DoorActivated doorActivated) {
-        handlerDoorState(doorActivated);
+    public void on(DoorToggled event) {
+        handlerDoorState(event);
 
     }
 

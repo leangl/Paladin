@@ -12,8 +12,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.inject.Inject;
 import com.nanospark.gard.R;
-import com.nanospark.gard.model.log.Log;
+import com.nanospark.gard.model.log.LogManager;
 import com.nanospark.gard.ui.activity.LogActivity;
 import com.nanospark.gard.ui.fragments.MainFragment;
 import com.nanospark.gard.ui.fragments.SchedulesFragment;
@@ -22,7 +23,6 @@ import com.nanospark.gard.ui.fragments.UsersFragment;
 
 import mobi.tattu.utils.ToastManager;
 import mobi.tattu.utils.Utils;
-import mobi.tattu.utils.persistance.datastore.DataStore;
 
 /**
  * Created by cristian on 23/09/15.
@@ -30,6 +30,9 @@ import mobi.tattu.utils.persistance.datastore.DataStore;
 public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActivity implements TabLayout.OnTabSelectedListener {
 
     private ViewPager mViewPager;
+
+    @Inject
+    private LogManager mLogManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,9 +150,9 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_log:
-                if(DataStore.getInstance().getAll(Log.class).isEmpty()){
+                if (mLogManager.getLogs().isEmpty()) {
                     ToastManager.get().showToast(R.string.no_record_msg);
-                }else{
+                } else {
                     startActivity(new Intent(this, LogActivity.class));
                 }
                 break;
@@ -168,7 +171,7 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
             getSupportActionBar().setHomeButtonEnabled(true);
             getSupportActionBar().setShowHideAnimationEnabled(true);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-          getSupportActionBar().setHomeAsUpIndicator(Utils.getDrawableResources(this, R.drawable.ic_action_navigation_arrow_back));
+            getSupportActionBar().setHomeAsUpIndicator(Utils.getDrawableResources(this, R.drawable.ic_action_navigation_arrow_back));
 
         }
 
