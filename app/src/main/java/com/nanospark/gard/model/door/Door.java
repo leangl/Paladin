@@ -200,6 +200,7 @@ public class Door {
 
     private void on(BoardConnected event) {
         // TODO check door state
+        this.opened = true;
     }
 
     public boolean isOpened() {
