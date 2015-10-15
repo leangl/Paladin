@@ -18,6 +18,7 @@
     <color name="secondary_text_default_material_dark">#b3b16f6f</color>
     <color name="edittexttheme_color">#6e6e6e</color>
     <color name="white">#ffffff</color>
+    <color name="user_divider">#b1b1b1</color>
 
 
 </resources>
