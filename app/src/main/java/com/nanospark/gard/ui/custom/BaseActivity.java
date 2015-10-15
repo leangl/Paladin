@@ -1,6 +1,7 @@
 package com.nanospark.gard.ui.custom;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -48,7 +49,11 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
         if (containsTab()) {
             initTabs();
         }
-
+        int orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+        if(getResources().getBoolean(R.bool.isTablet)){
+            orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+        }
+        setRequestedOrientation(orientation);
     }
 
     public abstract int getLayout();

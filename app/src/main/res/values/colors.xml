@@ -8,16 +8,16 @@
     <color name="cardview_background">#ffffff</color>
     <color name="toolbar_background">@color/background_material_dark</color>
     <color name="activity_main_background">#eeeeee</color>
-    <color name="door_one_background">#be2f2f</color>
-    <color name="door_one_switch_background">#b11010</color>
-    <color name="text_color_bold">#6e6e6e</color>
+
+    <color name="door_one_background">#ee9c26</color>
     <color name="door_two_background">#a6e04b</color>
-    <color name="door_two_switch_background">#8dc63f</color>
+    <color name="door_one_text_open_color">#ee9c26</color>
+
+    <color name="text_color_open_door_two">#a6e04b</color>
+    <color name="text_color_bold">#6e6e6e</color>
     <color name="secondary_text_default_material_dark">#b3b16f6f</color>
     <color name="edittexttheme_color">#6e6e6e</color>
     <color name="white">#ffffff</color>
-    <color name="door_one_text_open_color">#be2f2f</color>
-    <color name="door_two_text_open_color">#a6e04b</color>
 
 
 </resources>

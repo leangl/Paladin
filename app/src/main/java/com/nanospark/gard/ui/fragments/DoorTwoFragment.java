@@ -29,9 +29,10 @@ public class DoorTwoFragment extends BaseDoorFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view =  super.onCreateView(inflater, container, savedInstanceState);
-//        getCardView().findViewById(R.id.container_center).setBackgroundColor(getColorFromResource(R.color.door_two_background));
-//        getCardView().findViewById(R.id.container_switch).setBackgroundColor(getColorFromResource(R.color.door_two_switch_background));
-        ((TextView)getCardView().findViewById(R.id.textview_title_door)).setText(R.string.back_door_label);
+        getCardView().findViewById(R.id.container_center).setBackgroundColor(getColorFromResource(R.color.door_two_background));
+        TextView textView = (TextView) getCardView().findViewById(R.id.textview_title_door);
+        textView.setText(R.string.door_two_label);
+        ((TextView) getCardView().findViewById(R.id.textview_open)).setTextColor(getColorFromResource(R.color.text_color_open_door_two));
         return view;
     }
 

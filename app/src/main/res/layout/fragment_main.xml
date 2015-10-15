@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+            android:fillViewport="true">
 <LinearLayout
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,7 +14,6 @@
         android:layout_height="match_parent"
         android:id="@+id/door_one_container"
         >
-        <include layout="@layout/door_layout"/>
     </FrameLayout>
 
     <FrameLayout
@@ -21,15 +21,13 @@
         android:layout_height="match_parent"
         android:id="@+id/door_two_container"
         >
-        <include layout="@layout/door_layout"/>
     </FrameLayout>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/weather_conatainer"
         android:layout_marginBottom="10dp">
-        <include layout="@layout/door_layout"/>
-        </FrameLayout>
+    </FrameLayout>
 
 
 </LinearLayout>

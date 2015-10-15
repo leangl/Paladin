@@ -95,27 +95,29 @@ public abstract class BaseDoorFragment extends BaseFragment {
         });
 
         this.mImageViewDoor.setOnClickListener(v -> {
-           getDoor().toggle("Door is in motion", true);
+            getDoor().toggle("Door is in motion", true);
         });
 
-
-        if (this.mDoorOpened) {
-            defaultView(R.string.opened_label, R.drawable.door_open, mDoorOpened);
-        } else {
-            defaultView(R.string.close_label, R.drawable.door_closed, false);
-
-        }
+        stateView();
         this.mEditTextOpen.setText(getDoor().getOpenPhrase());
         this.mEditTextClose.setText(getDoor().getClosePhrase());
         setTextViewLastOpened();
 
     }
 
-    private void defaultView(int text, int drawable, boolean checked) {
+    private void stateView() {
+        if (this.mDoorOpened) {
+            defaultView(R.string.opened_label, R.drawable.ic_door_opened);
+        } else {
+            defaultView(R.string.closed_label, R.drawable.ic_door_closed);
+
+        }
+    }
+
+    private void defaultView(int text, int drawable) {
         if (mTextviewOpen != null) {
             mTextviewOpen.setText(text);
             mImageViewDoor.setImageResource(drawable);
-//            mSwitchCompat.setChecked(checked);
         }
     }
 
@@ -158,24 +160,14 @@ public abstract class BaseDoorFragment extends BaseFragment {
     public void handlerDoorState(DoorToggled event) {
         if (getDoor() != null && getDoor().getId() == event.door.getId()) {
             mDoorOpened = event.opened;
-            stopLoading();
-            if (mDoorOpened) {
-                defaultView(R.string.opened_label, R.drawable.door_open, true);
-            } else {
-                defaultView(R.string.closed_label, R.drawable.door_closed, false);
-            }
+            stateView();
         }
     }
 
     public void handlerDoorState(DoorActivationFailed doorActivationFailed) {
         if (getDoor() != null && getDoor().getId() == doorActivationFailed.door.getId()) {
-            stopLoading();
             mDoorOpened = doorActivationFailed.opened;
-            if (mDoorOpened) {
-                defaultView(R.string.opened_label, R.drawable.door_open, true);
-            } else {
-                defaultView(R.string.closed_label, R.drawable.door_closed, false);
-            }
+            stateView();
         }
     }
 
