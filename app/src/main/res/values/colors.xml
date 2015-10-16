@@ -19,6 +19,7 @@
     <color name="edittexttheme_color">#6e6e6e</color>
     <color name="white">#ffffff</color>
     <color name="user_divider">#b1b1b1</color>
+    <color name="text_color_pass">#f44336</color>
 
 
 </resources>
