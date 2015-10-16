@@ -37,4 +37,6 @@
     <string name="board_connected_msg">Board has been connected.</string>
     <string name="no_record_msg">No records to display</string>
     <string name="door_label">Door</string>
+    <string name="receive_alerts_label">Receive Alerts</string>
+    <string name="time_limits_label">Time Limits:</string>
 </resources>
