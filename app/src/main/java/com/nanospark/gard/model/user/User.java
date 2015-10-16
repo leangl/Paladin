@@ -2,8 +2,6 @@ package com.nanospark.gard.model.user;
 
 import com.nanospark.gard.model.door.Door;
 
-import java.util.List;
-
 import mobi.tattu.utils.StringUtils;
 
 /**
@@ -15,7 +13,7 @@ public class User {
     private String phone;
     private String password;
     private Notify notify;
-    private List<ControlSchedule> schedules;
+    private ControlSchedule schedule;
 
     public User() {
     }
@@ -51,11 +49,11 @@ public class User {
     public void setPhone(String phone) {
         this.phone = phone;
     }
-    public List<ControlSchedule> getSchedules() {
-        return schedules;
+    public ControlSchedule getSchedule() {
+        return schedule;
     }
-    public void setSchedules(List<ControlSchedule> schedules) {
-        this.schedules = schedules;
+    public void setSchedules(ControlSchedule schedule) {
+        this.schedule = schedule;
     }
     @Override
     public boolean equals(Object o) {
