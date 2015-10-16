@@ -22,7 +22,7 @@ public class ControlSchedule {
     private List<Integer> days;
     private boolean repeatEveryOtherDay;
     private boolean repeatWeeks;
-    private int repeatWeeksNumber;
+    private Integer repeatWeeksNumber;
 
     public List<Integer> getDays() {
         return days;
@@ -84,10 +84,10 @@ public class ControlSchedule {
     public void setRepeatWeeks(boolean repeatWeeks) {
         this.repeatWeeks = repeatWeeks;
     }
-    public int getRepeatWeeksNumber() {
+    public Integer getRepeatWeeksNumber() {
         return repeatWeeksNumber;
     }
-    public void setRepeatWeeksNumber(int repeatWeeksNumber) {
+    public void setRepeatWeeksNumber(Integer repeatWeeksNumber) {
         this.repeatWeeksNumber = repeatWeeksNumber;
     }
     public Integer getStartDay() {
