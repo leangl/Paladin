@@ -19,11 +19,21 @@
         app:columnCount="4"
         app:useDefaultMargins="true"
         android:id="@+id/gridlayout">
-
-
-
-
     </android.support.v7.widget.GridLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fb_add_user"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="30dp"
+        app:rippleColor="@color/white"
+        app:elevation="4dp"
+        app:backgroundTint="@color/red"
+        android:src="@drawable/ic_add_user"
+        android:scaleType="center"/>
 
 
 </RelativeLayout>
