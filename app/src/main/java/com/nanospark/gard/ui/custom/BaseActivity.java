@@ -39,7 +39,7 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getLayout());
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.title_toolbar);
         toolbar.setSubtitle(R.string.subtile_toolbar);
         toolbar.setSubtitleTextColor(getColorFromResource(R.color.white));
@@ -48,6 +48,8 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
 
         if (containsTab()) {
             initTabs();
+        }else{
+            start(getFragment(),false);
         }
         int orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
         if(getResources().getBoolean(R.bool.isTablet)){
@@ -59,6 +61,8 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
     public abstract int getLayout();
 
     public abstract boolean containsTab();
+
+    public abstract Fragment getFragment();
 
     private void initTabs() {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab);

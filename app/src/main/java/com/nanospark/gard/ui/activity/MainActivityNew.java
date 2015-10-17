@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 
 import com.nanospark.gard.R;
 import com.nanospark.gard.events.BoardConnected;
@@ -15,7 +16,7 @@ import com.nanospark.gard.events.SmsSuspended;
 import com.nanospark.gard.services.GarDService;
 import com.nanospark.gard.sms.SmsManager;
 import com.nanospark.gard.ui.custom.BaseActivity;
-import com.nanospark.gard.ui.fragments.DialogFragment;
+import com.nanospark.gard.ui.custom.DialogFragment;
 import com.squareup.otto.Subscribe;
 
 import mobi.tattu.utils.Tattu;
@@ -40,6 +41,11 @@ public class MainActivityNew extends BaseActivity {
     @Override
     public boolean containsTab() {
         return true;
+    }
+
+    @Override
+    public Fragment getFragment() {
+        return null;
     }
 
     @Subscribe

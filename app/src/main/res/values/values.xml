@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <bool name="isTablet">false</bool>
+    <string name="key_state">State</string>
+    <string name="key_day">day</string>
 </resources>

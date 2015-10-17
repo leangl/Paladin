@@ -94,6 +94,8 @@
             android:enabled="true"
             android:exported="true">
         </receiver>
+
+        <activity android:name=".ui.activity.CreateUserActivity"/>
         
     </application>
 

@@ -2,6 +2,7 @@ package com.nanospark.gard.ui.fragments;
 
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import com.google.inject.Inject;
 import com.nanospark.gard.R;
 import com.nanospark.gard.model.user.User;
 import com.nanospark.gard.model.user.UserManager;
+import com.nanospark.gard.ui.activity.CreateUserActivity;
 import com.nanospark.gard.ui.custom.BaseFragment;
 
 import java.util.List;
@@ -42,7 +44,7 @@ public class UsersFragment extends BaseFragment {
         GridLayout  gridLayout = (GridLayout) view.findViewById(R.id.gridlayout);
         gridLayout.setUseDefaultMargins(true);
         view.findViewById(R.id.fb_add_user).setOnClickListener(v -> {
-
+            showCreateUser();
         });
         List<User> userList = mUserManager.getAll();
         int size = userList.size();
@@ -62,8 +64,8 @@ public class UsersFragment extends BaseFragment {
         return view;
     }
 
-    private void createUser(){
-
+    private void showCreateUser(){
+        startActivity(new Intent(getBaseActivity(), CreateUserActivity.class));
     }
 
     private void populateUserView(User user, TextView name, TextView phone) {

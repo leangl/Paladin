@@ -38,5 +38,14 @@
     <string name="no_record_msg">No records to display</string>
     <string name="door_label">Door</string>
     <string name="receive_alerts_label">Receive Alerts</string>
-    <string name="time_limits_label">Time Limits:</string>
+    <string name="time_limits_label">Time Limits </string>
+    <string name="start_label">Start: </string>
+    <string name="end_label">End: </string>
+    <string name="repeat_only_every_day_label">Repeat only every day</string>
+    <string name="repeat_label">Repeat </string>
+    <string name="weeks_label">weeks</string>
+    <string name="require_password_label">Require Password</string>
+    <string name="notify_door_activity_label">Notify me of door activity</string>
+    <string name="new_user_label">New User</string>
+    <string name="save_label">Save</string>
 </resources>

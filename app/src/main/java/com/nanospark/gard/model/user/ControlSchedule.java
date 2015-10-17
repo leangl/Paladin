@@ -81,24 +81,31 @@ public class ControlSchedule {
     public boolean isRepeatWeeks() {
         return repeatWeeks;
     }
+
     public void setRepeatWeeks(boolean repeatWeeks) {
         this.repeatWeeks = repeatWeeks;
     }
+
     public int getRepeatWeeksNumber() {
         return repeatWeeksNumber;
     }
+
     public void setRepeatWeeksNumber(int repeatWeeksNumber) {
         this.repeatWeeksNumber = repeatWeeksNumber;
     }
+
     public Integer getStartDay() {
         return startDay;
     }
+
     public void setStartDay(Integer startDay) {
         this.startDay = startDay;
     }
+
     public Integer getStartHour() {
         return startHour;
     }
+
     public void setStartHour(Integer startHour) {
         this.startHour = startHour;
     }

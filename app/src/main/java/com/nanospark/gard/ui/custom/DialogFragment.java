@@ -1,4 +1,4 @@
-package com.nanospark.gard.ui.fragments;
+package com.nanospark.gard.ui.custom;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
