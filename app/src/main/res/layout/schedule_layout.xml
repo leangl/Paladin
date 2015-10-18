@@ -3,7 +3,7 @@
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" ena>
+                android:layout_height="match_parent">
 
     <ImageView
         android:layout_width="50dp"
@@ -197,24 +197,22 @@
         android:layout_height="wrap_content"
         android:id="@+id/spinner_events"
         android:layout_alignBottom="@+id/checkbox_repeat"
-        android:layout_toRightOf="@+id/textview_start_day"
         android:layout_alignTop="@+id/checkbox_repeat"
         android:spinnerMode="dropdown"
         android:layout_alignRight="@+id/checkbox_repeat_every_day"
-        android:layout_alignEnd="@+id/checkbox_repeat_every_day"/>
+        android:layout_alignEnd="@+id/checkbox_repeat_every_day"
+        android:layout_toRightOf="@+id/checkbox_repeat"
+        android:layout_toEndOf="@+id/checkbox_repeat"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/weeks_label"
-        android:id="@+id/textView17"
+        android:id="@+id/textView10"
         android:layout_alignTop="@+id/spinner_events"
-        android:layout_toLeftOf="@+id/textview_end_day"
-        android:layout_alignBottom="@+id/spinner_events"
-        android:gravity="center"
-        android:textStyle="bold"
+        android:layout_toRightOf="@+id/spinner_events"
         android:layout_toEndOf="@+id/spinner_events"
-        android:layout_toRightOf="@+id/spinner_events"/>
+        android:layout_alignBottom="@+id/spinner_events"/>
 
 </RelativeLayout>
