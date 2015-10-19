@@ -5,19 +5,27 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
+import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.inject.Inject;
 import com.nanospark.gard.R;
+import com.nanospark.gard.Utils;
 import com.nanospark.gard.model.user.User;
 import com.nanospark.gard.model.user.UserManager;
 import com.nanospark.gard.ui.activity.CreateUserActivity;
 import com.nanospark.gard.ui.custom.BaseFragment;
 
+import java.util.Calendar;
 import java.util.List;
+
+import mobi.tattu.utils.ToastManager;
+import mobi.tattu.utils.persistance.datastore.DataStore;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,6 +34,7 @@ public class UsersFragment extends BaseFragment {
 
     @Inject
     private UserManager mUserManager;
+    private GridLayout mGridLayout;
 
     public static UsersFragment newInstance() {
         
@@ -41,29 +50,73 @@ public class UsersFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_users, container, false);
-        GridLayout  gridLayout = (GridLayout) view.findViewById(R.id.gridlayout);
-        gridLayout.setUseDefaultMargins(true);
+        this.mGridLayout = (GridLayout) view.findViewById(R.id.gridlayout);
+        this.mGridLayout.setUseDefaultMargins(true);
         view.findViewById(R.id.fb_add_user).setOnClickListener(v -> {
             showCreateUser();
         });
+
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadUsers();
+    }
+
+    private void loadUsers() {
         List<User> userList = mUserManager.getAll();
         int size = userList.size();
+        this.mGridLayout.removeAllViews();
         for (int i = 0 ; i < size ; i++){
-            View userView = inflater.inflate(R.layout.user_layout,null,false);
+            View userView = LayoutInflater.from(getBaseActivity()).inflate(R.layout.user_layout, null, false);
             User user = userList.get(i);
 
             TextView name  = (TextView) userView.findViewById(R.id.textview_user_name);
             TextView phone = (TextView) userView.findViewById(R.id.textview_phone);
             TextView timeLimits = (TextView) userView.findViewById(R.id.textview_time_limits);
-
+            ImageView receiveAlerts = (ImageView) userView.findViewById(R.id.imageview_receive_alerts);
+            userView.findViewById(R.id.imageview_menu).setOnClickListener(v -> {
+                PopupMenu popupMenu = new PopupMenu(getBaseActivity(),v);
+                popupMenu.inflate(R.menu.actions);
+                popupMenu.setOnMenuItemClickListener(item -> {
+                    handlerPopMenu(item, user);
+                    return true;
+                });
+                popupMenu.show();
+            });
+            if(user.getNotify() != null){
+                receiveAlerts.setImageResource(R.drawable.ic_alert_enabled);
+            }
+            String startTime = Utils.getHour(getCalendarHour(user.getSchedule().getStartHour(), user.getSchedule().getStartMinute()));
+            String endTime = Utils.getHour(getCalendarHour(user.getSchedule().getEndHour(),user.getSchedule().getEndMinute()));
+            timeLimits.setText(startTime +Utils.SPACE+ endTime);
             populateUserView(user, name, phone);
 
-            addUserViewToGrid(gridLayout, userView);
+            addUserViewToGrid(this.mGridLayout, userView);
 
         }
-        return view;
     }
 
+    private void handlerPopMenu(MenuItem item,User user) {
+        switch (item.getItemId()){
+            case R.id.action_delete:
+                DataStore.getInstance().delete(User.class,user.getId());
+                loadUsers();
+                break;
+            case R.id.action_edit:
+                ToastManager.get().showToast("Falta implementacion");
+                break;
+        }
+    }
+
+    private Calendar getCalendarHour(int hour,int minute){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY,hour);
+        calendar.set(Calendar.MINUTE,minute);
+        return calendar;
+    }
     private void showCreateUser(){
         startActivity(new Intent(getBaseActivity(), CreateUserActivity.class));
     }

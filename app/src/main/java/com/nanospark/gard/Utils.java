@@ -31,13 +31,15 @@ public class Utils {
         builder.append(getHour(calendar));
         return builder;
     }
-    private static String getHour(Calendar calendar){
+    public  static String getHour(Calendar calendar){
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
         StringBuilder builder = new StringBuilder();
         builder.append(hour > 9 ? hour : "0" + hour );
         builder.append(SEPARATOR_HOUR);
         builder.append(minute > 9 ? minute : "0" + minute);
+        builder.append(SPACE);
+        builder.append(calendar.getDisplayName(Calendar.AM_PM,Calendar.SHORT,Locale.US));
         return builder.toString();
     }
 
