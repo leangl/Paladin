@@ -27,8 +27,6 @@ import com.squareup.otto.Subscribe;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import mobi.tattu.utils.Tattu;
-
 /**
  * Created by cristian on 17/10/15.
  */
@@ -59,8 +57,6 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         mControlSchedule = new ControlSchedule();
         mControlSchedule.setDays(new ArrayList<>());
         ((CreateUserActivity) getBaseActivity()).setListener(this);
-        Tattu.register(this);
-
     }
 
     @Nullable
