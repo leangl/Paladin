@@ -26,7 +26,7 @@
         <activity
             android:name=".ui.activity.MainActivityNew"
             android:launchMode="singleTask"
-            >
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

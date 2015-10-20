@@ -132,32 +132,15 @@
         android:layout_alignStart="@+id/textView12"
         android:layout_below="@+id/textView12"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/textview_end_day"
-        android:textColor="@color/text_color_bold"
-        android:gravity="center"
-        android:layout_alignBottom="@+id/textView15"
-        android:layout_toRightOf="@+id/textView15"
-        android:layout_toEndOf="@+id/textView15"
-        android:layout_below="@+id/textview_end_time"
-        android:layout_marginLeft="5dp"
-        android:visibility="visible"
-        android:hint="@string/hint_time_limits"/>
-
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="64dp"
         android:id="@+id/days_container"
         android:layout_below="@+id/imageView2"
         android:layout_alignLeft="@+id/imageView"
-        android:layout_alignStart="@+id/imageView"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true">
+        android:layout_alignStart="@+id/imageView">
 
         <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"
@@ -165,6 +148,8 @@
             android:id="@+id/fb_day_sun"
             android:src="@drawable/ic_sun"
             android:scaleType="center"
+            app:rippleColor="@color/white"
+            app:borderWidth="0dp"
             />
         <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"
@@ -173,6 +158,8 @@
             android:src="@drawable/ic_mon"
             android:scaleType="center"
             app:rippleColor="@color/white"
+            app:borderWidth="0dp"
+
             />
         <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"
@@ -181,6 +168,8 @@
             android:src="@drawable/ic_tue"
             android:scaleType="center"
             app:rippleColor="@color/white"
+            app:borderWidth="0dp"
+
             />
         <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"
@@ -189,6 +178,8 @@
             android:src="@drawable/ic_wed"
             android:scaleType="center"
             app:rippleColor="@color/white"
+            app:borderWidth="0dp"
+
             />
         <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"
@@ -197,6 +188,8 @@
             android:src="@drawable/ic_thr"
             android:scaleType="center"
             app:rippleColor="@color/white"
+            app:borderWidth="0dp"
+
             />
         <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"
@@ -204,7 +197,9 @@
             android:id="@+id/fb_day_fri"
             android:src="@drawable/ic_fri"
             app:rippleColor="@color/white"
-            android:scaleType="center"/>
+            android:scaleType="center"
+            app:borderWidth="0dp"
+            />
         <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -212,6 +207,8 @@
             android:src="@drawable/ic_sat"
             android:scaleType="center"
             app:rippleColor="@color/white"
+            app:borderWidth="0dp"
+
             />
     </LinearLayout>
 
@@ -219,16 +216,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/checkbox_repeat_every_day"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         android:text="@string/repeat_only_every_day_label"
         android:checked="false"
-        android:layout_below="@+id/days_container"
-        android:layout_alignLeft="@+id/textview_start_day"
-        android:layout_alignStart="@+id/textview_start_day"
         app:buttonTint="@color/red"
         android:textColor="@color/text_color_bold"
         android:textStyle="bold"
-        android:textSize="16sp"/>
+        android:textSize="16sp"
+        android:layout_below="@+id/days_container"
+        android:layout_centerHorizontal="true"/>
 
     <android.support.v7.widget.AppCompatCheckBox
         android:layout_width="wrap_content"
@@ -246,15 +242,18 @@
         app:buttonTint="@color/red"
         />
 
-    <android.support.v7.widget.AppCompatSpinner
-        android:layout_width="150dp"
+    <android.support.v7.widget.AppCompatEditText
+        android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:id="@+id/spinner_events"
+        android:id="@+id/edittext_repeat_weeks"
         android:layout_alignBottom="@+id/checkbox_repeat"
         android:layout_alignTop="@+id/checkbox_repeat"
         android:spinnerMode="dropdown"
-        android:layout_toRightOf="@+id/textview_start_day"
-        />
+        android:layout_toRightOf="@+id/checkbox_repeat"
+        android:layout_toEndOf="@+id/checkbox_repeat"
+        app:backgroundTint="@color/red"
+        android:inputType="number"/>
+
 
     <TextView
         android:layout_width="wrap_content"
@@ -262,13 +261,39 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/weeks_label"
         android:id="@+id/textView10"
-        android:layout_alignBottom="@+id/spinner_events"
-        android:layout_toRightOf="@+id/spinner_events"
-        android:layout_toEndOf="@+id/spinner_events"
-        android:layout_alignTop="@+id/spinner_events"
+        android:layout_alignBottom="@+id/edittext_repeat_weeks"
+        android:layout_toEndOf="@+id/edittext_repeat_weeks"
+        android:layout_alignTop="@+id/edittext_repeat_weeks"
         android:gravity="center"
         android:textStyle="bold"
         android:textColor="@color/text_color_bold"
-        android:layout_marginLeft="30dp"/>
+        android:layout_toRightOf="@+id/edittext_repeat_weeks"/>
+
+    <android.support.v7.widget.AppCompatEditText
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/edittext_date_event"
+        android:layout_below="@+id/textView15"
+        android:layout_toLeftOf="@+id/textView15"
+        android:layout_toStartOf="@+id/textView15"
+        android:layout_marginRight="30dp"
+        android:layout_marginEnd="30dp"
+        android:visibility="invisible"
+        app:backgroundTint="@color/red"
+        android:enabled="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"/>
+
+    <android.support.v7.widget.AppCompatSpinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_date_event"
+        android:layout_above="@+id/days_container"
+        android:layout_alignLeft="@+id/textview_end_time"
+        android:layout_alignStart="@+id/textview_end_time"
+        android:layout_alignTop="@+id/textView15"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:spinnerMode="dropdown"/>
 
 </RelativeLayout>
