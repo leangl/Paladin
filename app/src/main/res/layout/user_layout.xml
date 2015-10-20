@@ -143,7 +143,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="12:00 AM  10:00 PM"
+                    android:text="@string/unknown_label"
                     android:id="@+id/textview_time_limits"
                     android:layout_alignTop="@+id/textView6"
                     android:layout_toEndOf="@+id/textView6"

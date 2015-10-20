@@ -228,7 +228,7 @@
 
     <android.support.v7.widget.AppCompatCheckBox
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:id="@+id/checkbox_repeat"
         android:layout_below="@+id/checkbox_repeat_every_day"
         android:layout_alignLeft="@+id/checkbox_repeat_every_day"
@@ -252,7 +252,8 @@
         android:layout_toRightOf="@+id/checkbox_repeat"
         android:layout_toEndOf="@+id/checkbox_repeat"
         app:backgroundTint="@color/red"
-        android:inputType="number"/>
+        android:inputType="number"
+        android:gravity="center"/>
 
 
     <TextView

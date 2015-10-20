@@ -23,7 +23,7 @@ public class UserManager {
     }
 
     public void add(User user) {
-        mDataStore.putObject(user.getId(),user);
+        mDataStore.putObject(user);
     }
 
     /**

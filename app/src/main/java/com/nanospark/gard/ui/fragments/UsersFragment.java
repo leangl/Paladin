@@ -24,8 +24,6 @@ import com.nanospark.gard.ui.custom.BaseFragment;
 import java.util.Calendar;
 import java.util.List;
 
-import mobi.tattu.utils.persistance.datastore.DataStore;
-
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -88,9 +86,11 @@ public class UsersFragment extends BaseFragment {
             if(user.getNotify() != null){
                 receiveAlerts.setImageResource(R.drawable.ic_alert_enabled);
             }
-            String startTime = Utils.getHour(getCalendarHour(user.getSchedule().getStartHour(), user.getSchedule().getStartMinute()));
-            String endTime = Utils.getHour(getCalendarHour(user.getSchedule().getEndHour(),user.getSchedule().getEndMinute()));
-            timeLimits.setText(startTime +Utils.SPACE+ endTime);
+            if(user.getSchedule() != null){
+                String startTime = Utils.getHour(getCalendarHour(user.getSchedule().getStartHour(), user.getSchedule().getStartMinute()));
+                String endTime = Utils.getHour(getCalendarHour(user.getSchedule().getEndHour(),user.getSchedule().getEndMinute()));
+                timeLimits.setText(startTime +Utils.SPACE+ endTime);
+            }
             populateUserView(user, name, phone);
 
             addUserViewToGrid(this.mGridLayout, userView);
@@ -101,7 +101,7 @@ public class UsersFragment extends BaseFragment {
     private void handlerPopMenu(MenuItem item,User user) {
         switch (item.getItemId()){
             case R.id.action_delete:
-                DataStore.getInstance().delete(User.class,user.getName());
+                mUserManager.delete(user);
                 loadUsers();
                 break;
             case R.id.action_edit:

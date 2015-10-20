@@ -34,6 +34,7 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
 
     @Inject
     private LogManager mLogManager;
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +46,12 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
         }
         setRequestedOrientation(orientation);
         setContentView(getLayout());
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.title_toolbar);
-        toolbar.setSubtitle(R.string.subtile_toolbar);
-        toolbar.setSubtitleTextColor(getColorFromResource(R.color.white));
-        toolbar.setTitleTextColor(getColorFromResource(R.color.white));
-        setSupportActionBar(toolbar);
+        this.mToolbar = (Toolbar)findViewById(R.id.toolbar);
+        this.mToolbar.setTitle(R.string.title_toolbar);
+        this.mToolbar.setSubtitle(R.string.subtile_toolbar);
+        this.mToolbar.setSubtitleTextColor(getColorFromResource(R.color.white));
+        this.mToolbar.setTitleTextColor(getColorFromResource(R.color.white));
+        setSupportActionBar(this.mToolbar);
 
         if (containsTab()) {
             initTabs();
@@ -186,5 +187,12 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
 
         }
 
+    }
+    public Toolbar getToolbar(){
+        return this.mToolbar;
+    }
+
+    public Object getViewInToolbar(int id){
+        return findViewById(R.id.toolbar_container).findViewById(id);
     }
 }
