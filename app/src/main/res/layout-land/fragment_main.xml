@@ -2,14 +2,14 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-            android:fillViewport="true">
+            android:fillViewport="true"
+            >
 
 
     <RelativeLayout
         android:orientation="horizontal" android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/grey_300"
-        android:gravity="center_vertical">
+             android:gravity="center_vertical">
 
 
         <FrameLayout

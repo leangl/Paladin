@@ -32,6 +32,7 @@ public class UsersFragment extends BaseFragment {
     @Inject
     private UserManager mUserManager;
     private GridLayout mGridLayout;
+    private List<User> mUserList;
 
     public static UsersFragment newInstance() {
         
@@ -42,6 +43,12 @@ public class UsersFragment extends BaseFragment {
         return fragment;
     }
 
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,16 +66,25 @@ public class UsersFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        loadUsers();
+        this.mUserList = mUserManager.getAll();
+        if(mUserList.isEmpty()){
+            View emptyView = LayoutInflater.from(getBaseActivity()).inflate(R.layout.empty_layout,null,false);
+            TextView textView = (TextView) emptyView.findViewById(R.id.textview_empty);
+            textView.setText(R.string.empty_users_msg);
+            mGridLayout.removeAllViews();
+            addViewToGrid(mGridLayout, emptyView);
+        }else{
+            loadUsers();
+        }
     }
 
     private void loadUsers() {
-        List<User> userList = mUserManager.getAll();
-        int size = userList.size();
+
+        int size = mUserList.size();
         this.mGridLayout.removeAllViews();
         for (int i = 0 ; i < size ; i++){
             View userView = LayoutInflater.from(getBaseActivity()).inflate(R.layout.user_layout, null, false);
-            User user = userList.get(i);
+            User user = mUserList.get(i);
 
             TextView name  = (TextView) userView.findViewById(R.id.textview_user_name);
             TextView phone = (TextView) userView.findViewById(R.id.textview_phone);
@@ -93,7 +109,7 @@ public class UsersFragment extends BaseFragment {
             }
             populateUserView(user, name, phone);
 
-            addUserViewToGrid(this.mGridLayout, userView);
+            addViewToGrid(this.mGridLayout, userView);
 
         }
     }
@@ -127,12 +143,12 @@ public class UsersFragment extends BaseFragment {
         phone.setText(user.getPhone());
     }
 
-    private void addUserViewToGrid(GridLayout gridLayout, View userView) {
+    private void addViewToGrid(GridLayout gridLayout, View view) {
         GridLayout.LayoutParams  layoutParams = new GridLayout.LayoutParams();
         layoutParams.rowSpec = GridLayout.spec(1,Float.valueOf("1.0"));
         layoutParams.columnSpec = GridLayout.spec(GridLayout.UNDEFINED,Float.valueOf("1.0"));
-        userView.setLayoutParams(layoutParams);
-        gridLayout.addView(userView);
+        view.setLayoutParams(layoutParams);
+        gridLayout.addView(view);
     }
 
 

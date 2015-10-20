@@ -193,6 +193,6 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
     }
 
     public Object getViewInToolbar(int id){
-        return findViewById(R.id.toolbar_container).findViewById(id);
+        return findViewById(id);
     }
 }

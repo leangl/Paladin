@@ -56,4 +56,6 @@
     <string name="passcode_label">Passcode:</string>
     <string name="hint_time_limits">________</string>
     <string name="error_name_msg">A user already exists with that name</string>
+    <string name="error_name_invalid">Username is invalid</string>
+    <string name="empty_users_msg">No registered users</string>
 </resources>

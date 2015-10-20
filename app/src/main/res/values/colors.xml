@@ -7,7 +7,7 @@
     <color name="text_tab_unselected">#a4bbc7</color>
     <color name="cardview_background">#ffffff</color>
     <color name="toolbar_background">@color/background_material_dark</color>
-    <color name="activity_main_background">#eeeeee</color>
+    <!--<color name="activity_main_background">#eeeeee</color>-->
 
     <color name="door_one_background">#ee9c26</color>
     <color name="door_two_background">#a6e04b</color>
