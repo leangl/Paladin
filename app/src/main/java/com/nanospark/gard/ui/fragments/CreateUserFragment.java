@@ -64,6 +64,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
     @Inject
     private UserManager mUserManager;
     private boolean mSave;
+    private boolean mEdit;
 
 
     public static CreateUserFragment newInstance(String idUser) {
@@ -84,6 +85,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
             mUser = new User();
         } else {
             this.mUser = mUserManager.findByName(id);
+            this.mEdit = true;
         }
     }
 
@@ -406,7 +408,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         String pass = this.mPasswordEditText.getText().toString();
         String repeatEvent = this.mRepeatEventWeeksEditText.getText().toString();
 
-        if (mUserManager.exists(name)) {
+        if (!this.mEdit && mUserManager.exists(name)) {
             ToastManager.get().showToast(getString(R.string.error_name_msg));
             return;
         } else {
