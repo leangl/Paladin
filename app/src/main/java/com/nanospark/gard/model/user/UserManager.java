@@ -52,4 +52,8 @@ public class UserManager {
         return find((user) -> user.getPhone().trim().equalsIgnoreCase(phone.trim()));
     }
 
+    public void delete(User user) {
+        mDataStore.delete(User.class, user);
+    }
+
 }
