@@ -9,7 +9,7 @@ import mobi.tattu.utils.StringUtils;
  */
 public class User {
 
-    private String id;
+
     private String name;
     private String phone;
     private String password;
@@ -112,11 +112,4 @@ public class User {
         return password != null && password.equalsIgnoreCase(this.password);
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 }

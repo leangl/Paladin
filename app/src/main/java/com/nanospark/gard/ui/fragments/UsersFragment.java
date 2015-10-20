@@ -24,7 +24,6 @@ import com.nanospark.gard.ui.custom.BaseFragment;
 import java.util.Calendar;
 import java.util.List;
 
-import mobi.tattu.utils.ToastManager;
 import mobi.tattu.utils.persistance.datastore.DataStore;
 
 /**
@@ -102,11 +101,13 @@ public class UsersFragment extends BaseFragment {
     private void handlerPopMenu(MenuItem item,User user) {
         switch (item.getItemId()){
             case R.id.action_delete:
-                DataStore.getInstance().delete(User.class,user.getId());
+                DataStore.getInstance().delete(User.class,user.getName());
                 loadUsers();
                 break;
             case R.id.action_edit:
-                ToastManager.get().showToast("Falta implementacion");
+                Intent intent = new Intent(getBaseActivity(),CreateUserActivity.class);
+                intent.putExtra(CreateUserFragment.ARG_ID_USER,user.getName());
+                startActivity(intent);
                 break;
         }
     }

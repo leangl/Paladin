@@ -2,6 +2,7 @@ package com.nanospark.gard.ui.fragments;
 
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.AppCompatEditText;
@@ -16,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.inject.Inject;
@@ -34,7 +36,6 @@ import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.UUID;
 
 import mobi.tattu.utils.ToastManager;
 
@@ -43,6 +44,7 @@ import mobi.tattu.utils.ToastManager;
  */
 public class CreateUserFragment extends BaseFragment implements CreateUserActivity.CreateUserListener {
 
+    public static final String ARG_ID_USER = "argID_user";
     private ControlSchedule mControlSchedule;
     private User mUser;
     private AppCompatEditText mNameEditText;
@@ -64,9 +66,10 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
     private boolean mSave;
 
 
-    public static CreateUserFragment newInstance() {
+    public static CreateUserFragment newInstance(String idUser) {
 
         Bundle args = new Bundle();
+        args.putString(ARG_ID_USER, idUser);
         CreateUserFragment fragment = new CreateUserFragment();
         fragment.setArguments(args);
         return fragment;
@@ -75,21 +78,26 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String id = getArguments().getString(ARG_ID_USER);
+        if (id == null) {
+            createUser();
+        } else {
+            this.mUser = mUserManager.findByName()
+        }
+    }
+
+    private void createUser() {
         mUser = new User();
-        mUser.setId(UUID.randomUUID().toString());
         mControlSchedule = new ControlSchedule();
         mControlSchedule.setDays(new ArrayList<>());
         ((CreateUserActivity) getBaseActivity()).setListener(this);
         mUser.setSchedules(this.mControlSchedule);
-
-
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_user, container, false);
-
         this.mNameEditText = (AppCompatEditText) view.findViewById(R.id.edittext_name);
         this.mPhoneEditText = (AppCompatEditText) view.findViewById(R.id.edittext_phone);
         this.mPasswordEditText = (AppCompatEditText) view.findViewById(R.id.edittext_password);
@@ -103,7 +111,6 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         this.mDoorEventSpinner.setEnabled(true);
         this.mPasswordEditText.setEnabled(false);
 
-        initScheduleView(scheludeContainer, daysContainer);
         ArrayAdapter<User.Notify> adapter = new ArrayAdapter<User.Notify>(getBaseActivity(), android.R.layout.simple_dropdown_item_1line, User.Notify.values());
 
         this.mDoorEventSpinner.setAdapter(adapter);
@@ -131,7 +138,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
                 mUser.setNotify(null);
             }
         });
-
+        initScheduleView(scheludeContainer, daysContainer);
         return view;
     }
 
@@ -141,14 +148,17 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         this.mDateStartTextView = (TextView) scheludeContainer.findViewById(R.id.textview_start_day);
         this.mRepeatEventWeeksEditText = (AppCompatEditText) scheludeContainer.findViewById(R.id.edittext_repeat_weeks);
         this.mDateEventEditText = (AppCompatEditText) scheludeContainer.findViewById(R.id.edittext_date_event);
-
+        CheckBox repeatEveryDayCheckBox = (CheckBox) scheludeContainer.findViewById(R.id.checkbox_repeat_every_day);
+        CheckBox repeatCheckBox = (CheckBox) scheludeContainer.findViewById(R.id.checkbox_repeat);
         AppCompatSpinner limitSpinner = (AppCompatSpinner) scheludeContainer.findViewById(R.id.spinner_date_event);
 
         this.mRepeatEventWeeksEditText.setEnabled(false);
-        ((CheckBox) scheludeContainer.findViewById(R.id.checkbox_repeat_every_day)).setOnCheckedChangeListener((buttonView, isChecked) -> {
+
+        repeatEveryDayCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             mControlSchedule.setRepeatEveryOtherDay(isChecked);
         });
-        ((CheckBox) scheludeContainer.findViewById(R.id.checkbox_repeat)).setOnCheckedChangeListener((buttonView, isChecked) -> {
+
+        repeatCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             mControlSchedule.setRepeatWeeks(isChecked);
             mRepeatEventWeeksEditText.setEnabled(true);
 
@@ -179,6 +189,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
                     mDateEventEditText.setVisibility(View.GONE);
                     mDateEventEditText.setOnClickListener(null);
                 }
+                mControlSchedule.setLimit(limit);
             }
 
             @Override
@@ -196,8 +207,47 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         this.mDateStartTextView.setOnClickListener(v -> {
             showDatePicker(R.id.textview_start_day);
         });
+        loadData(repeatEveryDayCheckBox, repeatCheckBox, limitSpinner);
 
     }
+
+    private void loadData(CheckBox repeatEveryDayCheckBox, CheckBox repeatCheckBox, AppCompatSpinner limitSpinner) {
+        if (mUser.getName() != null && !mUser.getName().isEmpty()) {
+            ControlSchedule controlSchedule = mUser.getSchedule();
+            Calendar calendarStart = createCalendarTime(controlSchedule.getStartHour(), mControlSchedule.getStartMinute());
+            mTimeStartTextView.setText(Utils.getHour(calendarStart));
+            Calendar calendarEnd = createCalendarTime(controlSchedule.getEndHour(), controlSchedule.getEndMinute());
+            mTimeEndTextView.setText(Utils.getHour(calendarEnd));
+            mDateStartTextView.setText(getDay(mControlSchedule.getStartDay(), mControlSchedule.getStartMonth(), mControlSchedule.getStartYear()));
+            mRepeatEventWeeksEditText.setText(mControlSchedule.getRepeatWeeksNumber());
+            repeatEveryDayCheckBox.setChecked(controlSchedule.isRepeatEveryOtherDay());
+            repeatCheckBox.setChecked(controlSchedule.isRepeatWeeks());
+            this.mRepeatEventWeeksEditText.setText(controlSchedule.getRepeatWeeksNumber());
+            if(controlSchedule.getLimit() != null){
+                limitSpinner.setSelection(getIndex(limitSpinner, controlSchedule.getLimit()));
+            }
+            this.mDateEventEditText.setText(getDay(controlSchedule.getLimitDay(), controlSchedule.getLimitMonth(), controlSchedule.getLimitYear()));
+            this.mNameEditText.setText(this.mUser.getName());
+            this.mPhoneEditText.setText(this.mUser.getPhone());
+            this.mPasswordEditText.setText(this.mUser.getPassword());
+            this.mRequirePassCheckBox.setChecked(mUser.getPassword() != null);
+            if (mUser.getNotify() != null) {
+                this.mNotifyCheckBox.setChecked(true);
+                this.mDoorEventSpinner.setSelection(getIndex(mDoorEventSpinner, mUser.getNotify()));
+            }
+        }
+    }
+
+    private int getIndex(Spinner spinner, Object object) {
+        int index = 0;
+        for (int i = 0; i < spinner.getCount(); i++) {
+            if (spinner.getItemAtPosition(i).equals(object)) {
+                index = i;
+            }
+        }
+        return index;
+    }
+
     private void showDatePicker(int id) {
         DatePickerFragment datePickerFragment = DatePickerFragment.newInstance(id);
         datePickerFragment.show(getBaseActivity().getSupportFragmentManager(), datePickerFragment.toString());
@@ -244,6 +294,10 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
             fb.setTag(R.string.key_state, state);
 
         });
+        if ((mUser.getName() != null && !mUser.getName().isEmpty()) && mUser.getSchedule().getDays().indexOf(day) != -1) {
+            floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(getColorFromResource(R.color.red)));
+            floatingActionButton.setImageResource(drawableSelected);
+        }
     }
 
     @Override
@@ -254,13 +308,9 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
 
     @Subscribe
     public void on(TimerPickerSelected timerPickerSelected) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, timerPickerSelected.hourOfDay);
-        calendar.set(Calendar.MINUTE, timerPickerSelected.minute);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND,0);
+        Calendar calendar = createCalendarTime(timerPickerSelected.hourOfDay, timerPickerSelected.minute);
 
-       if (validateStartTime((Calendar) this.mTimeStartTextView.getTag(), calendar)) {
+        if (validateStartTime((Calendar) this.mTimeStartTextView.getTag(), calendar)) {
             if (timerPickerSelected.id == R.id.textview_start_time) {
                 mControlSchedule.setStartHour(timerPickerSelected.hourOfDay);
                 mControlSchedule.setStartMinute(timerPickerSelected.minute);
@@ -273,8 +323,18 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
                 mTimeEndTextView.setText(Utils.getHour(calendar));
             }
         } else {
-           ToastManager.get().showToast(R.string.error_time_msg);
+            ToastManager.get().showToast(R.string.error_time_msg);
         }
+    }
+
+    @NonNull
+    private Calendar createCalendarTime(int hour, int minute) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar;
     }
 
     @Subscribe
@@ -283,10 +343,10 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         calendar.set(Calendar.DAY_OF_MONTH, datePickerSelected.day);
         calendar.set(Calendar.MONTH, datePickerSelected.month);
         calendar.set(Calendar.YEAR, datePickerSelected.year);
-        calendar.set(Calendar.HOUR_OF_DAY,0);
-        calendar.set(Calendar.MINUTE,0);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND,0);
+        calendar.set(Calendar.MILLISECOND, 0);
 
         if (validateStartTime((Calendar) mDateStartTextView.getTag(), calendar)) {
             if (datePickerSelected.id == R.id.textview_start_day) {
@@ -303,7 +363,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
                 mDateEventEditText.setText(getDay(datePickerSelected.day, datePickerSelected.month, datePickerSelected.year));
             }
         } else {
-            if(this.mDateEventEditText.getVisibility() == View.VISIBLE){
+            if (this.mDateEventEditText.getVisibility() == View.VISIBLE) {
                 ToastManager.get().showToast(R.string.error_date_msg);
             }
         }
@@ -335,36 +395,51 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         String name = this.mNameEditText.getText().toString();
         String phone = this.mPhoneEditText.getText().toString();
         String pass = this.mPasswordEditText.getText().toString();
-        String dateEvents = this.mDateEventEditText.getText().toString();
+        String repeatEvent = this.mRepeatEventWeeksEditText.getText().toString();
 
-        if (validateField(name, getString(R.string.name_label))) {
-            this.mUser.setName(name);
-        }else{
+        if(mUserManager.exists(name)){
+            ToastManager.get().showToast(getString(R.string.field_empty_msg, getString(R.string.name_label)));
             return;
+        }else{
+            if (validateField(name, getString(R.string.name_label))) {
+                this.mUser.setName(name);
+            } else {
+                return;
+            }
         }
+
         if (validateField(phone, getString(R.string.phone_label))) {
             this.mUser.setPhone(phone);
-        }else{
+        } else {
             return;
         }
-        if(this.mRequirePassCheckBox.isChecked()){
+        if (this.mRequirePassCheckBox.isChecked()) {
             if (validateField(pass, getString(R.string.passcode_label))) {
                 this.mUser.setPassword(pass);
-            }else{
+            } else {
                 return;
             }
         }
 
         if (this.mTimelimitsCheckBox.isChecked()) {
             mSave = validateSchelude();
-        }else{
+        } else {
             return;
         }
-        if(mSave){
+        if (this.mRepeatEventWeeksEditText.isEnabled()) {
+            if (validateField(repeatEvent, getString(R.string.repeat_only_every_day_label))) {
+                this.mUser.getSchedule().setRepeatWeeks(true);
+                this.mUser.getSchedule().setRepeatWeeksNumber(Integer.parseInt(repeatEvent));
+            } else {
+                return;
+            }
+        }
+        if (mSave) {
             this.mUserManager.add(this.mUser);
             getBaseActivity().onBackPressed();
 
         }
+
     }
 
     private boolean validateSchelude() {

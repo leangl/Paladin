@@ -38,6 +38,7 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         int orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
         if(getResources().getBoolean(R.bool.isTablet)){
             orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;

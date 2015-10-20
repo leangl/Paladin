@@ -15,11 +15,15 @@ import com.nanospark.gard.ui.fragments.CreateUserFragment;
 public class CreateUserActivity extends BaseActivity {
 
     private CreateUserListener mListener;
+    private String mId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getSupportActionBar().setTitle(R.string.new_user_label);
+        if(getIntent() != null){
+            mId =getIntent().getStringExtra(CreateUserFragment.ARG_ID_USER);
+        }
+       super.onCreate(savedInstanceState);
+                getSupportActionBar().setTitle(R.string.new_user_label);
 
     }
 
@@ -35,7 +39,7 @@ public class CreateUserActivity extends BaseActivity {
 
     @Override
     public Fragment getFragment() {
-        return CreateUserFragment.newInstance();
+        return CreateUserFragment.newInstance(mId);
     }
 
     @Override
