@@ -95,7 +95,7 @@
             android:exported="true">
         </receiver>
 
-        <activity android:name=".ui.activity.CreateUserActivity"/>
+        <activity android:name=".ui.activity.CreateUserActivity" android:windowSoftInputMode="adjustPan|adjustResize"/>
         
     </application>
 

@@ -20,6 +20,7 @@ public class CreateUserActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setTitle(R.string.new_user_label);
+
     }
 
     @Override

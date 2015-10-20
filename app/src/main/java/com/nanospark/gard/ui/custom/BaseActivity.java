@@ -38,6 +38,11 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        int orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+        if(getResources().getBoolean(R.bool.isTablet)){
+            orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+        }
+        setRequestedOrientation(orientation);
         setContentView(getLayout());
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.title_toolbar);
@@ -51,11 +56,7 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
         }else{
             start(getFragment(),false);
         }
-        int orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-        if(getResources().getBoolean(R.bool.isTablet)){
-            orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-        }
-        setRequestedOrientation(orientation);
+
     }
 
     public abstract int getLayout();
