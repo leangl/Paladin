@@ -108,7 +108,12 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         this.mDoorEventSpinner.setEnabled(true);
         this.mPasswordEditText.setEnabled(false);
 
-        ArrayAdapter<User.Notify> adapter = new ArrayAdapter<User.Notify>(getBaseActivity(), android.R.layout.simple_dropdown_item_1line, User.Notify.values());
+        ArrayList<User.Notify> notifyList = new ArrayList<>(3);
+        notifyList.add(User.Notify.OPEN);
+        notifyList.add(User.Notify.CLOSE);
+        notifyList.add(User.Notify.ALL);
+
+        ArrayAdapter<User.Notify> adapter = new ArrayAdapter<User.Notify>(getBaseActivity(), android.R.layout.simple_dropdown_item_1line, notifyList);
 
         this.mDoorEventSpinner.setAdapter(adapter);
         this.mDoorEventSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -145,7 +150,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         this.mNotifyCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             this.mDoorEventSpinner.setEnabled(isChecked);
             if (!isChecked) {
-                mUser.setNotify(null);
+                mUser.setNotify(User.Notify.NONE);
             }
         });
         initScheduleView(scheludeContainer, daysContainer);
@@ -171,7 +176,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
 
         repeatCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             mControlSchedule.setRepeatWeeks(isChecked);
-            mRepeatEventWeeksEditText.setEnabled(true);
+            mRepeatEventWeeksEditText.setEnabled(isChecked);
 
         });
         ArrayAdapter<ControlSchedule.Limit> adapter = new ArrayAdapter<ControlSchedule.Limit>(getBaseActivity(), android.R.layout.simple_dropdown_item_1line, ControlSchedule.Limit.values());
@@ -255,9 +260,12 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
             this.mPhoneEditText.setText(this.mUser.getPhone());
             this.mPasswordEditText.setText(this.mUser.getPassword());
             this.mRequirePassCheckBox.setChecked(mUser.getPassword() != null);
-            if (mUser.getNotify() != null) {
+            if (mUser.getNotify().equals(User.Notify.NONE)) {
+                this.mNotifyCheckBox.setChecked(false);
+            }else{
                 this.mNotifyCheckBox.setChecked(true);
                 this.mDoorEventSpinner.setSelection(getIndex(mDoorEventSpinner, mUser.getNotify()));
+
             }
         }
     }
