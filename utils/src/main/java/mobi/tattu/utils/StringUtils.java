@@ -5,6 +5,11 @@ package mobi.tattu.utils;
  */
 public class StringUtils {
 
+    public static final String SPACE = " ";
+    public static final String COMMA = ",";
+    public static final String SEPARATOR_HOUR = ":";
+    public static final String NEW_LINE_FILE = "\r\n";
+
     public static boolean isBlank(CharSequence text) {
         return text == null || text.toString().trim().isEmpty();
     }

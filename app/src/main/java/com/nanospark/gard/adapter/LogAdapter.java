@@ -18,6 +18,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import java.util.Calendar;
 import java.util.List;
 
+import mobi.tattu.utils.StringUtils;
+
 /**
  * Created by cristian on 10/10/15.
  */
@@ -70,7 +72,7 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
         int minutes = diff(dateOpen.get(Calendar.MINUTE), dateClose.get(Calendar.MINUTE));
         int seconds = diff(dateOpen.get(Calendar.SECOND), dateClose.get(Calendar.SECOND));
         builder.append(getString(R.string.opened_for_label));
-        builder.append(Utils.SPACE);
+        builder.append(StringUtils.SPACE);
         appendHour(builder, hour, R.string.hours_label);
         appendHour(builder, minutes, R.string.minutes_label);
         appendHour(builder, seconds, R.string.seconds_label);
@@ -81,9 +83,9 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
     private void appendHour(StringBuilder builder, int value, int text) {
         if (value > 0) {
             builder.append(value);
-            builder.append(Utils.SPACE);
+            builder.append(StringUtils.SPACE);
             builder.append(getString(text));
-            builder.append(Utils.SPACE);
+            builder.append(StringUtils.SPACE);
         }
     }
 

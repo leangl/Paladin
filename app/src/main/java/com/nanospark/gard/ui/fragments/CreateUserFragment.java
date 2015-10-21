@@ -102,6 +102,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         this.mNotifyCheckBox = (CheckBox) view.findViewById(R.id.checkbox_notify);
         this.mDoorEventSpinner = (AppCompatSpinner) view.findViewById(R.id.spinner_door_event);
         View scheludeContainer = view.findViewById(R.id.schedule_container);
+        scheludeContainer.setVisibility(View.GONE);
         LinearLayout daysContainer = (LinearLayout) scheludeContainer.findViewById(R.id.days_container);
 
         this.mDoorEventSpinner.setEnabled(true);
@@ -421,10 +422,10 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         String phone = this.mPhoneEditText.getText().toString();
         String pass = this.mPasswordEditText.getText().toString();
         String repeatEvent = this.mRepeatEventWeeksEditText.getText().toString();
-        String userName = this.mUser.getName() == null ? "" : this.mUser.getName();
+        String userName = this.mUser.getName();
 
 
-        if(!userName.equals(this.mNameEditText.getText().toString())){
+        if(userName == null || !userName.equals(this.mNameEditText.getText().toString())){
             if (mUserManager.exists(name)) {
                 ToastManager.get().showToast(getString(R.string.error_name_msg));
                 return;

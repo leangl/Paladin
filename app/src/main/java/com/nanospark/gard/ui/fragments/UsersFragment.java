@@ -24,6 +24,8 @@ import com.nanospark.gard.ui.custom.BaseFragment;
 import java.util.Calendar;
 import java.util.List;
 
+import mobi.tattu.utils.StringUtils;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -105,7 +107,7 @@ public class UsersFragment extends BaseFragment {
             if(user.getSchedule() != null){
                 String startTime = Utils.getHour(getCalendarHour(user.getSchedule().getStartHour(), user.getSchedule().getStartMinute()));
                 String endTime = Utils.getHour(getCalendarHour(user.getSchedule().getEndHour(),user.getSchedule().getEndMinute()));
-                timeLimits.setText(startTime +Utils.SPACE+ endTime);
+                timeLimits.setText(startTime + StringUtils.SPACE+ endTime);
             }
             populateUserView(user, name, phone);
 

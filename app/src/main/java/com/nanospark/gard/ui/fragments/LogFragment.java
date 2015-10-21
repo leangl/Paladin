@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 
+import mobi.tattu.utils.StringUtils;
 import mobi.tattu.utils.ToastManager;
 import mobi.tattu.utils.image.AsyncTask;
 
@@ -106,11 +107,11 @@ public class LogFragment extends BaseFragment {
 
                 StringBuilder builder = new StringBuilder();
                 builder.append(getString(R.string.door_label));
-                builder.append(Utils.COMMA);
+                builder.append(StringUtils.COMMA);
                 builder.append(getString(R.string.event_label));
-                builder.append(Utils.COMMA);
+                builder.append(StringUtils.COMMA);
                 builder.append(getString(R.string.date_label));
-                builder.append(Utils.NEW_LINE_FILE);
+                builder.append(StringUtils.NEW_LINE_FILE);
 
                 fileWriter.write(builder.toString());
                 builder = new StringBuilder();
@@ -120,13 +121,13 @@ public class LogFragment extends BaseFragment {
                     calendar.setTime(log.getDate());
 
                     builder.append(log.getDoorId());
-                    builder.append(Utils.COMMA);
+                    builder.append(StringUtils.COMMA);
 
                     builder.append(log.getEvent());
-                    builder.append(Utils.COMMA);
+                    builder.append(StringUtils.COMMA);
 
                     builder.append(Utils.getDateLog(calendar, false).toString());
-                    builder.append(Utils.NEW_LINE_FILE);
+                    builder.append(StringUtils.NEW_LINE_FILE);
                     fileWriter.write(builder.toString());
                 }
                 fileWriter.close();
