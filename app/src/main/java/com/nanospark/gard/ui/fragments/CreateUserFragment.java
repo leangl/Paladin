@@ -130,7 +130,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         mTimelimitsCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             int visibilty;
             if (isChecked) {
-                if(mControlSchedule == null){
+                if (mControlSchedule == null) {
                     mControlSchedule = new ControlSchedule();
                     mControlSchedule.setDays(new ArrayList<>());
                     mUser.setSchedules(this.mControlSchedule);
@@ -188,9 +188,11 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 ControlSchedule.Limit limit = (ControlSchedule.Limit) parent.getAdapter().getItem(position);
-                mDateEventEditText.setText(null);
+
                 if (limit.equals(ControlSchedule.Limit.DATE)) {
-                    showDatePicker(R.id.edittext_date_event);
+                    if(parent.getTag() == null){
+                        showDatePicker(view.getId());
+                    }
                     mDateEventEditText.setVisibility(View.VISIBLE);
                     mDateEventEditText.setFocusable(true);
                     mDateEventEditText.setFocusableInTouchMode(true);
@@ -198,21 +200,25 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
                         showDatePicker(v.getId());
                     });
                 } else if (limit.equals(ControlSchedule.Limit.EVENTS)) {
+
+                    mDateEventEditText.setText(null);
                     mDateEventEditText.setVisibility(View.VISIBLE);
                     mDateEventEditText.setOnClickListener(null);
                     mDateEventEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
                 } else {
+                    mDateEventEditText.setText(null);
                     mDateEventEditText.setVisibility(View.GONE);
                     mDateEventEditText.setOnClickListener(null);
                 }
                 if(mControlSchedule != null){
                     mControlSchedule.setLimit(limit);
                 }
+                parent.setTag(null);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                parent.setTag(null);
             }
         });
         initDays(daysContainer);
@@ -248,6 +254,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
                     this.mRepeatEventWeeksEditText.setText(controlSchedule.getRepeatWeeksNumber());
                 }
                 if (controlSchedule.getLimit() != null) {
+                    limitSpinner.setTag(true);
                     limitSpinner.setSelection(getIndex(limitSpinner, controlSchedule.getLimit()));
                 }
                 if(controlSchedule.getLimitDay() != null){
