@@ -68,50 +68,55 @@ public class UsersFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
+        loadUsers();
+    }
+
+    private void loadUsers() {
         this.mUserList = mUserManager.getAll();
-        if(mUserList.isEmpty()){
+        int size = mUserList.size();
+        if(size  > 0){
+            this.mGridLayout.removeAllViews();
+            for (int i = 0 ; i < size ; i++){
+                View userView = LayoutInflater.from(getBaseActivity()).inflate(R.layout.user_layout, null, false);
+                User user = mUserList.get(i);
+
+                TextView name  = (TextView) userView.findViewById(R.id.textview_user_name);
+                TextView phone = (TextView) userView.findViewById(R.id.textview_phone);
+                TextView timeLimits = (TextView) userView.findViewById(R.id.textview_time_limits);
+                ImageView receiveAlerts = (ImageView) userView.findViewById(R.id.imageview_receive_alerts);
+                userView.findViewById(R.id.imageview_menu).setOnClickListener(v -> {
+                    PopupMenu popupMenu = new PopupMenu(getBaseActivity(),v);
+                    popupMenu.inflate(R.menu.actions);
+                    popupMenu.setOnMenuItemClickListener(item -> {
+                        handlerPopMenu(item, user);
+                        return true;
+                    });
+                    popupMenu.show();
+                });
+                if(user.getNotify() != null){
+                    receiveAlerts.setImageResource(R.drawable.ic_alert_enabled);
+                }
+                if(user.getSchedule() != null){
+                    String startTime = "";
+                    String endTime = "";
+                    if(user.getSchedule().getStartHour() != null){
+                        startTime = Utils.getHour(getCalendarHour(user.getSchedule().getStartHour(), user.getSchedule().getStartMinute()));
+                    }
+                    if(user.getSchedule().getEndHour() != null){
+                        endTime = Utils.getHour(getCalendarHour(user.getSchedule().getEndHour(),user.getSchedule().getEndMinute()));
+                    }
+                    timeLimits.setText(startTime + StringUtils.SPACE+ endTime);
+                }
+                populateUserView(user, name, phone);
+
+                addViewToGrid(this.mGridLayout, userView);
+            }
+        }else{
             View emptyView = LayoutInflater.from(getBaseActivity()).inflate(R.layout.empty_layout,null,false);
             TextView textView = (TextView) emptyView.findViewById(R.id.textview_empty);
             textView.setText(R.string.empty_users_msg);
             mGridLayout.removeAllViews();
             addViewToGrid(mGridLayout, emptyView);
-        }else{
-            loadUsers();
-        }
-    }
-
-    private void loadUsers() {
-
-        int size = mUserList.size();
-        this.mGridLayout.removeAllViews();
-        for (int i = 0 ; i < size ; i++){
-            View userView = LayoutInflater.from(getBaseActivity()).inflate(R.layout.user_layout, null, false);
-            User user = mUserList.get(i);
-
-            TextView name  = (TextView) userView.findViewById(R.id.textview_user_name);
-            TextView phone = (TextView) userView.findViewById(R.id.textview_phone);
-            TextView timeLimits = (TextView) userView.findViewById(R.id.textview_time_limits);
-            ImageView receiveAlerts = (ImageView) userView.findViewById(R.id.imageview_receive_alerts);
-            userView.findViewById(R.id.imageview_menu).setOnClickListener(v -> {
-                PopupMenu popupMenu = new PopupMenu(getBaseActivity(),v);
-                popupMenu.inflate(R.menu.actions);
-                popupMenu.setOnMenuItemClickListener(item -> {
-                    handlerPopMenu(item, user);
-                    return true;
-                });
-                popupMenu.show();
-            });
-            if(user.getNotify() != null){
-                receiveAlerts.setImageResource(R.drawable.ic_alert_enabled);
-            }
-            if(user.getSchedule() != null){
-                String startTime = Utils.getHour(getCalendarHour(user.getSchedule().getStartHour(), user.getSchedule().getStartMinute()));
-                String endTime = Utils.getHour(getCalendarHour(user.getSchedule().getEndHour(),user.getSchedule().getEndMinute()));
-                timeLimits.setText(startTime + StringUtils.SPACE+ endTime);
-            }
-            populateUserView(user, name, phone);
-
-            addViewToGrid(this.mGridLayout, userView);
 
         }
     }

@@ -1,7 +1,6 @@
 package com.nanospark.gard.ui.custom;
 
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -39,12 +38,12 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        int orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-        if(getResources().getBoolean(R.bool.isTablet)){
-            orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-        }
-        setRequestedOrientation(orientation);
+        //Esto es para saber si esta en un tablet o un celular
+//        int orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+//        if(getResources().getBoolean(R.bool.isTablet)){
+//            orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+//        }
+//        setRequestedOrientation(orientation);
         setContentView(getLayout());
         this.mToolbar = (Toolbar)findViewById(R.id.toolbar);
         this.mToolbar.setTitle(R.string.title_toolbar);
