@@ -66,9 +66,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
     private boolean mSave;
     private boolean mEdit;
 
-
     public static CreateUserFragment newInstance(String idUser) {
-
         Bundle args = new Bundle();
         args.putString(ARG_ID_USER, idUser);
         CreateUserFragment fragment = new CreateUserFragment();
@@ -84,7 +82,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         if (id == null) {
             mUser = new User();
         } else {
-            this.mUser = mUserManager.findByName(id);
+            this.mUser = mUserManager.getUser(id);
             this.mControlSchedule = this.mUser.getSchedule();
             this.mEdit = true;
         }
@@ -433,7 +431,6 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         String pass = this.mPasswordEditText.getText().toString();
         String repeatEvent = this.mRepeatEventWeeksEditText.getText().toString();
         String userName = this.mUser.getName();
-
 
         if (userName == null || !userName.equals(this.mNameEditText.getText().toString())) {
             if (mUserManager.exists(name)) {

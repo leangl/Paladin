@@ -30,9 +30,7 @@ public class UserManager {
      * Valida si existe el nombre de usuario
      */
     public boolean exists(String username) {
-        User user = new User();
-        user.setName(username);
-        return mDataStore.contains(user);
+        return findByName(username) != null;
     }
 
     public User find(F.Predicate<User> p) {
@@ -42,6 +40,10 @@ public class UserManager {
             }
         }
         return null;
+    }
+
+    public User getUser(String id) {
+        return mDataStore.getObject(id, User.class).get();
     }
 
     public User findByName(String username) {

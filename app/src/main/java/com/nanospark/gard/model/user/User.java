@@ -2,6 +2,9 @@ package com.nanospark.gard.model.user;
 
 import com.nanospark.gard.model.door.Door;
 
+import java.util.UUID;
+import java.util.regex.Pattern;
+
 import mobi.tattu.utils.StringUtils;
 
 /**
@@ -9,7 +12,9 @@ import mobi.tattu.utils.StringUtils;
  */
 public class User {
 
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s");
 
+    private String id;
     private String name;
     private String phone;
     private String password;
@@ -17,15 +22,15 @@ public class User {
     private ControlSchedule schedule;
 
     public User() {
+        this.id = UUID.randomUUID().toString();
     }
 
-    public User(String name, String phone, String password, Notify notify) {
-        this.name = name;
-        this.phone = phone;
-        this.password = password;
-        this.notify = notify;
+    public String getId() {
+        return id;
     }
-
+    public void setId(String id) {
+        this.id = id;
+    }
     public String getName() {
         return name;
     }
@@ -63,12 +68,12 @@ public class User {
 
         User user = (User) o;
 
-        return name.equals(user.name);
+        return id.equals(user.id);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return id.hashCode();
     }
 
     public boolean isPasswordRequired() {
@@ -101,11 +106,23 @@ public class User {
                 return close;
             }
         }
-
     }
 
     public static boolean isUsernameValid(String username) {
-        return StringUtils.isNotBlank(username) && username.length() <= 20;
+        if (StringUtils.isBlank(username)) {
+            return false;
+        }
+        if (username.length() > 20) {
+            return false;
+        }
+        if (WHITESPACE_PATTERN.matcher(username).find()) {
+            return false;
+        }
+        if (Character.isDigit(username.charAt(0))) {
+            return false;
+        }
+
+        return true;
     }
 
     public boolean isPasswordCorrect(String password) {

@@ -131,7 +131,7 @@ public class UsersFragment extends BaseFragment {
                 break;
             case R.id.action_edit:
                 Intent intent = new Intent(getBaseActivity(), CreateUserActivity.class);
-                intent.putExtra(CreateUserFragment.ARG_ID_USER, user.getName());
+                intent.putExtra(CreateUserFragment.ARG_ID_USER, user.getId());
                 startActivity(intent);
                 break;
         }
