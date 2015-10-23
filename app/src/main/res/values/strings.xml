@@ -19,6 +19,7 @@
     <string name="close_label">Close:</string>
     <string name="subtile_toolbar">by NANOSPARK</string>
     <string name="unknown_label">Unknown</string>
+    <string name="not_available_label">n/a</string>
     <string name="opened_label">Opened</string>
     <string name="closed_label">Closed</string>
     <string name="start_voice_recognition_msg">Starting voice recognition...</string>
@@ -38,7 +39,7 @@
     <string name="no_record_msg">No records to display</string>
     <string name="door_label">Door</string>
     <string name="receive_alerts_label">Receive Alerts</string>
-    <string name="time_limits_label">Time Limits </string>
+    <string name="time_limits_label">Time limits: </string>
     <string name="start_label">Start: </string>
     <string name="end_label">End: </string>
     <string name="repeat_only_every_day_label">Repeat only every day</string>

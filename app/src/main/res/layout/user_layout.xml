@@ -7,150 +7,148 @@
                 android:orientation="vertical">
 
     <android.support.v7.widget.CardView
+        android:id="@+id/cardview_door"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/cardview_door"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="10dp"
         card_view:cardBackgroundColor="@color/cardview_background"
         card_view:cardCornerRadius="4dp"
         card_view:cardPreventCornerOverlap="false"
         card_view:cardUseCompatPadding="false"
-        card_view:contentPadding="0dp"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="10dp">
+        card_view:contentPadding="0dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-
-            >
-
+            android:layout_alignParentRight="true"
+            android:orientation="vertical">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <LinearLayout
-                    android:orientation="horizontal"
+                    android:id="@+id/linearLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
-                    android:id="@+id/linearLayout">
+                    android:layout_alignParentTop="true"
+                    android:orientation="horizontal">
 
                     <TextView
+                        android:id="@+id/textview_user_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="Luke Jhon Obama Keneddy Smith"
-                        android:id="@+id/textview_user_name"
-                        android:layout_weight="0.2"
-                        android:layout_marginTop="10dp"
                         android:layout_marginLeft="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_weight="0.2"
+                        android:text="Luke Jhon Obama Keneddy Smith"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
                         android:textColor="@color/text_color_bold"
                         android:textStyle="bold"/>
 
                     <ImageView
+                        android:id="@+id/imageview_menu"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/imageview_menu"
                         android:src="@drawable/ic_menu_owerflow"/>
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/textview_phone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="(715) 378 4568"
-                    android:id="@+id/textview_phone"
-                    android:layout_below="@+id/linearLayout"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
+                    android:layout_below="@+id/linearLayout"
+                    android:layout_marginBottom="10dp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="5dp"
-                    android:layout_marginBottom="10dp"
+                    android:text="(715) 378 4568"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/red"/>
 
             </RelativeLayout>
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/user_divider"
                 android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"/>
+                android:layout_marginRight="10dp"
+                android:background="@color/user_divider"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="90dp">
 
                 <ImageView
+                    android:id="@+id/imageview_receive_alerts"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/imageview_receive_alerts"
-                    android:layout_alignParentTop="true"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
-                    android:src="@drawable/ic_alert_disabled"
+                    android:layout_alignParentTop="true"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginTop="10dp"/>
+                    android:layout_marginTop="10dp"
+                    android:src="@drawable/ic_alert_disabled"/>
 
                 <TextView
+                    android:id="@+id/textView5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="@string/receive_alerts_label"
-                    android:id="@+id/textView5"
-                    android:layout_alignTop="@+id/imageview_receive_alerts"
-                    android:layout_toRightOf="@+id/imageview_receive_alerts"
-                    android:layout_toEndOf="@+id/imageview_receive_alerts"
-                    android:layout_marginLeft="10dp"
                     android:layout_alignBottom="@+id/imageview_receive_alerts"
+                    android:layout_alignTop="@+id/imageview_receive_alerts"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toEndOf="@+id/imageview_receive_alerts"
+                    android:layout_toRightOf="@+id/imageview_receive_alerts"
                     android:gravity="center"
+                    android:text="@string/receive_alerts_label"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textStyle="bold"/>
 
                 <ImageView
+                    android:id="@+id/imageView3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/imageView3"
-                    android:layout_below="@+id/imageview_receive_alerts"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
-                    android:src="@drawable/ic_time_limits"
+                    android:layout_below="@+id/imageview_receive_alerts"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginTop="5dp"/>
+                    android:layout_marginTop="5dp"
+                    android:src="@drawable/ic_time_limits"/>
 
                 <TextView
+                    android:id="@+id/textView6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="@string/time_limits_label"
-                    android:id="@+id/textView6"
-                    android:gravity="center"
-                    android:textStyle="bold"
                     android:layout_alignBottom="@+id/imageView3"
                     android:layout_alignLeft="@+id/textView5"
                     android:layout_alignStart="@+id/textView5"
-                    android:layout_alignTop="@+id/imageView3"/>
+                    android:layout_alignTop="@+id/imageView3"
+                    android:gravity="center"
+                    android:text="@string/time_limits_label"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textStyle="bold"/>
 
                 <TextView
+                    android:id="@+id/textview_time_limits"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="@string/unknown_label"
-                    android:id="@+id/textview_time_limits"
-                    android:layout_alignTop="@+id/textView6"
-                    android:layout_toEndOf="@+id/textView6"
                     android:layout_alignParentBottom="true"
-                    android:layout_toRightOf="@+id/textView6"
+                    android:layout_alignTop="@+id/textView6"
                     android:layout_marginLeft="5dp"
-                    android:paddingTop="3.5dp"/>
+                    android:layout_toEndOf="@+id/textView6"
+                    android:layout_toRightOf="@+id/textView6"
+                    android:paddingTop="3.5dp"
+                    android:text="@string/not_available_label"
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
             </RelativeLayout>
         </LinearLayout>
     </android.support.v7.widget.CardView>
