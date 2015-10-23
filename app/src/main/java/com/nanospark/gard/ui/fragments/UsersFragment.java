@@ -95,7 +95,7 @@ public class UsersFragment extends BaseFragment {
                     });
                     popupMenu.show();
                 });
-                if (user.getNotify() != null) {
+                if (user.isNotificationEnabled()) {
                     receiveAlerts.setImageResource(R.drawable.ic_alert_enabled);
                 }
                 if (user.getSchedule() != null) {
