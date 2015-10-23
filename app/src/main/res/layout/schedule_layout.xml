@@ -47,6 +47,8 @@
         android:layout_toRightOf="@+id/textView8"
         android:gravity="center"
         android:hint="@string/hint_time_limits"
+        android:maxLines="1"
+        android:singleLine="true"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/text_color_bold"
         android:visibility="visible"/>
@@ -63,6 +65,8 @@
         android:layout_marginRight="80dp"
         android:gravity="center"
         android:hint="@string/hint_time_limits"
+        android:maxLines="1"
+        android:singleLine="true"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/text_color_bold"
         android:visibility="visible"/>
@@ -116,6 +120,8 @@
         android:layout_toRightOf="@+id/textView13"
         android:gravity="center"
         android:hint="@string/hint_time_limits"
+        android:maxLines="1"
+        android:singleLine="true"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/text_color_bold"
         android:visibility="visible"/>
@@ -275,6 +281,8 @@
         android:layout_toRightOf="@+id/checkbox_repeat"
         android:gravity="center"
         android:inputType="number"
+        android:maxLines="1"
+        android:singleLine="true"
         android:spinnerMode="dropdown"
         app:backgroundTint="@color/red"/>
 

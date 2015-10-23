@@ -9,13 +9,13 @@
     <android.support.v4.widget.Space
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.15"
+        android:layout_weight="0.25"
         android:background="@android:color/transparent"/>
 
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.7"
+        android:layout_weight="0.5"
         android:fillViewport="true">
 
         <LinearLayout
@@ -44,6 +44,8 @@
                         android:focusable="true"
                         android:focusableInTouchMode="true"
                         android:hint="@string/name_label"
+                        android:maxLines="1"
+                        android:singleLine="true"
                         app:backgroundTint="@color/red"/>
 
                     <android.support.v7.widget.AppCompatCheckBox
@@ -115,6 +117,8 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/phone_label"
                         android:inputType="number"
+                        android:maxLines="1"
+                        android:singleLine="true"
                         app:backgroundTint="@color/red"/>
 
                     <android.support.v7.widget.AppCompatCheckBox
@@ -148,6 +152,6 @@
     <android.support.v4.widget.Space
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.15"
+        android:layout_weight="0.25"
         android:background="@android:color/transparent"/>
 </LinearLayout>
