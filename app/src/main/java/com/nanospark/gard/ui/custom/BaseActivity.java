@@ -15,12 +15,14 @@ import android.view.MenuItem;
 import com.google.inject.Inject;
 import com.nanospark.gard.R;
 import com.nanospark.gard.model.log.LogManager;
+import com.nanospark.gard.sms.SmsManager;
 import com.nanospark.gard.ui.activity.LogActivity;
 import com.nanospark.gard.ui.fragments.MainFragment;
 import com.nanospark.gard.ui.fragments.SchedulesFragment;
 import com.nanospark.gard.ui.fragments.SettingsFragment;
 import com.nanospark.gard.ui.fragments.UsersFragment;
 
+import mobi.tattu.utils.DialogUtils;
 import mobi.tattu.utils.ToastManager;
 import mobi.tattu.utils.Utils;
 
@@ -45,7 +47,7 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
 //        }
 //        setRequestedOrientation(orientation);
         setContentView(getLayout());
-        this.mToolbar = (Toolbar)findViewById(R.id.toolbar);
+        this.mToolbar = (Toolbar) findViewById(R.id.toolbar);
         this.mToolbar.setTitle(R.string.title_toolbar);
         this.mToolbar.setSubtitle(R.string.subtile_toolbar);
         this.mToolbar.setSubtitleTextColor(getColorFromResource(R.color.white));
@@ -54,8 +56,8 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
 
         if (containsTab()) {
             initTabs();
-        }else{
-            start(getFragment(),false);
+        } else {
+            start(getFragment(), false);
         }
 
     }
@@ -69,6 +71,7 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
     private void initTabs() {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab);
         tabLayout.setTabTextColors(getResources().getColorStateList(R.color.tab_selector));
+        tabLayout.setSelectedTabIndicatorColor(getResources().getColor(R.color.white));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.title_main));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.title_users));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.title_schedules));
@@ -160,6 +163,12 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.settings:
+                DialogUtils.ask(this, "Fake SMS", fakeSmsText -> {
+                    SmsManager.fakeSms = fakeSmsText;
+                    return true;
+                });
+                break;
             case R.id.action_log:
                 if (mLogManager.getLogs().isEmpty()) {
                     ToastManager.get().showToast(R.string.no_record_msg);
@@ -187,11 +196,11 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
         }
 
     }
-    public Toolbar getToolbar(){
+    public Toolbar getToolbar() {
         return this.mToolbar;
     }
 
-    public Object getViewInToolbar(int id){
+    public Object getViewInToolbar(int id) {
         return findViewById(id);
     }
 }

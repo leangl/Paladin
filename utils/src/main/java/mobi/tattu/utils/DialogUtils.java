@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -169,6 +170,27 @@ public class DialogUtils {
             }
             return true;
         }
+    }
+
+    public static void ask(Context ctx, String title, F.Function<String, Boolean> listener) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
+        alert.setTitle(title);
+
+        final EditText edittext = new EditText(ctx);
+        alert.setView(edittext);
+
+        alert.setPositiveButton(R.string.ok, (dialog, whichButton) -> {
+            String text = edittext.getText().toString();
+            if (listener.apply(text)) {
+                dialog.dismiss();
+            }
+        });
+
+        alert.setNegativeButton(R.string.cancel, (dialog, whichButton) -> {
+            // what ever you want to do with No option.
+        });
+
+        alert.show();
     }
 
 }

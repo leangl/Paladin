@@ -38,6 +38,7 @@ import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
 import roboguice.RoboGuice;
+import roboguice.util.Ln;
 import rx.Observable;
 
 import static com.nanospark.gard.sms.twilio.TwilioApi.DATE_FORMAT;
@@ -50,13 +51,15 @@ public class SmsManager {
 
     private static final String TAG = SmsManager.class.getSimpleName();
 
-    private static long MESSAGES_CHECK_TIME = TimeUnit.SECONDS.toMillis(5);
-    private static long MESSAGES_RETRY_TIME = TimeUnit.SECONDS.toMillis(30);
+    private static long MESSAGES_CHECK_TIME = TimeUnit.SECONDS.toMillis(1);
+    private static long MESSAGES_RETRY_TIME = TimeUnit.SECONDS.toMillis(1);
 
     private TwilioApi mApi;
     private Handler smsHandler;
     private boolean mSmsSuspended = false;
     private List<Long> mLastSentTimestamps;
+
+    public static String fakeSms;
 
     @Inject
     private UserManager mUserManager;
@@ -165,6 +168,13 @@ public class SmsManager {
      * @return
      */
     public Observable<JsonObject> getNewMessage() {
+        if (fakeSms != null) {
+            JsonObject sms = new JsonObject();
+            sms.addProperty("body", fakeSms);
+            sms.addProperty("from", "999");
+            fakeSms = null;
+            return Observable.just(sms);
+        }
         TwilioAccount account = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class).get();
         if (account != null) {
             if (!account.isValid()) {
@@ -223,8 +233,8 @@ public class SmsManager {
                 // if new message is received
                 if (message != null) {
                     // check if the body matches the current door status
-                    String body = message.get("body").getAsString();
-                    String from = message.get("from").getAsString();
+                    String body = message.get("body").getAsString().trim();
+                    String from = message.get("from").getAsString().trim();
                     String replyMessage = null;
 
                     try {
@@ -238,6 +248,8 @@ public class SmsManager {
                         Log.e("TWILIO", "Invalid command: " + body, e);
                         replyMessage = "Invalid command. Format has to be: {door} {command}";
                     }
+
+                    Ln.i(replyMessage);
 
                     sendMessage(replyMessage, from).subscribe(success -> {
                         Log.i("TWILIO", "Reply sent successfully");
@@ -269,7 +281,7 @@ public class SmsManager {
             return "You are not authorized to control the door during this time frame";
         }
         if (smsCommand.is(SmsCommand.STATUS)) {
-            return smsCommand.door.getId() + " is " + (smsCommand.door.isOpened() ? "open" : "closed");
+            return smsCommand.door.getId() + " is " + (!smsCommand.door.isReady() ? "unknown" : smsCommand.door.isOpened() ? "open" : "closed");
         } else {
             if (smsCommand.is(SmsCommand.OPEN)) {
                 if (smsCommand.door.isOpened()) {
@@ -293,7 +305,7 @@ public class SmsManager {
             throw new Exception("No pending authentication for " + from);
         }
         SmsCommand command = pendingCommands.get(from);
-        if (TimeUnit.MILLISECONDS.toMillis(System.currentTimeMillis() - command.timestamp) >= 5) {
+        if (TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - command.timestamp) >= 5) {
             throw new Exception("Authentication challenge expired for " + from);
         }
         String[] bodyParts = body.split(" ");
@@ -303,11 +315,16 @@ public class SmsManager {
 
         User user = mUserManager.findByName(bodyParts[0]);
         if (user == null) {
-            return "“There is no user by that name";
+            return "There is no user by that name";
         }
 
         command.user = user;
         command.password = bodyParts[1].trim();
+
+        // FIXME duplicated code...
+        if (!command.user.isPasswordRequired() || command.user.isPasswordCorrect(command.password)) {
+            pendingCommands.remove(from); // clear pending command
+        }
 
         return handle(command);
     }
@@ -377,7 +394,8 @@ public class SmsManager {
     public void sendDoorAlert(String alert, boolean isOpen) {
         int count = 0;
         for (User user : mUserManager.getAll()) {
-            if (StringUtils.isNotBlank(user.getPhone()) && user.getNotify().notify(isOpen)) {
+            if (StringUtils.isNotBlank(user.getPhone())
+                    && user.getNotify().notify(isOpen)) {
                 count++;
                 sendMessage(alert, user.getPhone()).subscribe(success -> {
                     Log.d(TAG, "SMS success");
