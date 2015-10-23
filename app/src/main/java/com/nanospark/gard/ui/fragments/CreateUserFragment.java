@@ -245,13 +245,11 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
                 Calendar calendarEnd = createCalendarTime(controlSchedule.getEndHour(), controlSchedule.getEndMinute());
                 mTimeEndTextView.setText(Utils.getHour(calendarEnd));
                 mDateStartTextView.setText(getDay(controlSchedule.getStartDay(), controlSchedule.getStartMonth(), controlSchedule.getStartYear()));
-                if(controlSchedule.getRepeatWeeksNumber() != null){
-                    mRepeatEventWeeksEditText.setText(controlSchedule.getRepeatWeeksNumber());
-                }
+
                 repeatEveryDayCheckBox.setChecked(controlSchedule.isRepeatEveryOtherDay());
                 repeatCheckBox.setChecked(controlSchedule.isRepeatWeeks());
                 if(controlSchedule.getRepeatWeeksNumber() != null){
-                    this.mRepeatEventWeeksEditText.setText(controlSchedule.getRepeatWeeksNumber());
+                    mRepeatEventWeeksEditText.setText(controlSchedule.getRepeatWeeksNumber() + "");
                 }
                 if (controlSchedule.getLimit() != null) {
                     limitSpinner.setTag(true);
