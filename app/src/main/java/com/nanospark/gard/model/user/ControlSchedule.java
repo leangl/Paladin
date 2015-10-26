@@ -147,7 +147,59 @@ public class ControlSchedule {
 
     @Override
     public String toString() {
-        return "Monday and Tuesday, 8:00am - 10:00am, 2 times";
+        return getHourRangeString() + "\n" + getDayLimitString();
+    }
+
+    public String getHourRangeString() {
+        StringBuilder sb = new StringBuilder();
+
+        if (isStartTimeSet()) {
+            if (startHour >= 12) {
+                sb.append(24 - startHour + "p-");
+            } else {
+                sb.append(startHour + "a-");
+            }
+        } else {
+            sb.append("0a-");
+        }
+
+        if (isEndTimeSet()) {
+            if (endHour >= 12) {
+                sb.append(24 - endHour + "p");
+            } else {
+                sb.append(endHour + "a");
+            }
+        } else {
+            sb.append("24p-");
+        }
+        return sb.toString();
+    }
+
+    public String getDayLimitString() {
+        if (days == null || days.isEmpty() || days.size() == 7) {
+            return "Daily";
+        }
+        StringBuilder sb = new StringBuilder();
+        if (repeatEveryOtherWeek || (repeatWeeks && repeatWeeksNumber == 2)) {
+            sb.append("Every other ");
+        } else if ((repeatWeeks && repeatWeeksNumber > 2)) {
+            if (repeatWeeksNumber == 3) {
+                sb.append("Every 3rd ");
+            } else if (repeatWeeksNumber == 4) {
+                sb.append("Every 4th ");
+            } else {
+                sb.append("Every " + repeatWeeksNumber + " ");
+            }
+        }
+        boolean first = true;
+        for (int day : days) {
+            if (!first) {
+                sb.append(", ");
+            }
+            first = false;
+            sb.append(Day.fromCalendar(day).abbr());
+        }
+        return sb.toString();
     }
 
     public enum Limit {
@@ -255,5 +307,28 @@ public class ControlSchedule {
 
     public boolean isEndDateSet() {
         return Limit.DATE.equals(limit) && limitDay != null && limitMonth != null && limitYear != null;
+    }
+
+    public enum Day {
+        SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY;
+
+        public static Day fromCalendar(int day) {
+            return values()[day - 1];
+        }
+
+        @Override
+        public String toString() {
+            return name().substring(0, 1) + name().substring(1, 4).toLowerCase();
+        }
+
+        public String abbr() {
+            switch (this) {
+                case TUESDAY:
+                case THURSDAY:
+                    return name().substring(0, 2);
+                default:
+                    return name().substring(0, 1);
+            }
+        }
     }
 }

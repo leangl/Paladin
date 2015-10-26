@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import com.google.inject.Inject;
 import com.nanospark.gard.R;
-import com.nanospark.gard.Utils;
 import com.nanospark.gard.model.user.User;
 import com.nanospark.gard.model.user.UserManager;
 import com.nanospark.gard.ui.activity.CreateUserActivity;
@@ -23,8 +22,6 @@ import com.nanospark.gard.ui.custom.BaseFragment;
 
 import java.util.Calendar;
 import java.util.List;
-
-import mobi.tattu.utils.StringUtils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -84,7 +81,8 @@ public class UsersFragment extends BaseFragment {
 
                 TextView name = (TextView) userView.findViewById(R.id.textview_user_name);
                 TextView phone = (TextView) userView.findViewById(R.id.textview_phone);
-                TextView timeLimits = (TextView) userView.findViewById(R.id.textview_time_limits);
+                TextView timeLimits1 = (TextView) userView.findViewById(R.id.textview_time_limits1);
+                TextView timeLimits2 = (TextView) userView.findViewById(R.id.textview_time_limits2);
                 ImageView receiveAlerts = (ImageView) userView.findViewById(R.id.imageview_receive_alerts);
                 userView.findViewById(R.id.imageview_menu).setOnClickListener(v -> {
                     PopupMenu popupMenu = new PopupMenu(getBaseActivity(), v);
@@ -98,7 +96,9 @@ public class UsersFragment extends BaseFragment {
                 if (user.isNotificationEnabled()) {
                     receiveAlerts.setImageResource(R.drawable.ic_alert_enabled);
                 }
-                if (user.getSchedule() != null) {
+                timeLimits1.setText(user.getTimelimitString1());
+                timeLimits2.setText(user.getTimelimitString2());
+                /*if (user.getSchedule() != null) {
                     String startTime = "";
                     String endTime = "";
                     if (user.getSchedule().getStartHour() != null) {
@@ -108,7 +108,7 @@ public class UsersFragment extends BaseFragment {
                         endTime = Utils.getHour(getCalendarHour(user.getSchedule().getEndHour(), user.getSchedule().getEndMinute()));
                     }
                     timeLimits.setText(startTime + StringUtils.SPACE + endTime);
-                }
+                }*/
                 populateUserView(user, name, phone);
 
                 addViewToGrid(this.mGridLayout, userView);

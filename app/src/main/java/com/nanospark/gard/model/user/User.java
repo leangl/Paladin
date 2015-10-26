@@ -1,5 +1,7 @@
 package com.nanospark.gard.model.user;
 
+import com.nanospark.gard.GarD;
+import com.nanospark.gard.R;
 import com.nanospark.gard.model.door.Door;
 
 import java.util.UUID;
@@ -139,4 +141,18 @@ public class User {
         return password != null && password.equalsIgnoreCase(this.password);
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    public String getTimelimitString1() {
+        if (getSchedule() == null) return GarD.instance.getString(R.string.not_available_label);
+        return getSchedule().getHourRangeString();
+    }
+
+    public String getTimelimitString2() {
+        if (getSchedule() == null) return "";
+        return getSchedule().getDayLimitString();
+    }
 }
