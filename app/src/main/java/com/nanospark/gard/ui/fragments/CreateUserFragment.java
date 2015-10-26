@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -45,26 +46,24 @@ import mobi.tattu.utils.ToastManager;
 public class CreateUserFragment extends BaseFragment implements CreateUserActivity.CreateUserListener {
 
     public static final String ARG_ID_USER = "argID_user";
+
     private ControlSchedule mControlSchedule;
     private User mUser;
-    private AppCompatEditText mNameEditText;
-    private AppCompatEditText mPhoneEditText;
-    private AppCompatEditText mPasswordEditText;
-    private AppCompatSpinner mDoorEventSpinner;
-    private AppCompatEditText mRepeatEventWeeksEditText;
-    private AppCompatEditText mDateEventEditText;
+    private EditText mNameEditText;
+    private EditText mPhoneEditText;
+    private EditText mPasswordEditText;
+    private Spinner mDoorEventSpinner;
+    private EditText mRepeatEventWeeksEditText;
+    private TextView mDateEventEditText;
     private TextView mTimeStartTextView;
     private TextView mTimeEndTextView;
     private TextView mDateStartTextView;
-
     private CheckBox mRequirePassCheckBox;
     private CheckBox mNotifyCheckBox;
     private CheckBox mTimelimitsCheckBox;
 
     @Inject
     private UserManager mUserManager;
-    private boolean mSave;
-    private boolean mEdit;
 
     public static CreateUserFragment newInstance(String idUser) {
         Bundle args = new Bundle();
@@ -84,7 +83,6 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         } else {
             this.mUser = mUserManager.getUser(id);
             this.mControlSchedule = this.mUser.getSchedule();
-            this.mEdit = true;
         }
     }
 
@@ -111,7 +109,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         notifyList.add(User.Notify.CLOSE);
         notifyList.add(User.Notify.ALL);
 
-        ArrayAdapter<User.Notify> adapter = new ArrayAdapter<User.Notify>(getBaseActivity(), android.R.layout.simple_dropdown_item_1line, notifyList);
+        ArrayAdapter<User.Notify> adapter = new ArrayAdapter<>(getBaseActivity(), android.R.layout.simple_dropdown_item_1line, notifyList);
 
         this.mDoorEventSpinner.setAdapter(adapter);
         this.mDoorEventSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -157,7 +155,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         this.mTimeEndTextView = (TextView) scheduleContainer.findViewById(R.id.textview_end_time);
         this.mDateStartTextView = (TextView) scheduleContainer.findViewById(R.id.textview_start_day);
         this.mRepeatEventWeeksEditText = (AppCompatEditText) scheduleContainer.findViewById(R.id.edittext_repeat_weeks);
-        this.mDateEventEditText = (AppCompatEditText) scheduleContainer.findViewById(R.id.edittext_date_event);
+        this.mDateEventEditText = (TextView) scheduleContainer.findViewById(R.id.edittext_date_event);
         CheckBox repeatEveryDayCheckBox = (CheckBox) scheduleContainer.findViewById(R.id.checkbox_repeat_every_day);
         CheckBox repeatCheckBox = (CheckBox) scheduleContainer.findViewById(R.id.checkbox_repeat);
         AppCompatSpinner limitSpinner = (AppCompatSpinner) scheduleContainer.findViewById(R.id.spinner_date_event);
@@ -165,8 +163,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         this.mRepeatEventWeeksEditText.setEnabled(false);
 
         repeatEveryDayCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-
-            mControlSchedule.setRepeatEveryOtherDay(isChecked);
+            mControlSchedule.setRepeatEveryOtherWeek(isChecked);
         });
 
         repeatCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -174,8 +171,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
             mRepeatEventWeeksEditText.setEnabled(isChecked);
 
         });
-        ArrayAdapter<ControlSchedule.Limit> adapter = new ArrayAdapter<ControlSchedule.Limit>(getBaseActivity(), android.R.layout.simple_dropdown_item_1line, ControlSchedule.Limit.values());
-
+        ArrayAdapter<ControlSchedule.Limit> adapter = new ArrayAdapter<>(getBaseActivity(), android.R.layout.simple_dropdown_item_1line, ControlSchedule.Limit.values());
 
         limitSpinner.setAdapter(adapter);
         limitSpinner.setPrompt("Event");
@@ -189,17 +185,27 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
                         showDatePicker(view.getId());
                     }
                     mDateEventEditText.setVisibility(View.VISIBLE);
-                    mDateEventEditText.setFocusable(true);
-                    mDateEventEditText.setFocusableInTouchMode(true);
+                    mDateEventEditText.setFocusable(false);
+                    mDateEventEditText.setFocusableInTouchMode(false);
                     mDateEventEditText.setOnClickListener(v -> {
                         showDatePicker(v.getId());
                     });
+                    if (mControlSchedule != null && mControlSchedule.isEndDateSet()) {
+                        mDateEventEditText.setText(getDay(mControlSchedule.getLimitDay(), mControlSchedule.getLimitMonth(), mControlSchedule.getLimitYear()));
+                    } else {
+                        mDateEventEditText.setText(null);
+                    }
                 } else if (limit.equals(ControlSchedule.Limit.EVENTS)) {
-
-                    mDateEventEditText.setText(null);
                     mDateEventEditText.setVisibility(View.VISIBLE);
+                    mDateEventEditText.setFocusable(true);
+                    mDateEventEditText.setFocusableInTouchMode(true);
                     mDateEventEditText.setOnClickListener(null);
                     mDateEventEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    if (mControlSchedule != null && mControlSchedule.getLimitEvents() != null) {
+                        mDateEventEditText.setText(mControlSchedule.getLimitEvents() + "");
+                    } else {
+                        mDateEventEditText.setText(null);
+                    }
                 } else {
                     mDateEventEditText.setText(null);
                     mDateEventEditText.setVisibility(View.GONE);
@@ -226,8 +232,10 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         this.mDateStartTextView.setOnClickListener(v -> {
             showDatePicker(R.id.textview_start_day);
         });
-        loadData(repeatEveryDayCheckBox, repeatCheckBox, limitSpinner);
+        Calendar today = Calendar.getInstance();
+        mDateStartTextView.setText(getDay(today.get(Calendar.DAY_OF_MONTH), today.get(Calendar.MONTH), today.get(Calendar.YEAR)));
 
+        loadData(repeatEveryDayCheckBox, repeatCheckBox, limitSpinner);
     }
 
     private void loadData(CheckBox repeatEveryDayCheckBox, CheckBox repeatCheckBox, AppCompatSpinner limitSpinner) {
@@ -235,13 +243,22 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
             ControlSchedule controlSchedule = mUser.getSchedule();
             if (controlSchedule != null) {
 
-                Calendar calendarStart = createCalendarTime(controlSchedule.getStartHour(), controlSchedule.getStartMinute());
-                mTimeStartTextView.setText(Utils.getHour(calendarStart));
-                Calendar calendarEnd = createCalendarTime(controlSchedule.getEndHour(), controlSchedule.getEndMinute());
-                mTimeEndTextView.setText(Utils.getHour(calendarEnd));
-                mDateStartTextView.setText(getDay(controlSchedule.getStartDay(), controlSchedule.getStartMonth(), controlSchedule.getStartYear()));
+                mTimelimitsCheckBox.setChecked(true);
 
-                repeatEveryDayCheckBox.setChecked(controlSchedule.isRepeatEveryOtherDay());
+                if (controlSchedule.isStartTimeSet()) {
+                    Calendar calendarStart = createCalendarTime(controlSchedule.getStartHour(), controlSchedule.getStartMinute());
+                    mTimeStartTextView.setText(Utils.getHour(calendarStart));
+                }
+                if (controlSchedule.isEndTimeSet()) {
+                    Calendar calendarEnd = createCalendarTime(controlSchedule.getEndHour(), controlSchedule.getEndMinute());
+                    mTimeEndTextView.setText(Utils.getHour(calendarEnd));
+                }
+
+                if (controlSchedule.isStartDateSet()) {
+                    mDateStartTextView.setText(getDay(controlSchedule.getStartDay(), controlSchedule.getStartMonth(), controlSchedule.getStartYear()));
+                }
+
+                repeatEveryDayCheckBox.setChecked(controlSchedule.isRepeatEveryOtherWeek());
                 repeatCheckBox.setChecked(controlSchedule.isRepeatWeeks());
                 if (controlSchedule.getRepeatWeeksNumber() != null) {
                     mRepeatEventWeeksEditText.setText(controlSchedule.getRepeatWeeksNumber() + "");
@@ -250,11 +267,6 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
                     limitSpinner.setTag(true);
                     limitSpinner.setSelection(getIndex(limitSpinner, controlSchedule.getLimit()));
                 }
-                if (controlSchedule.getLimitDay() != null) {
-                    this.mDateEventEditText.setText(getDay(controlSchedule.getLimitDay(), controlSchedule.getLimitMonth(), controlSchedule.getLimitYear()));
-                    this.mDateStartTextView.setVisibility(View.VISIBLE);
-                }
-                mTimelimitsCheckBox.setChecked(true);
             }
             this.mNameEditText.setText(this.mUser.getName());
             this.mPhoneEditText.setText(this.mUser.getPhone());
@@ -291,16 +303,16 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
     }
 
     private void initDays(LinearLayout daysContainer) {
-        handlerDay((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_sun), Calendar.SUNDAY, R.drawable.ic_sun, R.drawable.ic_sun_selected);
-        handlerDay((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_mon), Calendar.MONDAY, R.drawable.ic_mon, R.drawable.ic_mon_selected);
-        handlerDay((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_tue), Calendar.TUESDAY, R.drawable.ic_tue, R.drawable.ic_tue_selected);
-        handlerDay((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_wed), Calendar.WEDNESDAY, R.drawable.ic_wed, R.drawable.ic_wed_selected);
-        handlerDay((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_thr), Calendar.THURSDAY, R.drawable.ic_thr, R.drawable.ic_thr_selected);
-        handlerDay((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_fri), Calendar.FRIDAY, R.drawable.ic_fri, R.drawable.ic_fri_selected);
-        handlerDay((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_sat), Calendar.SATURDAY, R.drawable.ic_sat, R.drawable.ic_sat_selected);
+        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_sun), Calendar.SUNDAY, R.drawable.ic_sun, R.drawable.ic_sun_selected);
+        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_mon), Calendar.MONDAY, R.drawable.ic_mon, R.drawable.ic_mon_selected);
+        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_tue), Calendar.TUESDAY, R.drawable.ic_tue, R.drawable.ic_tue_selected);
+        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_wed), Calendar.WEDNESDAY, R.drawable.ic_wed, R.drawable.ic_wed_selected);
+        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_thr), Calendar.THURSDAY, R.drawable.ic_thr, R.drawable.ic_thr_selected);
+        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_fri), Calendar.FRIDAY, R.drawable.ic_fri, R.drawable.ic_fri_selected);
+        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_sat), Calendar.SATURDAY, R.drawable.ic_sat, R.drawable.ic_sat_selected);
     }
 
-    private void handlerDay(FloatingActionButton floatingActionButton, int day, int drawable, int drawableSelected) {
+    private void handleDaySelected(FloatingActionButton floatingActionButton, int day, int drawable, int drawableSelected) {
         floatingActionButton.setTag(R.string.key_state, Boolean.FALSE);
         floatingActionButton.setTag(R.string.key_day, day);
         floatingActionButton.setOnClickListener(v -> {
@@ -312,7 +324,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
                 color = R.color.white;
                 drawableAux = drawable;
                 state = false;
-                mControlSchedule.getDays().remove((Integer) fb.getTag(R.string.key_day));
+                mControlSchedule.getDays().remove(fb.getTag(R.string.key_day));
 
             } else {
                 color = R.color.red;
@@ -327,7 +339,6 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
 
         });
         if ((mUser.getName() != null && !mUser.getName().isEmpty()) && (mUser.getSchedule() != null && mUser.getSchedule().getDays().indexOf(day) != -1)) {
-
             floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(getColorFromResource(R.color.red)));
             floatingActionButton.setImageResource(drawableSelected);
             floatingActionButton.setTag(R.string.key_state, true);
@@ -339,25 +350,19 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         return true;
     }
 
-
     @Subscribe
     public void on(TimerPickerSelected timerPickerSelected) {
         Calendar calendar = createCalendarTime(timerPickerSelected.hourOfDay, timerPickerSelected.minute);
-
-        if (validateStartTime((Calendar) this.mTimeStartTextView.getTag(), calendar)) {
-            if (timerPickerSelected.id == R.id.textview_start_time) {
-                mControlSchedule.setStartHour(timerPickerSelected.hourOfDay);
-                mControlSchedule.setStartMinute(timerPickerSelected.minute);
-                mTimeStartTextView.setTag(calendar);
-                mTimeStartTextView.setText(Utils.getHour(calendar));
-                resetTimeEnd(mControlSchedule, this.mTimeEndTextView);
-            } else {
-                mControlSchedule.setEndHour(timerPickerSelected.hourOfDay);
-                mControlSchedule.setEndMinute(timerPickerSelected.minute);
-                mTimeEndTextView.setText(Utils.getHour(calendar));
-            }
+        if (timerPickerSelected.id == R.id.textview_start_time) {
+            mControlSchedule.setStartHour(timerPickerSelected.hourOfDay);
+            mControlSchedule.setStartMinute(timerPickerSelected.minute);
+            mTimeStartTextView.setTag(calendar);
+            mTimeStartTextView.setText(Utils.getHour(calendar));
+            resetTimeEnd(mControlSchedule, this.mTimeEndTextView);
         } else {
-            ToastManager.get().showToast(R.string.error_time_msg);
+            mControlSchedule.setEndHour(timerPickerSelected.hourOfDay);
+            mControlSchedule.setEndMinute(timerPickerSelected.minute);
+            mTimeEndTextView.setText(Utils.getHour(calendar));
         }
     }
 
@@ -425,7 +430,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
     }
 
     @Override
-    public void save() {
+    public boolean save() {
         String name = this.mNameEditText.getText().toString();
         String phone = this.mPhoneEditText.getText().toString();
         String pass = this.mPasswordEditText.getText().toString();
@@ -435,15 +440,13 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         if (userName == null || !userName.equals(this.mNameEditText.getText().toString())) {
             if (mUserManager.exists(name)) {
                 ToastManager.get().showToast(getString(R.string.error_name_msg));
-                return;
+                return false;
             } else {
                 if (User.isUsernameValid(name)) {
-                    this.mSave = true;
                     this.mUser.setName(name);
                 } else {
-                    this.mSave = false;
                     ToastManager.get().showToast(getString(R.string.error_name_invalid));
-                    return;
+                    return false;
                 }
             }
         }
@@ -451,65 +454,67 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         if (validateField(phone, getString(R.string.phone_label))) {
             this.mUser.setPhone(phone);
         } else {
-            return;
+            return false;
         }
         if (this.mRequirePassCheckBox.isChecked()) {
             if (validateField(pass, getString(R.string.passcode_label))) {
                 this.mUser.setPassword(pass);
             } else {
-                return;
+                return false;
             }
+        } else {
+            this.mUser.setPassword(null);
         }
 
         if (this.mTimelimitsCheckBox.isChecked()) {
-            mSave = validateSchedule();
+            if (!validateSchedule()) {
+                return false;
+            }
         }
         if (this.mRepeatEventWeeksEditText.isEnabled()) {
-            if (validateField(repeatEvent, getString(R.string.repeat_only_every_day_label))) {
+            if (validateField(repeatEvent, "Week")) {
                 this.mUser.getSchedule().setRepeatWeeks(true);
                 this.mUser.getSchedule().setRepeatWeeksNumber(Integer.parseInt(repeatEvent));
             } else {
-                return;
+                return false;
             }
         }
 
-        if (mSave) {
-            this.mUserManager.add(this.mUser);
-            getBaseActivity().onBackPressed();
-
+        if (mControlSchedule != null && ControlSchedule.Limit.EVENTS.equals(mControlSchedule.getLimitEvents())) {
+            try {
+                mControlSchedule.setLimitEvents(Integer.parseInt(mDateEventEditText.getText().toString()));
+            } catch (Exception e) {
+                ToastManager.get().showToast("Number of Events is not a valid number");
+                return false;
+            }
         }
 
+        this.mUserManager.add(this.mUser);
 
+        return true;
     }
 
     private boolean validateSchedule() {
-        String timeStart = mTimeStartTextView.getText().toString();
-        String timeEnd = this.mTimeEndTextView.getText().toString();
         String dayStart = this.mDateStartTextView.getText().toString();
-        String dayEnd = this.mDateEventEditText.getText().toString();
-        if (!validateField(timeStart, getString(R.string.start_label))) {
+        String limitText = this.mDateEventEditText.getText().toString();
+        if (!validateField(dayStart, "Start Date")) {
             return false;
-        } else if (!validateField(timeEnd, getString(R.string.end_label))) {
-            return false;
-        } else if (!validateField(dayStart, getString(R.string.start_label) + " Day")) {
-            return false;
-        } else if (this.mDateEventEditText.getVisibility() == View.VISIBLE && !validateField(dayEnd, getString(R.string.end_label) + " Day")) {
-            return false;
-        } else {
-            return true;
         }
-
-
+        if (ControlSchedule.Limit.DATE.equals(mControlSchedule.getLimit()) && !validateField(limitText, "End Date")) {
+            return false;
+        }
+        if (ControlSchedule.Limit.EVENTS.equals(mControlSchedule.getLimit()) && !validateField(limitText, "Number of Events")) {
+            return false;
+        }
+        return true;
     }
 
     private boolean validateField(String text, String nameField) {
         if (TextUtils.isEmpty(text)) {
             ToastManager.get().showToast(getString(R.string.field_empty_msg, nameField));
-            this.mSave = false;
-            return this.mSave;
+            return false;
         }
-        this.mSave = true;
-        return this.mSave;
+        return true;
     }
 
 

@@ -50,9 +50,9 @@ public class Schedule {
     public boolean trigger() {
         if (isNow()) {
             if (action.equals(ACTION_OPEN_DOOR)) {
-                return Door.getInstance(doorId).open("Scheduled action taken, door is in motion", false);
+                return Door.getInstance(doorId).send(new Door.Open("Scheduled action taken, door is in motion", false));
             } else if (action.equals(ACTION_CLOSE_DOOR)) {
-                return Door.getInstance(doorId).close("Scheduled action taken, door is in motion", false);
+                return Door.getInstance(doorId).send(new Door.Close("Scheduled action taken, door is in motion", false));
             }
         }
         return false;

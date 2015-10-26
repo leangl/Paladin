@@ -1,6 +1,13 @@
 package com.nanospark.gard.model.user;
 
+import com.nanospark.gard.model.door.Door;
+
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+
+import mobi.tattu.utils.ResourceUtils;
+import roboguice.util.Ln;
 
 /**
  * Created by Leandro on 1/10/2015.
@@ -20,9 +27,11 @@ public class ControlSchedule {
     private Integer limitYear;
     private Integer limitEvents;
     private List<Integer> days;
-    private boolean repeatEveryOtherDay;
+    private boolean repeatEveryOtherWeek;
     private boolean repeatWeeks;
     private Integer repeatWeeksNumber;
+    private Long createTimestamp;
+    private Integer triggeredEvents;
 
     public List<Integer> getDays() {
         return days;
@@ -72,11 +81,11 @@ public class ControlSchedule {
     public void setLimitYear(Integer limitYear) {
         this.limitYear = limitYear;
     }
-    public boolean isRepeatEveryOtherDay() {
-        return repeatEveryOtherDay;
+    public boolean isRepeatEveryOtherWeek() {
+        return repeatEveryOtherWeek;
     }
-    public void setRepeatEveryOtherDay(boolean repeatEveryOtherDay) {
-        this.repeatEveryOtherDay = repeatEveryOtherDay;
+    public void setRepeatEveryOtherWeek(boolean repeatEveryOtherWeek) {
+        this.repeatEveryOtherWeek = repeatEveryOtherWeek;
     }
     public boolean isRepeatWeeks() {
         return repeatWeeks;
@@ -120,6 +129,21 @@ public class ControlSchedule {
     public void setStartYear(Integer startYear) {
         this.startYear = startYear;
     }
+    public Long getCreateTimestamp() {
+        return createTimestamp;
+    }
+    public void setCreateTimestamp(Long createTimestamp) {
+        this.createTimestamp = createTimestamp;
+    }
+    public Integer getTriggeredEvents() {
+        return triggeredEvents;
+    }
+    public void setTriggeredEvents(Integer triggeredEvents) {
+        this.triggeredEvents = triggeredEvents;
+    }
+    public void incrementEvents() {
+        setTriggeredEvents(getTriggeredEvents() + 1);
+    }
 
     @Override
     public String toString() {
@@ -127,6 +151,109 @@ public class ControlSchedule {
     }
 
     public enum Limit {
-        FOREVER, DATE, EVENTS
+        FOREVER, DATE, EVENTS;
+
+        @Override
+        public String toString() {
+            return ResourceUtils.stringByName("limit." + name().toLowerCase());
+        }
+
+    }
+
+    public boolean isAllowed(Door door) {
+        Calendar today = Calendar.getInstance();
+        if (isStartTimeSet()) {
+            int minute = today.get(Calendar.MINUTE);
+            int hour = today.get(Calendar.HOUR_OF_DAY);
+            if (hour < startHour || (hour == startHour && minute < startMinute)) {
+                Ln.i("Today is before end hour: HH:mm", hour, minute);
+                return false;
+            }
+        }
+        if (isEndTimeSet()) {
+            int minute = today.get(Calendar.MINUTE);
+            int hour = today.get(Calendar.HOUR_OF_DAY);
+            if (hour > endHour || (hour == endHour && minute > endMinute)) {
+                Ln.i("Today is after end hour: HH:mm", hour, minute);
+                return false;
+            }
+        }
+
+        if (isStartDateSet()) {
+            int day = today.get(Calendar.DAY_OF_MONTH);
+            int month = today.get(Calendar.MONTH);
+            int year = today.get(Calendar.YEAR);
+            if (year < startYear ||
+                    (year == startYear &&
+                            (month < startMonth || (month == startMonth && day < startDay)))) {
+                Ln.i("Today is before start date: yyyy/MM/dd", year, month, day);
+                return false;
+            }
+        }
+
+        if (isEndDateSet()) {
+            int day = today.get(Calendar.DAY_OF_MONTH);
+            int month = today.get(Calendar.MONTH);
+            int year = today.get(Calendar.YEAR);
+            if (year > limitYear ||
+                    (year == limitYear &&
+                            (month > limitMonth || (month == limitMonth && day > limitDay)))) {
+                Ln.i("Today is after end date: yyyy/MM/dd", year, month, day);
+                return false;
+            }
+        }
+
+        int skipWeeks = 1;
+        if (repeatEveryOtherWeek) {
+            skipWeeks = 2;
+        } else if (repeatWeeks) {
+            skipWeeks = repeatWeeksNumber;
+        }
+
+        Ln.i("Skipping weeks: " + skipWeeks);
+
+        if (skipWeeks > 1) {
+            Calendar start = Calendar.getInstance();
+            start.setTime(new Date(createTimestamp));
+
+            while (start.get(Calendar.WEEK_OF_YEAR) < today.get(Calendar.WEEK_OF_YEAR)) { // FIXME take year into account
+                start.set(Calendar.WEEK_OF_YEAR, start.get(Calendar.WEEK_OF_YEAR) + skipWeeks);
+            }
+            if (start.get(Calendar.WEEK_OF_YEAR) != today.get(Calendar.WEEK_OF_YEAR)) {
+                Ln.i("Week skipped");
+                return false;
+            }
+        }
+
+        if (Limit.EVENTS.equals(limit)) {
+            if (triggeredEvents >= limitEvents) {
+                Ln.i("Events limit exceeded: " + triggeredEvents);
+                return false;
+            }
+        }
+
+        if (days != null && !days.isEmpty() && !days.contains(today.get(Calendar.DAY_OF_WEEK))) {
+            Ln.i("Day not allowed: " + today.get(Calendar.DAY_OF_WEEK));
+            return false;
+        }
+
+        Ln.i("Allowed time.");
+        return true;
+    }
+
+    public boolean isStartTimeSet() {
+        return startMinute != null && startHour != null;
+    }
+
+    public boolean isStartDateSet() {
+        return startDay != null && startMonth != null && startYear != null;
+    }
+
+    public boolean isEndTimeSet() {
+        return endMinute != null && endHour != null;
+    }
+
+    public boolean isEndDateSet() {
+        return Limit.DATE.equals(limit) && limitDay != null && limitMonth != null && limitYear != null;
     }
 }

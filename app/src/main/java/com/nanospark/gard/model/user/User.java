@@ -5,6 +5,7 @@ import com.nanospark.gard.model.door.Door;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import mobi.tattu.utils.ResourceUtils;
 import mobi.tattu.utils.StringUtils;
 
 /**
@@ -84,8 +85,12 @@ public class User {
         return notify != null && !notify.equals(Notify.NONE);
     }
 
-    public boolean isAllowedTime(Door door) {
-        return true; // TODO
+    public boolean isAllowed(Door door) {
+        if (schedule == null) {
+            return true;
+        } else {
+            return schedule.isAllowed(door);
+        }
     }
 
     public enum Notify {
@@ -99,12 +104,17 @@ public class User {
             this.close = close;
         }
 
-        public boolean notify(boolean isOpen) {
-            if (isOpen) {
+        public boolean notify(Door.Command command) {
+            if (command instanceof Door.Open) {
                 return open;
             } else {
                 return close;
             }
+        }
+
+        @Override
+        public String toString() {
+            return ResourceUtils.stringByName("notify." + name().toLowerCase());
         }
     }
 

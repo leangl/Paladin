@@ -12,7 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.nanospark.gard.GarD;
-import com.nanospark.gard.events.DoorToggled;
+import com.nanospark.gard.events.CommandProcessed;
 import com.nanospark.gard.events.SmsSuspended;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.user.User;
@@ -171,7 +171,7 @@ public class SmsManager {
         if (fakeSms != null) {
             JsonObject sms = new JsonObject();
             sms.addProperty("body", fakeSms);
-            sms.addProperty("from", "999");
+            sms.addProperty("from", "1");
             fakeSms = null;
             return Observable.just(sms);
         }
@@ -277,23 +277,23 @@ public class SmsManager {
         if (smsCommand.user.isPasswordRequired() && !smsCommand.user.isPasswordCorrect(smsCommand.password)) {
             return "Pass code is invalid";
         }
-        if (!smsCommand.user.isAllowedTime(smsCommand.door)) {
+        if (!smsCommand.user.isAllowed(smsCommand.door)) {
             return "You are not authorized to control the door during this time frame";
         }
         if (smsCommand.is(SmsCommand.STATUS)) {
-            return smsCommand.door.getId() + " is " + (!smsCommand.door.isReady() ? "unknown" : smsCommand.door.isOpened() ? "open" : "closed");
+            return smsCommand.door.getId() + " is " + smsCommand.door.getState().toString().toLowerCase();
         } else {
             if (smsCommand.is(SmsCommand.OPEN)) {
                 if (smsCommand.door.isOpened()) {
                     return "The door is already open.";
                 }
-                smsCommand.door.toggle("Message received, door is in motion", false);
+                smsCommand.door.send(new Door.Open("Message received, door is in motion", false, smsCommand.user));
                 return "Open door command received.";
             } else if (smsCommand.is(SmsCommand.CLOSE)) {
                 if (smsCommand.door.isClosed()) {
                     return "The door is already closed.";
                 }
-                smsCommand.door.toggle("Message received, door is in motion", false);
+                smsCommand.door.send(new Door.Close("Message received, door is in motion", false, smsCommand.user));
                 return "Close door command received.";
             }
         }
@@ -384,18 +384,18 @@ public class SmsManager {
     }
 
     @Subscribe
-    public void on(DoorToggled event) {
-        sendDoorAlert(event.door.getId() + " is " + (event.opened ? "open" : "closed"), event.opened);
+    public void on(CommandProcessed event) {
+        sendDoorAlert(event.door.getId() + " is " + event.command.toString(), event.command);
     }
 
     /**
      * Send SMS message to users configured to receive door status alerts
      */
-    public void sendDoorAlert(String alert, boolean isOpen) {
+    public void sendDoorAlert(String alert, Door.Command command) {
         int count = 0;
         for (User user : mUserManager.getAll()) {
             if (StringUtils.isNotBlank(user.getPhone())
-                    && user.getNotify().notify(isOpen)) {
+                    && user.getNotify().notify(command)) {
                 count++;
                 sendMessage(alert, user.getPhone()).subscribe(success -> {
                     Log.d(TAG, "SMS success");

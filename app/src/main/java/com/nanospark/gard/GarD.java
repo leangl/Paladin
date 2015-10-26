@@ -3,11 +3,13 @@ package com.nanospark.gard;
 import android.app.Application;
 import android.util.Log;
 
-import com.nanospark.gard.events.DoorActivated;
+import com.nanospark.gard.events.CommandSent;
 import com.nanospark.gard.events.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
+import com.nanospark.gard.model.log.LogManager;
 import com.nanospark.gard.model.scheduler.Schedule;
 import com.nanospark.gard.model.scheduler.SchedulerWizard;
+import com.nanospark.gard.model.user.UserManager;
 import com.nanospark.gard.services.GarDService;
 import com.nanospark.gard.sms.SmsManager;
 import com.nanospark.gard.ui.activity.MainActivityNew;
@@ -50,20 +52,26 @@ public class GarD extends Application {
         Door.getInstance(DOOR_TWO_ID);
         VoiceRecognizer.getInstance();
         SmsManager.getInstance();
+        LogManager.getInstance();
+        UserManager.getInstance();
 
+        // Start service as soon as app starts
         GarDService.start();
 
+        // Start existing schedules
         Set<Schedule> schedules = DataStore.getInstance().getAll(Schedule.class);
         for (Schedule schedule : schedules) {
             SchedulerWizard.initializeAlarm(this, schedule);
         }
+
+        // Initialize Universal Image Loader
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
         ImageLoader.getInstance().init(config);
 
     }
 
     @Subscribe
-    public void on(DoorActivated event) {
+    public void on(CommandSent event) {
         toast(event.message);
     }
 

@@ -51,7 +51,7 @@
     <string name="save_label">Save</string>
     <string name="error_time_msg">The end time must be greater than start</string>
     <string name="error_date_msg">The end date must be greater than the initial</string>
-    <string name="field_empty_msg">The %1$s field can not be empty</string>
+    <string name="field_empty_msg">%1$s field can not be empty</string>
     <string name="name_label">Name</string>
     <string name="phone_label">Phone</string>
     <string name="passcode_label">Passcode:</string>
@@ -59,4 +59,13 @@
     <string name="error_name_msg">A user already exists with that name</string>
     <string name="error_name_invalid">Name is invalid</string>
     <string name="empty_users_msg">No registered users</string>
+    <string name="notify.open">Open</string>
+    <string name="notify.close">Close</string>
+    <string name="notify.all">All</string>
+    <string name="notify.none">None</string>
+
+    <string name="limit.forever">Forever</string>
+    <string name="limit.date">Date</string>
+    <string name="limit.events">Number of events</string>
+
 </resources>

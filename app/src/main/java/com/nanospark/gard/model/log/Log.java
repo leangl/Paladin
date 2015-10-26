@@ -1,6 +1,6 @@
 package com.nanospark.gard.model.log;
 
-import com.nanospark.gard.events.DoorToggled;
+import com.nanospark.gard.events.CommandProcessed;
 
 import java.util.Date;
 
@@ -19,9 +19,9 @@ public class Log {
     public Log() {
     }
 
-    public Log(DoorToggled event) {
+    public Log(CommandProcessed event) {
         this.doorId = event.door.getId();
-        this.event = event.opened ? EVENT_OPEN : EVENT_CLOSE;
+        this.event = event.command.isOpen() ? EVENT_OPEN : EVENT_CLOSE;
         this.date = new Date();
     }
 

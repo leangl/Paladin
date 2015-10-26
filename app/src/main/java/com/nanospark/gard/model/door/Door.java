@@ -9,11 +9,12 @@ import com.nanospark.gard.GarD;
 import com.nanospark.gard.R;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
-import com.nanospark.gard.events.DoorActivated;
-import com.nanospark.gard.events.DoorActivationFailed;
-import com.nanospark.gard.events.DoorToggled;
+import com.nanospark.gard.events.CommandFailed;
+import com.nanospark.gard.events.CommandProcessed;
+import com.nanospark.gard.events.CommandSent;
 import com.nanospark.gard.events.VoiceRecognitionDisabled;
 import com.nanospark.gard.events.VoiceRecognitionEnabled;
+import com.nanospark.gard.model.user.User;
 import com.nanospark.gard.sms.SmsManager;
 import com.squareup.otto.Subscribe;
 
@@ -34,7 +35,7 @@ public class Door {
 
     private static int sAutoCloseMillis = 0;
 
-    private Boolean opened = null;
+    private State state = State.UNKNOWN;
     private int id;
     private int inputPinNumber;
     private int outputPinNumber;
@@ -46,7 +47,7 @@ public class Door {
     private Config config;
     private Handler mAutoCloseHandler;
     private Handler mActivationTimeoutHandler;
-    private boolean mPendingConfirmation;
+    private Command mPendingCommand;
 
     @Inject
     private DataStore mDataStore;
@@ -86,54 +87,16 @@ public class Door {
         return new Door[]{getInstance(1), getInstance(2)};
     }
 
-    public boolean open(String message, boolean forced) {
-        Log.i(toString(), "Command received with message: " + message);
-        if (mPendingConfirmation && !forced) {
-            Log.i(toString(), "Another command pending, ignored...");
-            return false;
-        }
-        if (!isReady()) {
-            Log.w(toString(), "Door not ready: " + id);
-            ToastManager.get().showToast("The door is not ready.", 1);
-            return false;
-        }
-        if (!isOpened()) {
-            Log.i(toString(), "Opening door: " + id);
-            Log.i(toString(), message);
-            startAutoClose();
-            Tattu.post(new DoorActivated(this, true, message));
-            return true;
-        } else {
-            Log.w(toString(), "Door already open: " + id);
-            ToastManager.get().showToast("The door is already open.", 1);
-            return false;
-        }
-    }
-
-    public boolean close(String message, boolean forced) {
-        if (!isReady()) {
-            Log.w(toString(), "Door not ready: " + id);
-            ToastManager.get().showToast("The door is not ready.", 1);
-            return false;
-        }
-        if (isOpened()) {
-            Log.i(toString(), "Closing door: " + id);
-            Log.i(toString(), message);
-            Tattu.post(new DoorActivated(this, false, message));
-            return true;
-        } else {
-            Log.w(toString(), "Door already closed: " + id);
-            ToastManager.get().showToast("The door is already closed.", 1);
-            return false;
-        }
+    public boolean send(Command command) {
+        return command.apply(this);
     }
 
     public void confirm(boolean opened) {
         Log.i(toString(), "Confirmed door: " + id + " - opened: " + opened);
-        this.opened = opened;
-        mPendingConfirmation = false;
+        this.state = State.from(opened);
         mActivationTimeoutHandler.removeCallbacksAndMessages(null);
-        Tattu.post(new DoorToggled(this, opened));
+        Tattu.post(new CommandProcessed(this, mPendingCommand));
+        mPendingCommand = null;
     }
 
     private void startAutoClose() {
@@ -143,35 +106,26 @@ public class Door {
             @Override
             public void run() {
                 if (isOpened()) {
-                    close("Auto closing", false);
+                    send(new Close("Auto closing", false));
                 } else {
                     long currentTime = System.currentTimeMillis();
                     if (currentTime - startTime < 20000) {
                         mAutoCloseHandler.removeCallbacksAndMessages(null);
                         mAutoCloseHandler.postDelayed(this, 20000);
                     } else {
-                        close("Auto closing", false);
+                        send(new Close("Auto closing", false));
                     }
                 }
             }
         }, sAutoCloseMillis + 10000);
     }
 
-    public void toggle(String message, boolean forced) {
-        Log.i(toString(), "Toggle door: " + id);
-        if (isOpened()) {
-            close(message, forced);
-        } else if (isClosed()) {
-            open(message, forced);
-        }
-    }
-
     @Subscribe
-    public void on(DoorActivated event) {
+    public void on(CommandSent event) {
         if (event.door != this) return;
 
         activatePin = true;
-        mPendingConfirmation = true;
+        mPendingCommand = event.command;
         mActivationTimeoutHandler.removeCallbacksAndMessages(null);
         mActivationTimeoutHandler.postDelayed(new Runnable() {
 
@@ -180,39 +134,42 @@ public class Door {
             @Override
             public void run() {
                 increment++;
-                String action = event.opened ? "open" : "close";
                 if (increment < 3) {
-                    Log.d(Door.this.toString(), "Retrying command: " + action);
+                    Log.d(Door.this.toString(), "Retrying command: " + event.command.toString());
                     activatePin = true;
                     mActivationTimeoutHandler.postDelayed(this, 20000);
                 } else {
-                    Log.d(Door.this.toString(), "Retry failed: " + action);
-                    Tattu.post(new DoorActivationFailed(event.door, event.opened));
-                    mSmsManager.sendDoorAlert("Paladin was unable to " + action + " your door.", event.opened);
+                    Log.d(Door.this.toString(), "Retry failed: " + event.command.toString());
+                    Tattu.post(new CommandFailed(event.door, event.command));
+                    mSmsManager.sendDoorAlert("Paladin was unable to " + event.command.toString() + " your door.", event.command);
                 }
             }
         }, 20000);
     }
 
     private void on(BoardDisconnected event) {
-        this.opened = null;
+        this.state = State.UNKNOWN;
     }
 
     private void on(BoardConnected event) {
-        // TODO check door state
-        this.opened = true;
+        // FIXME check door state before deciding if it's open
+        this.state = State.OPEN;
+    }
+
+    public State getState() {
+        return state;
     }
 
     public boolean isOpened() {
-        return isReady() && this.opened;
+        return State.OPEN.equals(state);
     }
 
     public boolean isClosed() {
-        return isReady() && !isOpened();
+        return State.CLOSE.equals(state);
     }
 
     public boolean isReady() {
-        return this.opened != null;
+        return !State.UNKNOWN.equals(state);
     }
 
     public int getId() {
@@ -299,7 +256,7 @@ public class Door {
         }
 
         @Subscribe
-        public void on(DoorActivated event) {
+        public void on(CommandSent event) {
             super.on(event);
         }
 
@@ -323,7 +280,7 @@ public class Door {
         }
 
         @Subscribe
-        public void on(DoorActivated event) {
+        public void on(CommandSent event) {
             super.on(event);
         }
 
@@ -342,6 +299,153 @@ public class Door {
     public static class Config {
         public String openPhrase;
         public String closePhrase;
+    }
+
+    public static abstract class Command {
+        public final String message;
+        public final boolean forced;
+        public final User user;
+
+        public Command(String message, boolean forced) {
+            this(message, forced, null);
+        }
+
+        public Command(String message, boolean forced, User user) {
+            this.forced = forced;
+            this.message = message;
+            this.user = user;
+        }
+
+        protected abstract boolean apply(Door door);
+
+        public abstract String toString();
+
+        public boolean isOpen() {
+            return this instanceof Open;
+        }
+
+    }
+
+    public static class Open extends Command {
+
+        public Open(String message, boolean forced) {
+            super(message, forced);
+        }
+
+        public Open(String message, boolean forced, User user) {
+            super(message, forced, user);
+        }
+
+        @Override
+        protected boolean apply(Door door) {
+            Log.i(toString(), "Command received with message: " + message);
+            if (door.mPendingCommand != null && !forced) {
+                Log.i(toString(), "Another command pending, ignored...");
+                return false;
+            }
+            if (!door.isReady()) {
+                Log.w(toString(), "Door not ready: " + door.id);
+                ToastManager.get().showToast("The door is not ready.", 1);
+                return false;
+            }
+            if (!door.isOpened()) {
+                Log.i(toString(), "Opening door: " + door.id);
+                Log.i(toString(), message);
+                door.startAutoClose();
+                Tattu.post(new CommandSent(door, this, message));
+                return true;
+            } else {
+                Log.w(toString(), "Door already open: " + door.id);
+                ToastManager.get().showToast("The door is already open.", 1);
+                return false;
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "open";
+        }
+    }
+
+    public static class Close extends Command {
+
+        public Close(String message, boolean forced) {
+            super(message, forced);
+        }
+
+        public Close(String message, boolean forced, User user) {
+            super(message, forced, user);
+        }
+
+        @Override
+        protected boolean apply(Door door) {
+            if (!door.isReady()) {
+                Log.w(toString(), "Door not ready: " + door.id);
+                ToastManager.get().showToast("The door is not ready.", 1);
+                return false;
+            }
+            if (door.isOpened()) {
+                Log.i(toString(), "Closing door: " + door.id);
+                Log.i(toString(), message);
+                Tattu.post(new CommandSent(door, this, message));
+                return true;
+            } else {
+                Log.w(toString(), "Door already closed: " + door.id);
+                ToastManager.get().showToast("The door is already closed.", 1);
+                return false;
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "close";
+        }
+    }
+
+    public static class Toggle extends Command {
+
+        public Toggle(String message, boolean forced) {
+            super(message, forced);
+        }
+
+        public Toggle(String message, boolean forced, User user) {
+            super(message, forced, user);
+        }
+
+        @Override
+        protected boolean apply(Door door) {
+            Log.i(toString(), "Toggle door: " + door.id);
+            if (door.isOpened()) {
+                return door.send(new Close(message, forced));
+            } else if (door.isClosed()) {
+                return door.send(new Open(message, forced));
+            }
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            return "toggle";
+        }
+    }
+
+    public enum State {
+        OPEN("Open"), CLOSE("Closed"), UNKNOWN("Unknown");
+
+        public final String description;
+
+        State(String description) {
+            this.description = description;
+        }
+
+        public static State from(boolean opened) {
+            return opened ? OPEN : CLOSE;
+        }
+
+        @Override
+        public String toString() {
+            return description;
+        }
     }
 
 }

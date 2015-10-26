@@ -3,8 +3,8 @@ package com.nanospark.gard.ui.fragments;
 import com.nanospark.gard.GarD;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
-import com.nanospark.gard.events.DoorActivationFailed;
-import com.nanospark.gard.events.DoorToggled;
+import com.nanospark.gard.events.CommandFailed;
+import com.nanospark.gard.events.CommandProcessed;
 import com.nanospark.gard.events.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.squareup.otto.Subscribe;
@@ -30,12 +30,12 @@ public class DoorOneFragment extends BaseDoorFragment {
     }
 
     @Subscribe
-    public void on(DoorToggled event) {
+    public void on(CommandProcessed event) {
         super.on(event);
     }
 
     @Subscribe
-    public void on(DoorActivationFailed doorActivationFailed) {
+    public void on(CommandFailed doorActivationFailed) {
         super.on(doorActivationFailed);
     }
 

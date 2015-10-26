@@ -18,7 +18,7 @@ import com.google.inject.Inject;
 import com.nanospark.gard.R;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
-import com.nanospark.gard.events.DoorToggled;
+import com.nanospark.gard.events.CommandProcessed;
 import com.nanospark.gard.events.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.scheduler.DialogBuilder;
@@ -81,7 +81,7 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
         setContentView(R.layout.main_layout);
 
         mDoorToggle.setOnClickListener(v -> {
-            mDoorOne.toggle("Door is in motion", true);
+            mDoorOne.send(new Door.Toggle("Door is in motion", true));
         });
         mToggleVoiceControl.setOnClickListener(v -> {
             if (VoiceRecognizer.State.STARTED == VoiceRecognizer.getInstance().getCurrentState()) {
@@ -170,12 +170,12 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
     }
 
     @Subscribe
-    public void on(DoorToggled event) {
-        if (event.opened) {
-            mDoorState.setText("OPEN");
-        } else {
-            mDoorState.setText("CLOSED");
-        }
+    public void on(CommandProcessed event) {
+        refresh(mDoorOne);
+    }
+
+    private void refresh(Door door) {
+        mDoorState.setText(mDoorOne.getState().toString().toUpperCase());
         mDoorToggle.setEnabled(true);
     }
 
@@ -219,7 +219,7 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
         super.onStart();
         checkBoardConnected(getIntent());
         if (mDoorOne.isReady()) {
-            on(new DoorToggled(mDoorOne, mDoorOne.isOpened()));
+            refresh(mDoorOne);
         }
     }
 

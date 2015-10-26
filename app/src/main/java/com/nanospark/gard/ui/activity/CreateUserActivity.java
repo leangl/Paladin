@@ -30,7 +30,9 @@ public class CreateUserActivity extends BaseActivity {
         textView.setVisibility(View.VISIBLE);
         textView.setText("SAVE");
         textView.setOnClickListener(v -> {
-            mListener.save();
+            if (mListener.save()) {
+                finish();
+            }
         });
 
     }
@@ -68,7 +70,7 @@ public class CreateUserActivity extends BaseActivity {
     }
 
     public interface CreateUserListener {
-        void save();
+        boolean save();
     }
 
     public void setListener(CreateUserListener listener) {

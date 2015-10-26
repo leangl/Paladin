@@ -5,14 +5,14 @@ import com.nanospark.gard.model.door.Door;
 /**
  * Created by Leandro on 5/10/2015.
  */
-public class DoorActivationFailed {
+public class CommandFailed {
 
     public final Door door;
-    public final boolean opened;
+    public final Door.Command command;
 
-    public DoorActivationFailed(Door door, boolean opened) {
+    public CommandFailed(Door door, Door.Command command) {
         this.door = door;
-        this.opened = opened;
+        this.command = command;
     }
 
 }

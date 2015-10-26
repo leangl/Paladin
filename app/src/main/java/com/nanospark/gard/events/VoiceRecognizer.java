@@ -33,7 +33,7 @@ public class VoiceRecognizer implements RecognitionListener {
     public static final float DEFAULT_THRESHOLD = 1e-40f;
 
     private static final String KEY_OPEN = "open";
-    private static final String KEY_CLOSE = "open";
+    private static final String KEY_CLOSE = "close";
 
     private State currentState = State.STOPPED;
     private SpeechRecognizer recognizer;
@@ -127,13 +127,13 @@ public class VoiceRecognizer implements RecognitionListener {
     }
 
     @Subscribe
-    public void on(DoorToggled event) {
+    public void on(CommandProcessed event) {
         switchPhrase();
     }
 
     @Subscribe
     public void on(PhraseRecognized event) {
-        event.door.toggle("Command heard, door is in motion", true);
+        event.door.send(new Door.Toggle("Command heard, door is in motion", true));
     }
 
     /**
@@ -186,12 +186,7 @@ public class VoiceRecognizer implements RecognitionListener {
     private void switchPhrase() {
         if (recognizer != null) {
             recognizer.stop();
-            boolean result;
-            if (door.isOpened()) {
-                result = recognizer.startListening(KEY_OPEN + door.getId());
-            } else {
-                result = recognizer.startListening(KEY_CLOSE + door.getId());
-            }
+            boolean result = recognizer.startListening(door.getState().name() + door.getId());
             Log.d(TAG, "startListening " + result);
         }
     }

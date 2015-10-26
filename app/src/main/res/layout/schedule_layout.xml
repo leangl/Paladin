@@ -3,6 +3,7 @@
     android:id="@+id/schedule_container"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginBottom="20dp"
@@ -268,8 +269,7 @@
         android:textColor="@color/text_color_bold"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:buttonTint="@color/red"
-        />
+        app:buttonTint="@color/red"/>
 
     <android.support.v7.widget.AppCompatEditText
         android:id="@+id/edittext_repeat_weeks"
@@ -301,21 +301,6 @@
         android:textColor="@color/text_color_bold"
         android:textStyle="bold"/>
 
-    <android.support.v7.widget.AppCompatEditText
-        android:id="@+id/edittext_date_event"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView15"
-        android:layout_marginEnd="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_toLeftOf="@+id/textView15"
-        android:layout_toStartOf="@+id/textView15"
-        android:enabled="true"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:visibility="invisible"
-        app:backgroundTint="@color/red"/>
-
     <android.support.v7.widget.AppCompatSpinner
         android:id="@+id/spinner_date_event"
         android:layout_width="wrap_content"
@@ -327,5 +312,18 @@
         android:layout_alignStart="@+id/textview_end_time"
         android:layout_alignTop="@+id/textView15"
         android:spinnerMode="dropdown"/>
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/edittext_date_event"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/spinner_date_event"
+        android:layout_below="@+id/textView15"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:visibility="invisible"
+        app:backgroundTint="@color/red"
+        tools:visibility="visible"/>
+
 
 </RelativeLayout>

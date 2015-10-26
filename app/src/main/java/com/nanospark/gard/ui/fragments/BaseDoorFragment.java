@@ -16,8 +16,8 @@ import com.nanospark.gard.R;
 import com.nanospark.gard.Utils;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
-import com.nanospark.gard.events.DoorActivationFailed;
-import com.nanospark.gard.events.DoorToggled;
+import com.nanospark.gard.events.CommandFailed;
+import com.nanospark.gard.events.CommandProcessed;
 import com.nanospark.gard.events.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.log.Log;
@@ -56,7 +56,7 @@ public abstract class BaseDoorFragment extends BaseFragment {
     public void onStart() {
         super.onStart();
         if (getDoor().isReady()) {
-            this.handlerDoorState(new DoorToggled(getDoor(), getDoor().isOpened()));
+            refresh(getDoor());
         }
     }
 
@@ -81,7 +81,7 @@ public abstract class BaseDoorFragment extends BaseFragment {
             }
         });
         this.mImageViewDoor.setOnClickListener(v -> {
-            getDoor().toggle("Door is in motion", true);
+            getDoor().send(new Door.Toggle("Door is in motion", true));
         });
         stateView();
         this.mEditTextOpen.setText(getDoor().getOpenPhrase());
@@ -90,18 +90,10 @@ public abstract class BaseDoorFragment extends BaseFragment {
     }
 
     private void stateView() {
-        if (getDoor().isReady()) {
-            if (getDoor().isOpened()) {
-                defaultView(R.string.opened_label, R.drawable.ic_door_opened);
-            } else {
-                defaultView(R.string.closed_label, R.drawable.ic_door_closed);
-            }
-        } else {
-            defaultView(R.string.unknown_label, R.drawable.ic_door_opened);
-        }
+        defaultView(getDoor().getState().toString(), getDoor().isOpened() ? R.drawable.ic_door_opened : R.drawable.ic_door_closed);
     }
 
-    private void defaultView(int text, int drawable) {
+    private void defaultView(String text, int drawable) {
         if (mTextviewOpen != null) {
             mTextviewOpen.setText(text);
             mImageViewDoor.setImageResource(drawable);
@@ -130,14 +122,8 @@ public abstract class BaseDoorFragment extends BaseFragment {
         }
     }
 
-    public void handlerDoorState(DoorToggled event) {
-        if (getDoor().getId() == event.door.getId()) {
-            stateView();
-        }
-    }
-
-    public void handlerDoorState(DoorActivationFailed doorActivationFailed) {
-        if (getDoor().getId() == doorActivationFailed.door.getId()) {
+    public void refresh(Door door) {
+        if (getDoor().getId() == door.getId()) {
             stateView();
         }
     }
@@ -154,13 +140,13 @@ public abstract class BaseDoorFragment extends BaseFragment {
     }
 
     @Subscribe
-    public void on(BoardConnected boardConnected) {
-        this.handlerDoorState(new DoorToggled(getDoor(), getDoor().isOpened()));
+    public void on(BoardConnected event) {
+        this.refresh(getDoor());
     }
 
     @Subscribe
     public void on(BoardDisconnected boardDisconnected) {
-        this.handlerDoorState(new DoorToggled(getDoor(), getDoor().isOpened()));
+        this.refresh(getDoor());
     }
 
     @Subscribe
@@ -171,12 +157,14 @@ public abstract class BaseDoorFragment extends BaseFragment {
     }
 
     @Subscribe
-    public void on(DoorToggled event) {
-        handlerDoorState(event);
+    public void on(CommandProcessed event) {
+        refresh(event.door);
     }
 
     @Subscribe
-    public void on(DoorActivationFailed doorActivationFailed) {
-        handlerDoorState(doorActivationFailed);
+    public void on(CommandFailed doorActivationFailed) {
+        if (getDoor().getId() == getDoor().getId()) {
+            stateView();
+        }
     }
 }
