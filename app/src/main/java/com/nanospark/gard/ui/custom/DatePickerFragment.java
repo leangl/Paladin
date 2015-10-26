@@ -12,9 +12,8 @@ import java.util.Calendar;
 import mobi.tattu.utils.Tattu;
 
 
-public class DatePickerFragment extends DialogFragment
-                            implements DatePickerDialog.OnDateSetListener {
-    private static String ARG_ID;
+public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+    private static String ARG_ID = "arg_id";
     private int mId;
 
     @Override
@@ -24,9 +23,8 @@ public class DatePickerFragment extends DialogFragment
     }
 
     public static DatePickerFragment newInstance(int id) {
-
         Bundle args = new Bundle();
-         args.putInt(ARG_ID,id);
+        args.putInt(ARG_ID, id);
         DatePickerFragment fragment = new DatePickerFragment();
         fragment.setArguments(args);
         return fragment;
@@ -46,6 +44,6 @@ public class DatePickerFragment extends DialogFragment
     }
 
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        Tattu.post(new DatePickerSelected(view,year,month,day,this.mId));
+        Tattu.post(new DatePickerSelected(view, year, month, day, this.mId));
     }
 }

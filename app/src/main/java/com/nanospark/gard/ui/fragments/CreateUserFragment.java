@@ -358,7 +358,6 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
             mControlSchedule.setStartMinute(timerPickerSelected.minute);
             mTimeStartTextView.setTag(calendar);
             mTimeStartTextView.setText(Utils.getHour(calendar));
-            resetTimeEnd(mControlSchedule, this.mTimeEndTextView);
         } else {
             mControlSchedule.setEndHour(timerPickerSelected.hourOfDay);
             mControlSchedule.setEndMinute(timerPickerSelected.minute);
