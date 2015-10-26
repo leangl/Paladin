@@ -480,7 +480,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
             }
         }
 
-        if (mControlSchedule != null && ControlSchedule.Limit.EVENTS.equals(mControlSchedule.getLimitEvents())) {
+        if (mControlSchedule != null && ControlSchedule.Limit.EVENTS.equals(mControlSchedule.getLimit())) {
             try {
                 mControlSchedule.setLimitEvents(Integer.parseInt(mDateEventEditText.getText().toString()));
             } catch (Exception e) {
