@@ -1,6 +1,7 @@
 package com.nanospark.gard.model.scheduler;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,7 +13,7 @@ public class Schedule implements Serializable, Comparable<Schedule> {
     private String id;
     private String name;
     private Long createDate;
-    private List<Integer> doors;
+    private List<Integer> doors = new ArrayList<>();
     private Integer openHour;
     private Integer openMinute;
     private Integer closeHour;
