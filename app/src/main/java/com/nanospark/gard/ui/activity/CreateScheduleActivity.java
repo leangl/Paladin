@@ -20,7 +20,7 @@ public class CreateScheduleActivity extends BaseActivity {
 
     public static final String ARG_SCHEDULE = "schedule";
 
-    private CreateUserListener mListener;
+    private CreateScheduleFragment mFragment;
 
     public static void start(Activity ctx) {
         start(ctx, null);
@@ -40,7 +40,7 @@ public class CreateScheduleActivity extends BaseActivity {
         textView.setVisibility(View.VISIBLE);
         textView.setText(R.string.save_label);
         textView.setOnClickListener(v -> {
-            if (mListener != null && mListener.save()) {
+            if (mFragment != null && mFragment.save()) {
                 finish();
             }
         });
@@ -59,7 +59,8 @@ public class CreateScheduleActivity extends BaseActivity {
     @Override
     public Fragment getFragment() {
         Schedule schedule = (Schedule) getIntent().getSerializableExtra(ARG_SCHEDULE);
-        return CreateScheduleFragment.newInstance(schedule);
+        mFragment = CreateScheduleFragment.newInstance(schedule);
+        return mFragment;
     }
 
     @Override
@@ -71,7 +72,4 @@ public class CreateScheduleActivity extends BaseActivity {
         boolean save();
     }
 
-    public void setListener(CreateUserListener listener) {
-        this.mListener = listener;
-    }
 }

@@ -16,7 +16,7 @@ import com.nanospark.gard.ui.fragments.CreateUserFragment;
  */
 public class CreateUserActivity extends BaseActivity {
 
-    private CreateUserListener mListener;
+    private CreateUserFragment mFragment;
     private String mId;
 
     @Override
@@ -30,7 +30,7 @@ public class CreateUserActivity extends BaseActivity {
         textView.setVisibility(View.VISIBLE);
         textView.setText("SAVE");
         textView.setOnClickListener(v -> {
-            if (mListener != null && mListener.save()) {
+            if (mFragment != null && mFragment.save()) {
                 finish();
             }
         });
@@ -49,7 +49,8 @@ public class CreateUserActivity extends BaseActivity {
 
     @Override
     public Fragment getFragment() {
-        return CreateUserFragment.newInstance(mId);
+        mFragment = CreateUserFragment.newInstance(mId);
+        return mFragment;
     }
 
     @Override
@@ -61,7 +62,7 @@ public class CreateUserActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
-                mListener.save();
+                mFragment.save();
                 break;
             default:
                 super.onOptionsItemSelected(item);
@@ -69,11 +70,4 @@ public class CreateUserActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public interface CreateUserListener {
-        boolean save();
-    }
-
-    public void setListener(CreateUserListener listener) {
-        this.mListener = listener;
-    }
 }

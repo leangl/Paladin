@@ -253,8 +253,7 @@
         android:text="@string/repeat_only_every_day_label"
         android:textColor="@color/text_color_bold"
         android:textSize="16sp"
-        android:textStyle="bold"
-        app:buttonTint="@color/red"/>
+        android:textStyle="bold"/>
 
     <CheckBox
         android:id="@+id/checkbox_repeat"
@@ -268,8 +267,7 @@
         android:text="@string/repeat_label"
         android:textColor="@color/text_color_bold"
         android:textSize="16sp"
-        android:textStyle="bold"
-        app:buttonTint="@color/red"/>
+        android:textStyle="bold"/>
 
     <EditText
         android:id="@+id/edittext_repeat_weeks"

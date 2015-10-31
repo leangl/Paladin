@@ -116,6 +116,12 @@ public class SchedulesFragment extends BaseFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        loadSchedules();
+    }
+
+    @Override
     public boolean showHomeIcon() {
         return false;
     }

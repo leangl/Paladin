@@ -25,9 +25,9 @@ import com.nanospark.gard.Utils;
 import com.nanospark.gard.events.DatePickerSelected;
 import com.nanospark.gard.events.TimerPickerSelected;
 import com.nanospark.gard.model.user.ControlSchedule;
+import com.nanospark.gard.model.user.Limit;
 import com.nanospark.gard.model.user.User;
 import com.nanospark.gard.model.user.UserManager;
-import com.nanospark.gard.ui.activity.CreateUserActivity;
 import com.nanospark.gard.ui.custom.BaseFragment;
 import com.nanospark.gard.ui.custom.DatePickerFragment;
 import com.nanospark.gard.ui.custom.TimerPickerFragment;
@@ -41,7 +41,7 @@ import mobi.tattu.utils.ToastManager;
 /**
  * Created by cristian on 17/10/15.
  */
-public class CreateUserFragment extends BaseFragment implements CreateUserActivity.CreateUserListener {
+public class CreateUserFragment extends BaseFragment {
 
     public static final String ARG_ID_USER = "argID_user";
 
@@ -74,7 +74,6 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((CreateUserActivity) getBaseActivity()).setListener(this);
         String id = getArguments().getString(ARG_ID_USER);
         if (id == null) {
             mUser = new User();
@@ -115,7 +114,6 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mUser.setNotify((User.Notify) parent.getAdapter().getItem(position));
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
@@ -169,16 +167,18 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
             mRepeatEventWeeksEditText.setEnabled(isChecked);
 
         });
-        ArrayAdapter<ControlSchedule.Limit> adapter = new ArrayAdapter<>(getBaseActivity(), android.R.layout.simple_dropdown_item_1line, ControlSchedule.Limit.values());
+        ArrayAdapter<Limit> adapter = new ArrayAdapter<>(getBaseActivity(),
+                android.R.layout.simple_dropdown_item_1line,
+                Limit.values());
 
         limitSpinner.setAdapter(adapter);
         limitSpinner.setPrompt("Event");
         limitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                ControlSchedule.Limit limit = (ControlSchedule.Limit) parent.getAdapter().getItem(position);
+                Limit limit = (Limit) parent.getAdapter().getItem(position);
 
-                if (limit.equals(ControlSchedule.Limit.DATE)) {
+                if (limit.equals(Limit.DATE)) {
                     if (parent.getTag() == null) {
                         showDatePicker(view.getId());
                     }
@@ -193,7 +193,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
                     } else {
                         mDateEventEditText.setText(null);
                     }
-                } else if (limit.equals(ControlSchedule.Limit.EVENTS)) {
+                } else if (limit.equals(Limit.EVENTS)) {
                     mDateEventEditText.setVisibility(View.VISIBLE);
                     mDateEventEditText.setFocusable(true);
                     mDateEventEditText.setFocusableInTouchMode(true);
@@ -323,7 +323,6 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
                 drawableAux = drawable;
                 state = false;
                 mControlSchedule.getDays().remove(fb.getTag(R.string.key_day));
-
             } else {
                 color = R.color.red;
                 drawableAux = drawableSelected;
@@ -426,7 +425,6 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         return startTime == null ? true : startTime.before(endTime);
     }
 
-    @Override
     public boolean save() {
         String name = this.mNameEditText.getText().toString();
         String phone = this.mPhoneEditText.getText().toString();
@@ -477,7 +475,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
             }
         }
 
-        if (mControlSchedule != null && ControlSchedule.Limit.EVENTS.equals(mControlSchedule.getLimit())) {
+        if (mControlSchedule != null && Limit.EVENTS.equals(mControlSchedule.getLimit())) {
             try {
                 mControlSchedule.setLimitEvents(Integer.parseInt(mDateEventEditText.getText().toString()));
             } catch (Exception e) {
@@ -497,10 +495,10 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         if (!validateField(dayStart, "Start Date")) {
             return false;
         }
-        if (ControlSchedule.Limit.DATE.equals(mControlSchedule.getLimit()) && !validateField(limitText, "End Date")) {
+        if (Limit.DATE.equals(mControlSchedule.getLimit()) && !validateField(limitText, "End Date")) {
             return false;
         }
-        if (ControlSchedule.Limit.EVENTS.equals(mControlSchedule.getLimit()) && !validateField(limitText, "Number of Events")) {
+        if (Limit.EVENTS.equals(mControlSchedule.getLimit()) && !validateField(limitText, "Number of Events")) {
             return false;
         }
         return true;
@@ -513,6 +511,4 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         }
         return true;
     }
-
-
 }

@@ -20,7 +20,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="20dp"
+            android:paddingTop="20dp"
             android:background="@color/white"
             android:orientation="vertical"
             android:padding="10dp">
@@ -50,6 +50,7 @@
                 android:layout_gravity="center_horizontal">
 
                 <CheckBox
+                    android:id="@+id/door1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="30dp"
@@ -57,6 +58,7 @@
                     android:textSize="20sp"/>
 
                 <CheckBox
+                    android:id="@+id/door2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="30dp"
@@ -93,7 +95,11 @@
                     <EditText
                         android:id="@+id/open"
                         android:layout_width="80dp"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:gravity="center_horizontal"
+                        android:hint="n/a"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -106,7 +112,11 @@
                     <EditText
                         android:id="@+id/close"
                         android:layout_width="80dp"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:gravity="center_horizontal"
+                        android:hint="n/a"/>
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

@@ -1,5 +1,6 @@
 package com.nanospark.gard.model.user;
 
+import com.nanospark.gard.model.Day;
 import com.nanospark.gard.model.door.Door;
 
 import java.util.Calendar;
@@ -7,7 +8,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import mobi.tattu.utils.ResourceUtils;
 import roboguice.util.Ln;
 
 /**
@@ -217,16 +217,6 @@ public class ControlSchedule {
         return sb.toString();
     }
 
-    public enum Limit {
-        FOREVER, DATE, EVENTS;
-
-        @Override
-        public String toString() {
-            return ResourceUtils.stringByName("limit." + name().toLowerCase());
-        }
-
-    }
-
     public boolean isAllowed(Door door) {
         Calendar today = Calendar.getInstance();
         if (isStartTimeSet()) {
@@ -324,28 +314,4 @@ public class ControlSchedule {
         return Limit.DATE.equals(limit) && limitDay != null && limitMonth != null && limitYear != null;
     }
 
-    public enum Day {
-        SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY;
-
-        public static Day fromCalendar(int day) {
-            return values()[day - 1];
-        }
-
-        @Override
-        public String toString() {
-            return name().substring(0, 1) + name().substring(1, 4).toLowerCase();
-        }
-
-        public String abbr() {
-            switch (this) {
-                case SUNDAY:
-                case SATURDAY:
-                case TUESDAY:
-                case THURSDAY:
-                    return name().substring(0, 1) + name().substring(1, 2).toLowerCase();
-                default:
-                    return name().substring(0, 1);
-            }
-        }
-    }
 }

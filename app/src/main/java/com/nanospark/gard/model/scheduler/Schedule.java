@@ -13,6 +13,10 @@ public class Schedule implements Serializable, Comparable<Schedule> {
     private String name;
     private Long createDate;
     private List<Integer> doors;
+    private Integer openHour;
+    private Integer openMinute;
+    private Integer closeHour;
+    private Integer closeMinute;
 
     public Schedule() {
         this.id = UUID.randomUUID().toString();
@@ -42,6 +46,38 @@ public class Schedule implements Serializable, Comparable<Schedule> {
     }
     public void setDoors(List<Integer> doors) {
         this.doors = doors;
+    }
+    public Integer getCloseHour() {
+        return closeHour;
+    }
+    public void setCloseHour(Integer closeHour) {
+        this.closeHour = closeHour;
+    }
+    public Integer getCloseMinute() {
+        return closeMinute;
+    }
+    public void setCloseMinute(Integer closeMinute) {
+        this.closeMinute = closeMinute;
+    }
+    public Integer getOpenHour() {
+        return openHour;
+    }
+    public void setOpenHour(Integer openHour) {
+        this.openHour = openHour;
+    }
+    public Integer getOpenMinute() {
+        return openMinute;
+    }
+    public void setOpenMinute(Integer openMinute) {
+        this.openMinute = openMinute;
+    }
+
+    public boolean isOpenTimeSet() {
+        return openMinute != null && openHour != null;
+    }
+
+    public boolean isCloseTimeSet() {
+        return closeMinute != null && closeHour != null;
     }
 
     @Override
