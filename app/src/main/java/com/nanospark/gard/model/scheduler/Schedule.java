@@ -1,26 +1,48 @@
 package com.nanospark.gard.model.scheduler;
 
-import com.nanospark.gard.model.door.Door;
-
-import java.util.Calendar;
+import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 /**
- * Created by cristian on 09/08/15.
+ * Created by Leandro on 29/10/2015.
  */
-public class Schedule {
+public class Schedule implements Serializable, Comparable<Schedule> {
 
-    public static String ACTION_OPEN_DOOR = "action_open_door";
-    public static String ACTION_CLOSE_DOOR = "action_close_door";
+    private String id;
+    private String name;
+    private Long createDate;
+    private List<Integer> doors;
 
-    public String name;
-    public String action;
-    public List<Integer> days;
-    public List<String> dayNameSelecteds;
-    public int hourOfDay;
-    public int minute;
-    public long timeStamp;
-    public int doorId;
+    public Schedule() {
+        this.id = UUID.randomUUID().toString();
+        createDate = System.currentTimeMillis();
+    }
+
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public Long getCreateDate() {
+        return createDate;
+    }
+    public void setCreateDate(Long createDate) {
+        this.createDate = createDate;
+    }
+    public List<Integer> getDoors() {
+        return doors;
+    }
+    public void setDoors(List<Integer> doors) {
+        this.doors = doors;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -29,37 +51,17 @@ public class Schedule {
 
         Schedule schedule = (Schedule) o;
 
-        return name.equals(schedule.name);
+        return id.equals(schedule.id);
 
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
-    }
-
-    public boolean isNow() {
-        Calendar calendar = Calendar.getInstance();
-        int day = calendar.get(Calendar.DAY_OF_WEEK);
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
-
-        return this.days.contains(day) && this.hourOfDay == hour && this.minute == minute;
-    }
-
-    public boolean trigger() {
-        if (isNow()) {
-            if (action.equals(ACTION_OPEN_DOOR)) {
-                return Door.getInstance(doorId).send(new Door.Open("Scheduled action taken, door is in motion", false));
-            } else if (action.equals(ACTION_CLOSE_DOOR)) {
-                return Door.getInstance(doorId).send(new Door.Close("Scheduled action taken, door is in motion", false));
-            }
-        }
-        return false;
+        return id.hashCode();
     }
 
     @Override
-    public String toString() {
-        return name;
+    public int compareTo(Schedule another) {
+        return this.createDate.compareTo(another.createDate);
     }
 }

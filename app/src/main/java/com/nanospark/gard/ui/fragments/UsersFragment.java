@@ -34,19 +34,12 @@ public class UsersFragment extends BaseFragment {
     private List<User> mUserList;
 
     public static UsersFragment newInstance() {
-
-        Bundle args = new Bundle();
-
-        UsersFragment fragment = new UsersFragment();
-        fragment.setArguments(args);
-        return fragment;
+        return new UsersFragment();
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -88,7 +81,7 @@ public class UsersFragment extends BaseFragment {
                     PopupMenu popupMenu = new PopupMenu(getBaseActivity(), v);
                     popupMenu.inflate(R.menu.actions);
                     popupMenu.setOnMenuItemClickListener(item -> {
-                        handlerPopMenu(item, user);
+                        handlePopMenu(item, user);
                         return true;
                     });
                     popupMenu.show();
@@ -96,19 +89,8 @@ public class UsersFragment extends BaseFragment {
                 if (user.isNotificationEnabled()) {
                     receiveAlerts.setImageResource(R.drawable.ic_alert_enabled);
                 }
-                timeLimits1.setText(user.getTimelimitString1());
-                timeLimits2.setText(user.getTimelimitString2());
-                /*if (user.getSchedule() != null) {
-                    String startTime = "";
-                    String endTime = "";
-                    if (user.getSchedule().getStartHour() != null) {
-                        startTime = Utils.getHour(getCalendarHour(user.getSchedule().getStartHour(), user.getSchedule().getStartMinute()));
-                    }
-                    if (user.getSchedule().getEndHour() != null) {
-                        endTime = Utils.getHour(getCalendarHour(user.getSchedule().getEndHour(), user.getSchedule().getEndMinute()));
-                    }
-                    timeLimits.setText(startTime + StringUtils.SPACE + endTime);
-                }*/
+                timeLimits1.setText(user.getHourRangeString());
+                timeLimits2.setText(user.getDayLimitString());
                 populateUserView(user, name, phone);
 
                 addViewToGrid(this.mGridLayout, userView);
@@ -123,7 +105,7 @@ public class UsersFragment extends BaseFragment {
         }
     }
 
-    private void handlerPopMenu(MenuItem item, User user) {
+    private void handlePopMenu(MenuItem item, User user) {
         switch (item.getItemId()) {
             case R.id.action_delete:
                 mUserManager.delete(user);
@@ -159,7 +141,6 @@ public class UsersFragment extends BaseFragment {
         view.setLayoutParams(layoutParams);
         gridLayout.addView(view);
     }
-
 
     @Override
     public boolean showHomeIcon() {

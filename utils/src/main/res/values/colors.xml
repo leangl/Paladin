@@ -7,4 +7,5 @@
     <color name="divider">@color/grey_600</color>
     <color name="seekbar_preference_title_color">@color/black</color>
     <color name="seekbar_preference_summary_color">@color/grey_700</color>
+    <color name="transparent">@android:color/transparent</color>
 </resources>

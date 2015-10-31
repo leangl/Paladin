@@ -7,7 +7,7 @@ import com.nanospark.gard.events.CommandSent;
 import com.nanospark.gard.events.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.log.LogManager;
-import com.nanospark.gard.model.scheduler.Schedule;
+import com.nanospark.gard.model.scheduler.ScheduleOld;
 import com.nanospark.gard.model.scheduler.SchedulerWizard;
 import com.nanospark.gard.model.user.UserManager;
 import com.nanospark.gard.services.GarDService;
@@ -59,8 +59,8 @@ public class GarD extends Application {
         GarDService.start();
 
         // Start existing schedules
-        Set<Schedule> schedules = DataStore.getInstance().getAll(Schedule.class);
-        for (Schedule schedule : schedules) {
+        Set<ScheduleOld> schedules = DataStore.getInstance().getAll(ScheduleOld.class);
+        for (ScheduleOld schedule : schedules) {
             SchedulerWizard.initializeAlarm(this, schedule);
         }
 

@@ -20,7 +20,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String key = intent.getStringExtra(KEY_EXTRA_NAME);
-        Schedule schedule = DataStore.getInstance().getObject(key, Schedule.class).get();
+        ScheduleOld schedule = DataStore.getInstance().getObject(key, ScheduleOld.class).get();
         if (schedule != null) {
             if (schedule.trigger()) {
                 Log.i("Scheduler", "Schedule triggered: " + schedule);

@@ -14,6 +14,7 @@ import mobi.tattu.utils.DialogUtils;
 /**
  * Created by cristian on 09/08/15.
  */
+@Deprecated
 public class DialogBuilder {
 
     public static void buildDesiredActions(Context context, final SchedulerWizard wizard) {
@@ -24,7 +25,7 @@ public class DialogBuilder {
                 null,
                 (action, dialog) -> {
                     if (action != null) {
-                        wizard.getSchedule().action = action.contains("Open") ? Schedule.ACTION_OPEN_DOOR : Schedule.ACTION_CLOSE_DOOR;
+                        wizard.getSchedule().action = action.contains("Open") ? ScheduleOld.ACTION_OPEN_DOOR : ScheduleOld.ACTION_CLOSE_DOOR;
                         wizard.positiveButton(dialog);
                     } else {
                         wizard.negativeButton(dialog);

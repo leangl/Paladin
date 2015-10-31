@@ -4,6 +4,7 @@ import com.nanospark.gard.GarD;
 import com.nanospark.gard.R;
 import com.nanospark.gard.model.door.Door;
 
+import java.io.Serializable;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -13,7 +14,7 @@ import mobi.tattu.utils.StringUtils;
 /**
  * Created by Leandro on 1/10/2015.
  */
-public class User {
+public class User implements Serializable {
 
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s");
 
@@ -23,9 +24,12 @@ public class User {
     private String password;
     private Notify notify;
     private ControlSchedule schedule;
+    private Long createDate;
 
     public User() {
         this.id = UUID.randomUUID().toString();
+        createDate = System.currentTimeMillis();
+
     }
 
     public String getId() {
@@ -61,9 +65,16 @@ public class User {
     public ControlSchedule getSchedule() {
         return schedule;
     }
-    public void setSchedules(ControlSchedule schedule) {
+    public void setSchedule(ControlSchedule schedule) {
         this.schedule = schedule;
     }
+    public Long getCreateDate() {
+        return createDate;
+    }
+    public void setCreateDate(Long createDate) {
+        this.createDate = createDate;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -146,12 +157,12 @@ public class User {
         return name;
     }
 
-    public String getTimelimitString1() {
+    public String getHourRangeString() {
         if (getSchedule() == null) return GarD.instance.getString(R.string.not_available_label);
         return getSchedule().getHourRangeString();
     }
 
-    public String getTimelimitString2() {
+    public String getDayLimitString() {
         if (getSchedule() == null) return "";
         return getSchedule().getDayLimitString();
     }

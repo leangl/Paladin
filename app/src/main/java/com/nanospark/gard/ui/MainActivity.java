@@ -22,7 +22,7 @@ import com.nanospark.gard.events.CommandProcessed;
 import com.nanospark.gard.events.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.scheduler.DialogBuilder;
-import com.nanospark.gard.model.scheduler.Schedule;
+import com.nanospark.gard.model.scheduler.ScheduleOld;
 import com.nanospark.gard.model.scheduler.SchedulerWizard;
 import com.nanospark.gard.services.GarDService;
 import com.nanospark.gard.sms.twilio.TwilioAccount;
@@ -133,7 +133,7 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
     }
 
     private void loadSchedule(String key) {
-        Schedule schedule = DataStore.getInstance().getObject(key, Schedule.class).get();
+        ScheduleOld schedule = DataStore.getInstance().getObject(key, ScheduleOld.class).get();
         if (schedule != null) {
             populateListView(schedule.name, schedule);
         }
@@ -253,7 +253,7 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
     }
 
     @Override
-    public void onSuccess(String id, Schedule scheduled) {
+    public void onSuccess(String id, ScheduleOld scheduled) {
         populateListView(id, scheduled);
     }
 
@@ -263,7 +263,7 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
         GarDService.start(); // restart ioio
     }
 
-    private void populateListView(String id, Schedule scheduled) {
+    private void populateListView(String id, ScheduleOld scheduled) {
         List<String> list = new ArrayList<>();
         String[] desiredActions = getResources().getStringArray(R.array.desiredActions);
         list.add(scheduled.action.contains("open") ? desiredActions[0] : desiredActions[1]);

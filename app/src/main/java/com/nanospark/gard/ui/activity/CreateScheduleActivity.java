@@ -1,40 +1,49 @@
 package com.nanospark.gard.ui.activity;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import com.nanospark.gard.R;
+import com.nanospark.gard.model.scheduler.Schedule;
 import com.nanospark.gard.ui.custom.BaseActivity;
-import com.nanospark.gard.ui.fragments.CreateUserFragment;
+import com.nanospark.gard.ui.fragments.CreateScheduleFragment;
 
 /**
  * Created by cristian on 16/10/15.
  */
-public class CreateUserActivity extends BaseActivity {
+public class CreateScheduleActivity extends BaseActivity {
+
+    public static final String ARG_SCHEDULE = "schedule";
 
     private CreateUserListener mListener;
-    private String mId;
+
+    public static void start(Activity ctx) {
+        start(ctx, null);
+    }
+
+    public static void start(Activity ctx, Schedule schedule) {
+        Intent i = new Intent(ctx, CreateScheduleActivity.class);
+        i.putExtra(ARG_SCHEDULE, schedule);
+        ctx.startActivity(i);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (getIntent() != null) {
-            mId = getIntent().getStringExtra(CreateUserFragment.ARG_ID_USER);
-        }
         super.onCreate(savedInstanceState);
-        getToolbar().setTitle(R.string.new_user_label);
+        getToolbar().setTitle(R.string.new_schedule_label);
         TextView textView = (TextView) getViewInToolbar(R.id.textview_menu_overflow);
         textView.setVisibility(View.VISIBLE);
-        textView.setText("SAVE");
+        textView.setText(R.string.save_label);
         textView.setOnClickListener(v -> {
             if (mListener != null && mListener.save()) {
                 finish();
             }
         });
-
     }
 
     @Override
@@ -49,24 +58,13 @@ public class CreateUserActivity extends BaseActivity {
 
     @Override
     public Fragment getFragment() {
-        return CreateUserFragment.newInstance(mId);
+        Schedule schedule = (Schedule) getIntent().getSerializableExtra(ARG_SCHEDULE);
+        return CreateScheduleFragment.newInstance(schedule);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_save:
-                mListener.save();
-                break;
-            default:
-                super.onOptionsItemSelected(item);
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     public interface CreateUserListener {

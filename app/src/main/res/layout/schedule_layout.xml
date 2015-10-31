@@ -242,7 +242,7 @@
             app:rippleColor="@color/white"/>
     </LinearLayout>
 
-    <android.support.v7.widget.AppCompatCheckBox
+    <CheckBox
         android:id="@+id/checkbox_repeat_every_day"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -256,7 +256,7 @@
         android:textStyle="bold"
         app:buttonTint="@color/red"/>
 
-    <android.support.v7.widget.AppCompatCheckBox
+    <CheckBox
         android:id="@+id/checkbox_repeat"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
@@ -271,7 +271,7 @@
         android:textStyle="bold"
         app:buttonTint="@color/red"/>
 
-    <android.support.v7.widget.AppCompatEditText
+    <EditText
         android:id="@+id/edittext_repeat_weeks"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
@@ -283,8 +283,7 @@
         android:inputType="number"
         android:maxLines="1"
         android:singleLine="true"
-        android:spinnerMode="dropdown"
-        app:backgroundTint="@color/red"/>
+        android:spinnerMode="dropdown"/>
 
 
     <TextView
@@ -301,7 +300,7 @@
         android:textColor="@color/text_color_bold"
         android:textStyle="bold"/>
 
-    <android.support.v7.widget.AppCompatSpinner
+    <Spinner
         android:id="@+id/spinner_date_event"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -313,7 +312,7 @@
         android:layout_alignTop="@+id/textView15"
         android:spinnerMode="dropdown"/>
 
-    <android.support.v7.widget.AppCompatEditText
+    <EditText
         android:id="@+id/edittext_date_event"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
@@ -322,8 +321,5 @@
         android:focusable="false"
         android:focusableInTouchMode="false"
         android:visibility="invisible"
-        app:backgroundTint="@color/red"
         tools:visibility="visible"/>
-
-
 </RelativeLayout>

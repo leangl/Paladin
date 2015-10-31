@@ -48,6 +48,7 @@
     <string name="require_password_label">Require Password</string>
     <string name="notify_door_activity_label">Notify me of door activity</string>
     <string name="new_user_label">New User</string>
+    <string name="new_schedule_label">New Schedule</string>
     <string name="save_label">Save</string>
     <string name="error_time_msg">The end time must be greater than start</string>
     <string name="error_date_msg">The end date must be greater than the initial</string>
@@ -58,7 +59,8 @@
     <string name="hint_time_limits">________</string>
     <string name="error_name_msg">A user already exists with that name</string>
     <string name="error_name_invalid">Name is invalid</string>
-    <string name="empty_users_msg">No registered users</string>
+    <string name="empty_users_msg">No users</string>
+    <string name="empty_schedules">No schedules</string>
     <string name="notify.open">Open</string>
     <string name="notify.close">Close</string>
     <string name="notify.all">All</string>

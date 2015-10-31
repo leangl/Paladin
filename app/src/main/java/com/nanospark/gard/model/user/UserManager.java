@@ -7,6 +7,7 @@ import com.nanospark.gard.events.CommandProcessed;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import mobi.tattu.utils.F;
@@ -32,7 +33,9 @@ public class UserManager {
     }
 
     public List<User> getAll() {
-        return new ArrayList<>(mDataStore.getAll(User.class));
+        List<User> all = new ArrayList<>(mDataStore.getAll(User.class));
+        Collections.sort(all, (u1, u2) -> u1.getCreateDate().compareTo(u2.getCreateDate()));
+        return all;
     }
 
     public void add(User user) {

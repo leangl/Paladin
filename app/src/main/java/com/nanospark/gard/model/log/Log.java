@@ -2,12 +2,13 @@ package com.nanospark.gard.model.log;
 
 import com.nanospark.gard.events.CommandProcessed;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by Leandro on 1/10/2015.
  */
-public class Log {
+public class Log implements Serializable {
 
     public static final String EVENT_OPEN = "open";
     public static final String EVENT_CLOSE = "close";

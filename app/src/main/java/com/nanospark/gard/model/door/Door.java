@@ -188,6 +188,15 @@ public class Door {
         persist();
     }
 
+    public String getName() {
+        return config.doorName;
+    }
+
+    public void setName(String name) {
+        this.config.doorName = name;
+        persist();
+    }
+
     public String getOpenPhrase() {
         return config.openPhrase;
     }
@@ -210,15 +219,14 @@ public class Door {
         config = mDataStore.getObject(getId(), Config.class).get();
         if (config == null) {
             config = new Config();
+            config.doorName = "Door " + getId();
             config.openPhrase = GarD.instance.getString(R.string.default_open);
             config.closePhrase = GarD.instance.getString(R.string.default_close);
         }
     }
 
     private void persist() {
-        if (config != null) {
-            mDataStore.putObject(getId(), config);
-        }
+        mDataStore.putObject(getId(), config);
     }
 
     public void setup(IOIO ioio) throws ConnectionLostException {
@@ -297,6 +305,7 @@ public class Door {
     }
 
     public static class Config {
+        public String doorName;
         public String openPhrase;
         public String closePhrase;
     }

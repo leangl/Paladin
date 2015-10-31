@@ -2,6 +2,9 @@ package mobi.tattu.utils.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -100,19 +103,19 @@ public class BaseFragment extends RoboFragment implements BaseActivity.OnBackLis
         return getBaseActivity().popBackStack();
     }
 
-    protected void showLoading() {
-        showLoading(false);
-    }
-
     protected void stopLoading() {
         if (getBaseActivity() != null) getBaseActivity().stopLoading();
+    }
+
+    protected void showLoading() {
+        showLoading(false);
     }
 
     protected void showLoading(boolean cancelable) {
         if (getBaseActivity() != null) getBaseActivity().showLoading(cancelable);
     }
 
-    protected  void showLoading(boolean cancelable, int resId) {
+    protected void showLoading(boolean cancelable, int resId) {
         if (getBaseActivity() != null) getBaseActivity().showLoading(cancelable, resId);
     }
 
@@ -167,6 +170,10 @@ public class BaseFragment extends RoboFragment implements BaseActivity.OnBackLis
 
     public void toast(String message) {
         getBaseActivity().toast(message);
+    }
+
+    public <T extends View> T inflate(int resource, ViewGroup root, boolean attachToRoot) {
+        return (T) LayoutInflater.from(getActivity()).inflate(resource, root, attachToRoot);
     }
 
 }

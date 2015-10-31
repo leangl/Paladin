@@ -17,15 +17,16 @@ import mobi.tattu.utils.persistance.datastore.DataStore;
 /**
  * Created by cristian on 09/08/15.
  */
+@Deprecated
 public class SchedulerWizard implements TimePickerFragment.TimePickerFragmentListener {
 
-    private Schedule mSchedule;
+    private ScheduleOld mSchedule;
     private Context mContext;
     private boolean launcherClock = true;
     private BuilderWizardScheludedListener mListener;
 
     public SchedulerWizard(Context context, String name) {
-        this.mSchedule = new Schedule();
+        this.mSchedule = new ScheduleOld();
         this.mContext = context;
         this.mSchedule.days = new ArrayList<>();
         this.mSchedule.dayNameSelecteds = new ArrayList<>();
@@ -46,7 +47,7 @@ public class SchedulerWizard implements TimePickerFragment.TimePickerFragmentLis
 
     }
 
-    public static void initializeAlarm(Context context, Schedule schedule) {
+    public static void initializeAlarm(Context context, ScheduleOld schedule) {
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         Calendar calendar = Calendar.getInstance();
@@ -64,7 +65,7 @@ public class SchedulerWizard implements TimePickerFragment.TimePickerFragmentLis
         alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, timeInMillis, TimeUnit.HOURS.toMillis(24), alarmIntent);
     }
 
-    private static PendingIntent getPendingIntent(Context context, Schedule schedule) {
+    private static PendingIntent getPendingIntent(Context context, ScheduleOld schedule) {
         Intent intent = new Intent(context, AlarmReceiver.class);
         //intent.setAction(AlarmReceiver.ACTION);
         intent.putExtra(AlarmReceiver.KEY_EXTRA_NAME, schedule.name);
@@ -94,10 +95,10 @@ public class SchedulerWizard implements TimePickerFragment.TimePickerFragmentLis
          * @param id
          * @param schedule
          */
-        void onSuccess(String id, Schedule schedule);
+        void onSuccess(String id, ScheduleOld schedule);
     }
 
-    public Schedule getSchedule() {
+    public ScheduleOld getSchedule() {
         return mSchedule;
     }
 

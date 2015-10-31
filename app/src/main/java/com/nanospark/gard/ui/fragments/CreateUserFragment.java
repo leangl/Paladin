@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.widget.AppCompatEditText;
-import android.support.v7.widget.AppCompatSpinner;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -90,13 +88,13 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_user, container, false);
-        this.mNameEditText = (AppCompatEditText) view.findViewById(R.id.edittext_name);
-        this.mPhoneEditText = (AppCompatEditText) view.findViewById(R.id.edittext_phone);
-        this.mPasswordEditText = (AppCompatEditText) view.findViewById(R.id.edittext_password);
+        this.mNameEditText = (EditText) view.findViewById(R.id.edittext_name);
+        this.mPhoneEditText = (EditText) view.findViewById(R.id.edittext_phone);
+        this.mPasswordEditText = (EditText) view.findViewById(R.id.edittext_password);
         this.mTimelimitsCheckBox = (CheckBox) view.findViewById(R.id.checkbox_time_limits);
         this.mRequirePassCheckBox = (CheckBox) view.findViewById(R.id.checkbox_password);
         this.mNotifyCheckBox = (CheckBox) view.findViewById(R.id.checkbox_notify);
-        this.mDoorEventSpinner = (AppCompatSpinner) view.findViewById(R.id.spinner_door_event);
+        this.mDoorEventSpinner = (Spinner) view.findViewById(R.id.spinner_door_event);
         View scheduleContainer = view.findViewById(R.id.schedule_container);
         scheduleContainer.setVisibility(View.GONE);
         LinearLayout daysContainer = (LinearLayout) scheduleContainer.findViewById(R.id.days_container);
@@ -128,11 +126,11 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
                 if (mControlSchedule == null) {
                     mControlSchedule = new ControlSchedule();
                     mControlSchedule.setDays(new ArrayList<>());
-                    mUser.setSchedules(this.mControlSchedule);
+                    mUser.setSchedule(this.mControlSchedule);
                 }
                 visibilty = View.VISIBLE;
             } else {
-                mUser.setSchedules(null);
+                mUser.setSchedule(null);
                 visibilty = View.GONE;
             }
             scheduleContainer.setVisibility(visibilty);
@@ -154,11 +152,11 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         this.mTimeStartTextView = (TextView) scheduleContainer.findViewById(R.id.textview_start_time);
         this.mTimeEndTextView = (TextView) scheduleContainer.findViewById(R.id.textview_end_time);
         this.mDateStartTextView = (TextView) scheduleContainer.findViewById(R.id.textview_start_day);
-        this.mRepeatEventWeeksEditText = (AppCompatEditText) scheduleContainer.findViewById(R.id.edittext_repeat_weeks);
+        this.mRepeatEventWeeksEditText = (EditText) scheduleContainer.findViewById(R.id.edittext_repeat_weeks);
         this.mDateEventEditText = (TextView) scheduleContainer.findViewById(R.id.edittext_date_event);
         CheckBox repeatEveryDayCheckBox = (CheckBox) scheduleContainer.findViewById(R.id.checkbox_repeat_every_day);
         CheckBox repeatCheckBox = (CheckBox) scheduleContainer.findViewById(R.id.checkbox_repeat);
-        AppCompatSpinner limitSpinner = (AppCompatSpinner) scheduleContainer.findViewById(R.id.spinner_date_event);
+        Spinner limitSpinner = (Spinner) scheduleContainer.findViewById(R.id.spinner_date_event);
 
         this.mRepeatEventWeeksEditText.setEnabled(false);
 
@@ -238,7 +236,7 @@ public class CreateUserFragment extends BaseFragment implements CreateUserActivi
         loadData(repeatEveryDayCheckBox, repeatCheckBox, limitSpinner);
     }
 
-    private void loadData(CheckBox repeatEveryDayCheckBox, CheckBox repeatCheckBox, AppCompatSpinner limitSpinner) {
+    private void loadData(CheckBox repeatEveryDayCheckBox, CheckBox repeatCheckBox, Spinner limitSpinner) {
         if (mUser.getName() != null && !mUser.getName().isEmpty()) {
             ControlSchedule controlSchedule = mUser.getSchedule();
             if (controlSchedule != null) {

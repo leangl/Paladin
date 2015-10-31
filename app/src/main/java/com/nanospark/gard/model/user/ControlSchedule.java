@@ -3,6 +3,7 @@ package com.nanospark.gard.model.user;
 import com.nanospark.gard.model.door.Door;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -152,32 +153,45 @@ public class ControlSchedule {
 
     public String getHourRangeString() {
         StringBuilder sb = new StringBuilder();
-
-        if (isStartTimeSet()) {
-            if (startHour >= 12) {
-                sb.append(24 - startHour + "p-");
-            } else {
-                sb.append(startHour + "a-");
-            }
-        } else {
-            sb.append("0a-");
-        }
-
-        if (isEndTimeSet()) {
-            if (endHour >= 12) {
-                sb.append(24 - endHour + "p");
-            } else {
-                sb.append(endHour + "a");
-            }
-        } else {
-            sb.append("24p-");
-        }
+        sb.append(getHourString(startHour)).append("-").append(getHourString(endHour));
         return sb.toString();
+    }
+
+    private String getHourString(Integer hour) {
+        if (hour != null) {
+            if (hour == 12) {
+                return "12p";
+            } else if (hour == 24) {
+                return "0a";
+            } else if (hour > 12) {
+                return Math.abs(12 - hour) + "p";
+            } else {
+                return hour + "a";
+            }
+        } else {
+            return "0a";
+        }
     }
 
     public String getDayLimitString() {
         if (days == null || days.isEmpty() || days.size() == 7) {
-            return "Daily";
+            if (repeatWeeks || repeatEveryOtherWeek) {
+                StringBuilder sb = new StringBuilder();
+                if (repeatEveryOtherWeek || (repeatWeeks && repeatWeeksNumber == 2)) {
+                    sb.append("Every other week");
+                } else if ((repeatWeeks && repeatWeeksNumber > 2)) {
+                    if (repeatWeeksNumber == 3) {
+                        sb.append("Every 3rd week");
+                    } else if (repeatWeeksNumber == 4) {
+                        sb.append("Every 4th week");
+                    } else {
+                        sb.append("Every " + repeatWeeksNumber + " weeks");
+                    }
+                }
+                return sb.toString();
+            } else {
+                return "Daily";
+            }
         }
         StringBuilder sb = new StringBuilder();
         if (repeatEveryOtherWeek || (repeatWeeks && repeatWeeksNumber == 2)) {
@@ -192,6 +206,7 @@ public class ControlSchedule {
             }
         }
         boolean first = true;
+        Collections.sort(days);
         for (int day : days) {
             if (!first) {
                 sb.append(", ");
@@ -323,9 +338,11 @@ public class ControlSchedule {
 
         public String abbr() {
             switch (this) {
+                case SUNDAY:
+                case SATURDAY:
                 case TUESDAY:
                 case THURSDAY:
-                    return name().substring(0, 2);
+                    return name().substring(0, 1) + name().substring(1, 2).toLowerCase();
                 default:
                     return name().substring(0, 1);
             }

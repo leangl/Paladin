@@ -3,36 +3,117 @@ package com.nanospark.gard.ui.fragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayout;
+import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.google.inject.Inject;
 import com.nanospark.gard.R;
+import com.nanospark.gard.model.door.Door;
+import com.nanospark.gard.model.scheduler.Schedule;
+import com.nanospark.gard.model.scheduler.ScheduleManager;
+import com.nanospark.gard.ui.activity.CreateScheduleActivity;
 import com.nanospark.gard.ui.custom.BaseFragment;
+
+import java.util.List;
+
+import roboguice.inject.InjectView;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class SchedulesFragment extends BaseFragment {
 
+    private List<Schedule> mSchedules;
+
+    @InjectView(R.id.grid)
+    private GridLayout mGridLayout;
+    @InjectView(R.id.add_schedule)
+    private View mAddSchedule;
+
+    @Inject
+    private ScheduleManager mManager;
 
     public static SchedulesFragment newInstance() {
-        
-        Bundle args = new Bundle();
-        
-        SchedulesFragment fragment = new SchedulesFragment();
-        fragment.setArguments(args);
-        return fragment;
+        return new SchedulesFragment();
     }
 
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_schedules, container, false);
     }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mAddSchedule.setOnClickListener(v -> CreateScheduleActivity.start(getActivity()));
+        loadSchedules();
+    }
+
+    private void loadSchedules() {
+        this.mSchedules = mManager.getAll();
+        if (!mSchedules.isEmpty()) {
+            this.mGridLayout.removeAllViews();
+            for (Schedule schedule : mSchedules) {
+                View cardView = inflate(R.layout.schedule_card_layout, mGridLayout, false);
+
+                TextView name = (TextView) cardView.findViewById(R.id.name);
+                TextView door = (TextView) cardView.findViewById(R.id.door);
+                TextView openAt = (TextView) cardView.findViewById(R.id.open_at);
+                TextView closeAt = (TextView) cardView.findViewById(R.id.close_at);
+                TextView repeat = (TextView) cardView.findViewById(R.id.repeat);
+
+                name.setText(schedule.getName());
+                StringBuilder sb = new StringBuilder();
+                for (Integer doorId : schedule.getDoors()) {
+                    if (sb.length() > 0) sb.append(", ");
+                    sb.append(Door.getInstance(doorId).getName());
+                }
+                door.setText(sb.toString());
+
+                cardView.findViewById(R.id.imageview_menu).setOnClickListener(v -> {
+                    PopupMenu popupMenu = new PopupMenu(getBaseActivity(), v);
+                    popupMenu.inflate(R.menu.actions);
+                    popupMenu.setOnMenuItemClickListener(item -> {
+                        handlePopMenu(item, schedule);
+                        return true;
+                    });
+                    popupMenu.show();
+                });
+                addViewToGrid(this.mGridLayout, cardView);
+            }
+        } else {
+            View emptyView = LayoutInflater.from(getBaseActivity()).inflate(R.layout.empty_layout, null, false);
+            TextView textView = (TextView) emptyView.findViewById(R.id.textview_empty);
+            textView.setText(R.string.empty_schedules);
+            mGridLayout.removeAllViews();
+            addViewToGrid(mGridLayout, emptyView);
+        }
+    }
+
+    private void handlePopMenu(MenuItem item, Schedule schedule) {
+        switch (item.getItemId()) {
+            case R.id.action_delete:
+                mManager.delete(schedule);
+                loadSchedules();
+                break;
+            case R.id.action_edit:
+                CreateScheduleActivity.start(getActivity(), schedule);
+                break;
+        }
+    }
+
+    private void addViewToGrid(GridLayout gridLayout, View view) {
+        GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
+        layoutParams.rowSpec = GridLayout.spec(1, Float.valueOf("1.0"));
+        layoutParams.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, Float.valueOf("1.0"));
+        view.setLayoutParams(layoutParams);
+        gridLayout.addView(view);
+    }
 
     @Override
     public boolean showHomeIcon() {

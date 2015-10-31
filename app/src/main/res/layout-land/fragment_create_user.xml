@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
@@ -36,7 +35,7 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
 
-                    <android.support.v7.widget.AppCompatEditText
+                    <EditText
                         android:id="@+id/edittext_name"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -45,10 +44,9 @@
                         android:focusableInTouchMode="true"
                         android:hint="@string/name_label"
                         android:maxLines="1"
-                        android:singleLine="true"
-                        app:backgroundTint="@color/red"/>
+                        android:singleLine="true"/>
 
-                    <android.support.v7.widget.AppCompatCheckBox
+                    <CheckBox
                         android:id="@+id/checkbox_password"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -60,8 +58,7 @@
                         android:text="@string/require_password_label"
                         android:textColor="@color/text_color_bold"
                         android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:buttonTint="@color/red"/>
+                        android:textStyle="bold"/>
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -77,18 +74,16 @@
                             android:textAppearance="?android:attr/textAppearanceSmall"
                             android:textColor="@color/text_color_pass"/>
 
-                        <android.support.v7.widget.AppCompatEditText
+                        <EditText
                             android:id="@+id/edittext_password"
                             android:layout_width="80dp"
                             android:layout_height="wrap_content"
                             android:inputType="number"
-                            android:maxLength="4"
-                            app:backgroundTint="@color/red"/>
+                            android:maxLength="4"/>
 
                     </LinearLayout>
 
-
-                    <android.support.v7.widget.AppCompatCheckBox
+                    <CheckBox
                         android:id="@+id/checkbox_time_limits"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -100,8 +95,7 @@
                         android:text="@string/time_limits_label"
                         android:textColor="@color/text_color_bold"
                         android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:buttonTint="@color/red"/>
+                        android:textStyle="bold"/>
 
                 </LinearLayout>
 
@@ -111,17 +105,16 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
 
-                    <android.support.v7.widget.AppCompatEditText
+                    <EditText
                         android:id="@+id/edittext_phone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/phone_label"
                         android:inputType="number"
                         android:maxLines="1"
-                        android:singleLine="true"
-                        app:backgroundTint="@color/red"/>
+                        android:singleLine="true"/>
 
-                    <android.support.v7.widget.AppCompatCheckBox
+                    <CheckBox
                         android:id="@+id/checkbox_notify"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -129,10 +122,9 @@
                         android:text="@string/notify_door_activity_label"
                         android:textColor="@color/text_color_bold"
                         android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:buttonTint="@color/red"/>
+                        android:textStyle="bold"/>
 
-                    <android.support.v7.widget.AppCompatSpinner
+                    <Spinner
                         android:id="@+id/spinner_door_event"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -140,13 +132,10 @@
                         android:minWidth="100dp"
                         android:spinnerMode="dropdown"/>
                 </LinearLayout>
-
             </LinearLayout>
 
             <include layout="@layout/schedule_layout"/>
-
         </LinearLayout>
-
     </ScrollView>
 
     <android.support.v4.widget.Space
