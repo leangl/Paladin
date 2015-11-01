@@ -55,9 +55,35 @@ public class SchedulesFragment extends BaseFragment {
     }
 
     private void loadSchedules() {
+        this.mGridLayout.removeAllViews();
+
+        View autoCloseCard = inflate(R.layout.autoclose_card_layout, mGridLayout, false);
+        ((TextView) autoCloseCard.findViewById(R.id.after_open)).setText(Door.getAutoCloseTimer() + " millis");
+        autoCloseCard.findViewById(R.id.imageview_menu).setOnClickListener(v -> {
+            PopupMenu popupMenu = new PopupMenu(getBaseActivity(), v);
+            popupMenu.inflate(R.menu.autoclose);
+            popupMenu.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case R.id.action_edit:
+                        toast("EDIT");
+                        break;
+                    case R.id.action_enable:
+                        Door.enableAutoClose();
+                        break;
+                    case R.id.action_disable:
+                        Door.disableAutoClose();
+                        break;
+                }
+                return true;
+            });
+            popupMenu.getMenu().findItem(R.id.action_enable).setVisible(!Door.isAutoCloseEnabled());
+            popupMenu.getMenu().findItem(R.id.action_disable).setVisible(Door.isAutoCloseEnabled());
+            popupMenu.show();
+        });
+        addViewToGrid(this.mGridLayout, autoCloseCard);
+
         this.mSchedules = mManager.getAll();
         if (!mSchedules.isEmpty()) {
-            this.mGridLayout.removeAllViews();
             for (Schedule schedule : mSchedules) {
                 View cardView = inflate(R.layout.schedule_card_layout, mGridLayout, false);
 
@@ -75,6 +101,8 @@ public class SchedulesFragment extends BaseFragment {
                 }
                 door.setText(sb.toString());
 
+                repeat.setText(schedule.getRepeat().toString());
+
                 cardView.findViewById(R.id.imageview_menu).setOnClickListener(v -> {
                     PopupMenu popupMenu = new PopupMenu(getBaseActivity(), v);
                     popupMenu.inflate(R.menu.actions);
@@ -90,7 +118,6 @@ public class SchedulesFragment extends BaseFragment {
             View emptyView = LayoutInflater.from(getBaseActivity()).inflate(R.layout.empty_layout, null, false);
             TextView textView = (TextView) emptyView.findViewById(R.id.textview_empty);
             textView.setText(R.string.empty_schedules);
-            mGridLayout.removeAllViews();
             addViewToGrid(mGridLayout, emptyView);
         }
     }

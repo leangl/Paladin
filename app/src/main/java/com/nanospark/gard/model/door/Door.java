@@ -18,6 +18,8 @@ import com.nanospark.gard.model.user.User;
 import com.nanospark.gard.sms.SmsManager;
 import com.squareup.otto.Subscribe;
 
+import java.util.concurrent.TimeUnit;
+
 import ioio.lib.api.DigitalInput;
 import ioio.lib.api.DigitalOutput;
 import ioio.lib.api.IOIO;
@@ -75,12 +77,52 @@ public class Door {
         throw new IllegalArgumentException("No door with id " + id);
     }
 
-    public static void setAutoCloseTimer(int millis) {
-        sAutoCloseMillis = millis;
+    public static void setAutoCloseTimer(long millis) {
+        AutoCloseConfig config = getAutoCloseConfig();
+        config.millis = millis;
+        persist(config);
     }
 
-    public static int getAutoCloseTimer() {
-        return sAutoCloseMillis;
+    public static long getAutoCloseTimer() {
+        return getAutoCloseConfig().millis;
+    }
+
+    public static void enableAutoClose() {
+        AutoCloseConfig config = getAutoCloseConfig();
+        config.enabled = true;
+        persist(config);
+    }
+
+    public static void disableAutoClose() {
+        AutoCloseConfig config = getAutoCloseConfig();
+        config.enabled = false;
+        persist(config);
+    }
+
+    public static boolean isAutoCloseEnabled() {
+        return getAutoCloseConfig().enabled;
+    }
+
+    private static AutoCloseConfig getAutoCloseConfig() {
+        if (sAutoCloseConfig == null) {
+            sAutoCloseConfig = DataStore.getInstance().getObject(AutoCloseConfig.class.getSimpleName(), AutoCloseConfig.class).get();
+            if (sAutoCloseConfig == null) {
+                sAutoCloseConfig = new AutoCloseConfig();
+            }
+        }
+        return sAutoCloseConfig;
+    }
+
+    public static void persist(AutoCloseConfig config) {
+        DataStore.getInstance().putObject(AutoCloseConfig.class.getSimpleName(), config);
+    }
+
+    public static AutoCloseConfig sAutoCloseConfig;
+
+    public static class AutoCloseConfig {
+        public long millis = TimeUnit.MINUTES.toMillis(10);
+        public TimeUnit timeUnit = TimeUnit.MINUTES;
+        public boolean enabled = false;
     }
 
     public static final Door[] getDoors() {

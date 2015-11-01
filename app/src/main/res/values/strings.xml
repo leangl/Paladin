@@ -65,6 +65,8 @@
     <string name="notify.close">Close</string>
     <string name="notify.all">All</string>
     <string name="notify.none">None</string>
+    <string name="repeat.daily">Daily</string>
+    <string name="repeat.weekly">Weekly</string>
 
     <string name="limit.forever">Forever</string>
     <string name="limit.date">Date</string>

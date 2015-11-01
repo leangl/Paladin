@@ -1,9 +1,13 @@
 package com.nanospark.gard.model.scheduler;
 
+import com.nanospark.gard.model.Day;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import mobi.tattu.utils.ResourceUtils;
 
 /**
  * Created by Leandro on 29/10/2015.
@@ -18,6 +22,8 @@ public class Schedule implements Serializable, Comparable<Schedule> {
     private Integer openMinute;
     private Integer closeHour;
     private Integer closeMinute;
+    private Repeat repeat = Repeat.DAILY;
+    private List<Day> days;
 
     public Schedule() {
         this.id = UUID.randomUUID().toString();
@@ -73,6 +79,19 @@ public class Schedule implements Serializable, Comparable<Schedule> {
         this.openMinute = openMinute;
     }
 
+    public List<Day> getDays() {
+        return days;
+    }
+    public void setDays(List<Day> days) {
+        this.days = days;
+    }
+    public Repeat getRepeat() {
+        return repeat;
+    }
+    public void setRepeat(Repeat repeat) {
+        this.repeat = repeat;
+    }
+
     public boolean isOpenTimeSet() {
         return openMinute != null && openHour != null;
     }
@@ -100,5 +119,14 @@ public class Schedule implements Serializable, Comparable<Schedule> {
     @Override
     public int compareTo(Schedule another) {
         return this.createDate.compareTo(another.createDate);
+    }
+
+    public enum Repeat {
+        DAILY, WEEKLY;
+
+        @Override
+        public String toString() {
+            return ResourceUtils.toString(this);
+        }
     }
 }
