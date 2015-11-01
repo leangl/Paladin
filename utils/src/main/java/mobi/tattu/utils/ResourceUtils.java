@@ -31,7 +31,7 @@ public class ResourceUtils {
     }
 
     public static String toString(Enum<?> e) {
-        return ResourceUtils.stringByName(e.getClass().getSimpleName().toLowerCase() + "." + e.name().toLowerCase());
+        return ResourceUtils.stringByName(e.getDeclaringClass().getSimpleName().toLowerCase() + "." + e.name().toLowerCase());
     }
 
 }

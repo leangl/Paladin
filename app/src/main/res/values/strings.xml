@@ -67,7 +67,6 @@
     <string name="notify.none">None</string>
     <string name="repeat.daily">Daily</string>
     <string name="repeat.weekly">Weekly</string>
-
     <string name="limit.forever">Forever</string>
     <string name="limit.date">Date</string>
     <string name="limit.events">Number of events</string>

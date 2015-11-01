@@ -21,6 +21,7 @@ import com.nanospark.gard.ui.custom.BaseFragment;
 
 import java.util.List;
 
+import mobi.tattu.utils.ResourceUtils;
 import roboguice.inject.InjectView;
 
 /**
@@ -58,7 +59,8 @@ public class SchedulesFragment extends BaseFragment {
         this.mGridLayout.removeAllViews();
 
         View autoCloseCard = inflate(R.layout.autoclose_card_layout, mGridLayout, false);
-        ((TextView) autoCloseCard.findViewById(R.id.after_open)).setText(Door.getAutoCloseTimer() + " millis");
+        ((TextView) autoCloseCard.findViewById(R.id.enabled)).setText(Door.isAutoCloseEnabled() ? R.string.enabled : R.string.disabled);
+        ((TextView) autoCloseCard.findViewById(R.id.after_open)).setText(Door.getAutoCloseValue() + " " + ResourceUtils.toString(Door.getAutoCloseUnit()).toLowerCase());
         autoCloseCard.findViewById(R.id.imageview_menu).setOnClickListener(v -> {
             PopupMenu popupMenu = new PopupMenu(getBaseActivity(), v);
             popupMenu.inflate(R.menu.autoclose);
@@ -69,9 +71,11 @@ public class SchedulesFragment extends BaseFragment {
                         break;
                     case R.id.action_enable:
                         Door.enableAutoClose();
+                        loadSchedules();
                         break;
                     case R.id.action_disable:
                         Door.disableAutoClose();
+                        loadSchedules();
                         break;
                 }
                 return true;

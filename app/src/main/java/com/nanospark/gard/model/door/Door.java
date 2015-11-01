@@ -35,8 +35,6 @@ import roboguice.RoboGuice;
  */
 public class Door {
 
-    private static int sAutoCloseMillis = 0;
-
     private State state = State.UNKNOWN;
     private int id;
     private int inputPinNumber;
@@ -77,14 +75,19 @@ public class Door {
         throw new IllegalArgumentException("No door with id " + id);
     }
 
-    public static void setAutoCloseTimer(long millis) {
+    public static void setAutoClose(TimeUnit unit, long value) {
         AutoCloseConfig config = getAutoCloseConfig();
-        config.millis = millis;
+        config.unit = unit;
+        config.value = value;
         persist(config);
     }
 
-    public static long getAutoCloseTimer() {
-        return getAutoCloseConfig().millis;
+    public static TimeUnit getAutoCloseUnit() {
+        return getAutoCloseConfig().unit;
+    }
+
+    public static long getAutoCloseValue() {
+        return getAutoCloseConfig().value;
     }
 
     public static void enableAutoClose() {
@@ -120,8 +123,8 @@ public class Door {
     public static AutoCloseConfig sAutoCloseConfig;
 
     public static class AutoCloseConfig {
-        public long millis = TimeUnit.MINUTES.toMillis(10);
-        public TimeUnit timeUnit = TimeUnit.MINUTES;
+        public TimeUnit unit = TimeUnit.MINUTES;
+        public long value = 10;
         public boolean enabled = false;
     }
 
@@ -142,6 +145,8 @@ public class Door {
     }
 
     private void startAutoClose() {
+        if (!this.isAutoCloseEnabled()) return;
+
         long startTime = System.currentTimeMillis();
         mAutoCloseHandler.removeCallbacksAndMessages(null);
         mAutoCloseHandler.postDelayed(new Runnable() {
@@ -159,7 +164,7 @@ public class Door {
                     }
                 }
             }
-        }, sAutoCloseMillis + 10000);
+        }, this.getAutoCloseUnit().toMillis(this.getAutoCloseValue()) + 10000); // as per wireframe: Wait {Auto-Close Interval} + 10s
     }
 
     @Subscribe

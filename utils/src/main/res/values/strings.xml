@@ -4,9 +4,22 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="ok">Ok</string>
+    <string name="accept">Accept</string>
     <string name="cancel">Cancel</string>
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
     <string name="loading">Loading...</string>
     <string name="no_location">Cannot obtain your position</string>
     <string name="open_drawer">Open menu</string>
     <string name="close_drawer">Close menu</string>
+    <string name="timeunit.microseconds">Microseconds</string>
+    <string name="timeunit.nanoseconds">Nanoseconds</string>
+    <string name="timeunit.milliseconds">Milliseconds</string>
+    <string name="timeunit.seconds">Seconds</string>
+    <string name="timeunit.minutes">Minutes</string>
+    <string name="timeunit.hours">Hours</string>
+    <string name="timeunit.days">Days</string>
+
 </resources>
