@@ -43,6 +43,16 @@ public class SimpleTextWatcher implements TextWatcher {
         if (after != null) after.afterTextChanged(s);
     }
 
+    public void setAfter(AfterTextChanged after) {
+        this.after = after;
+    }
+    public void setBefore(BeforeTextChanged before) {
+        this.before = before;
+    }
+    public void setChanged(TextChanged changed) {
+        this.changed = changed;
+    }
+
     public interface BeforeTextChanged {
         void beforeTextChanged(int start, int count, int after, CharSequence s);
     }

@@ -2,7 +2,6 @@ package com.nanospark.gard.ui.fragments;
 
 import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.text.InputType;
@@ -244,12 +243,10 @@ public class CreateUserFragment extends BaseFragment {
                 mTimelimitsCheckBox.setChecked(true);
 
                 if (controlSchedule.isStartTimeSet()) {
-                    Calendar calendarStart = createCalendarTime(controlSchedule.getStartHour(), controlSchedule.getStartMinute());
-                    mTimeStartTextView.setText(Utils.getHour(calendarStart));
+                    mTimeStartTextView.setText(Utils.getHour(controlSchedule.getStartHour(), controlSchedule.getStartMinute()));
                 }
                 if (controlSchedule.isEndTimeSet()) {
-                    Calendar calendarEnd = createCalendarTime(controlSchedule.getEndHour(), controlSchedule.getEndMinute());
-                    mTimeEndTextView.setText(Utils.getHour(calendarEnd));
+                    mTimeEndTextView.setText(Utils.getHour(controlSchedule.getEndHour(), controlSchedule.getEndMinute()));
                 }
 
                 if (controlSchedule.isStartDateSet()) {
@@ -349,7 +346,7 @@ public class CreateUserFragment extends BaseFragment {
 
     @Subscribe
     public void on(TimerPickerSelected timerPickerSelected) {
-        Calendar calendar = createCalendarTime(timerPickerSelected.hourOfDay, timerPickerSelected.minute);
+        Calendar calendar = Utils.createCalendarTime(timerPickerSelected.hourOfDay, timerPickerSelected.minute);
         if (timerPickerSelected.id == R.id.textview_start_time) {
             mControlSchedule.setStartHour(timerPickerSelected.hourOfDay);
             mControlSchedule.setStartMinute(timerPickerSelected.minute);
@@ -360,16 +357,6 @@ public class CreateUserFragment extends BaseFragment {
             mControlSchedule.setEndMinute(timerPickerSelected.minute);
             mTimeEndTextView.setText(Utils.getHour(calendar));
         }
-    }
-
-    @NonNull
-    private Calendar createCalendarTime(int hour, int minute) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return calendar;
     }
 
     @Subscribe
@@ -479,7 +466,7 @@ public class CreateUserFragment extends BaseFragment {
             try {
                 mControlSchedule.setLimitEvents(Integer.parseInt(mDateEventEditText.getText().toString()));
             } catch (Exception e) {
-                ToastManager.get().showToast("Number of Events is not a valid number");
+                toast("Number of Events is not a valid number");
                 return false;
             }
         }

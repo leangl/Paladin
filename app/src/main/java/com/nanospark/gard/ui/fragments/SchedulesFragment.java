@@ -2,34 +2,40 @@ package com.nanospark.gard.ui.fragments;
 
 
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayout;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.inject.Inject;
 import com.nanospark.gard.R;
+import com.nanospark.gard.Utils;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.scheduler.Schedule;
 import com.nanospark.gard.model.scheduler.ScheduleManager;
 import com.nanospark.gard.ui.activity.CreateScheduleActivity;
 import com.nanospark.gard.ui.custom.BaseFragment;
 
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import mobi.tattu.utils.EnumWrapper;
 import mobi.tattu.utils.ResourceUtils;
+import mobi.tattu.utils.StringUtils;
 import roboguice.inject.InjectView;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class SchedulesFragment extends BaseFragment {
-
-    private List<Schedule> mSchedules;
 
     @InjectView(R.id.grid)
     private GridLayout mGridLayout;
@@ -67,7 +73,7 @@ public class SchedulesFragment extends BaseFragment {
             popupMenu.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
                     case R.id.action_edit:
-                        toast("EDIT");
+                        editAutoclose();
                         break;
                     case R.id.action_enable:
                         Door.enableAutoClose();
@@ -86,43 +92,41 @@ public class SchedulesFragment extends BaseFragment {
         });
         addViewToGrid(this.mGridLayout, autoCloseCard);
 
-        this.mSchedules = mManager.getAll();
-        if (!mSchedules.isEmpty()) {
-            for (Schedule schedule : mSchedules) {
-                View cardView = inflate(R.layout.schedule_card_layout, mGridLayout, false);
+        for (Schedule schedule : mManager.getAll()) {
+            View cardView = inflate(R.layout.schedule_card_layout, mGridLayout, false);
 
-                TextView name = (TextView) cardView.findViewById(R.id.name);
-                TextView door = (TextView) cardView.findViewById(R.id.door);
-                TextView openAt = (TextView) cardView.findViewById(R.id.open_at);
-                TextView closeAt = (TextView) cardView.findViewById(R.id.close_at);
-                TextView repeat = (TextView) cardView.findViewById(R.id.repeat);
+            TextView name = (TextView) cardView.findViewById(R.id.name);
+            TextView door = (TextView) cardView.findViewById(R.id.door);
+            TextView openAt = (TextView) cardView.findViewById(R.id.open_at);
+            TextView closeAt = (TextView) cardView.findViewById(R.id.close_at);
+            TextView repeat = (TextView) cardView.findViewById(R.id.repeat);
 
-                name.setText(schedule.getName());
-                StringBuilder sb = new StringBuilder();
-                for (Integer doorId : schedule.getDoors()) {
-                    if (sb.length() > 0) sb.append(", ");
-                    sb.append(Door.getInstance(doorId).getName());
-                }
-                door.setText(sb.toString());
-
-                repeat.setText(schedule.getRepeat().toString());
-
-                cardView.findViewById(R.id.imageview_menu).setOnClickListener(v -> {
-                    PopupMenu popupMenu = new PopupMenu(getBaseActivity(), v);
-                    popupMenu.inflate(R.menu.actions);
-                    popupMenu.setOnMenuItemClickListener(item -> {
-                        handlePopMenu(item, schedule);
-                        return true;
-                    });
-                    popupMenu.show();
-                });
-                addViewToGrid(this.mGridLayout, cardView);
+            name.setText(schedule.getName());
+            StringBuilder sb = new StringBuilder();
+            for (Integer doorId : schedule.getDoors()) {
+                if (sb.length() > 0) sb.append(", ");
+                sb.append(Door.getInstance(doorId).getName());
             }
-        } else {
-            View emptyView = LayoutInflater.from(getBaseActivity()).inflate(R.layout.empty_layout, null, false);
-            TextView textView = (TextView) emptyView.findViewById(R.id.textview_empty);
-            textView.setText(R.string.empty_schedules);
-            addViewToGrid(mGridLayout, emptyView);
+            door.setText(sb.toString());
+
+            if (schedule.isOpenTimeSet())
+                openAt.setText(Utils.getHour(schedule.getOpenHour(), schedule.getOpenMinute()));
+
+            if (schedule.isCloseTimeSet())
+                closeAt.setText(Utils.getHour(schedule.getCloseHour(), schedule.getCloseMinute()));
+
+            repeat.setText(schedule.getRepeat().toString());
+
+            cardView.findViewById(R.id.imageview_menu).setOnClickListener(v -> {
+                PopupMenu popupMenu = new PopupMenu(getBaseActivity(), v);
+                popupMenu.inflate(R.menu.actions);
+                popupMenu.setOnMenuItemClickListener(item -> {
+                    handlePopMenu(item, schedule);
+                    return true;
+                });
+                popupMenu.show();
+            });
+            addViewToGrid(this.mGridLayout, cardView);
         }
     }
 
@@ -155,5 +159,41 @@ public class SchedulesFragment extends BaseFragment {
     @Override
     public boolean showHomeIcon() {
         return false;
+    }
+
+    public void editAutoclose() {
+        View content = inflate(R.layout.autoclose_edit, null, false);
+        EditText valueView = (EditText) content.findViewById(R.id.value);
+        Spinner unitsView = (Spinner) content.findViewById(R.id.unit);
+
+        ArrayAdapter<EnumWrapper<TimeUnit>> adapter = new ArrayAdapter<>(getBaseActivity(),
+                android.R.layout.simple_dropdown_item_1line,
+                EnumWrapper.wrap(TimeUnit.MINUTES, TimeUnit.HOURS));
+        unitsView.setAdapter(adapter);
+
+        valueView.setText(Door.getAutoCloseValue() + "");
+        unitsView.setSelection(adapter.getPosition(new EnumWrapper(Door.getAutoCloseUnit())));
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                .setTitle("Set Auto-Close Interval")
+                .setPositiveButton(R.string.accept, (dialog, whichButton) -> {
+                })
+                .setNegativeButton(R.string.cancel, (dialog, whichButton) -> {
+                })
+                .setView(content);
+
+        AlertDialog dialog = builder.show();
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
+            if (StringUtils.isBlank(valueView.getText())) {
+                toast("Please enter a value");
+                return;
+            }
+            long value = Long.parseLong(valueView.getText().toString());
+            TimeUnit unit = adapter.getItem(unitsView.getSelectedItemPosition()).value;
+            Door.setAutoClose(unit, value);
+            loadSchedules();
+
+            dialog.dismiss();
+        });
     }
 }

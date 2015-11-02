@@ -42,30 +42,65 @@ public class ToastManager {
         groups = new SparseArray<>();
     }
 
-    public ToastReference showToast(int toastText, int groupId) {
-        return showToast(Tattu.context.getString(toastText), groupId);
+    public static ToastReference show(int toastText, int groupId) {
+        return get().showToast(toastText, groupId);
     }
 
+    public static ToastReference show(String toastText) {
+        return get().showToast(toastText);
+    }
+
+    public static ToastReference show(String toastText, int groupId) {
+        return get().showToast(toastText, groupId);
+    }
+
+    public static ToastReference show(int toastText) {
+        return get().showToast(toastText);
+    }
+
+    public static ToastReference show(int toastText, long duration) {
+        return get().showToast(toastText, duration);
+    }
+
+    public static ToastReference show(int toastText, long duration, int groupId) {
+        return get().showToast(toastText, duration, groupId);
+    }
+
+    public static ToastReference show(final String toastText, final long duration, int groupId) {
+        return get().showToast(toastText, duration, groupId);
+    }
+
+    @Deprecated
+    public ToastReference showToast(int toastText, int groupId) {
+        return this.showToast(Tattu.context.getString(toastText), groupId);
+    }
+
+    @Deprecated
     public ToastReference showToast(String toastText) {
         return showToast(toastText, NOT_GROUPED);
     }
 
+    @Deprecated
     public ToastReference showToast(String toastText, int groupId) {
         return showToast(toastText, SHORT_DURATION, groupId);
     }
 
+    @Deprecated
     public ToastReference showToast(int toastText) {
         return showToast(Tattu.context.getString(toastText), toastText);
     }
 
+    @Deprecated
     public ToastReference showToast(int toastText, long duration) {
         return showToast(Tattu.context.getString(toastText), duration, toastText);
     }
 
+    @Deprecated
     public ToastReference showToast(int toastText, long duration, int groupId) {
         return showToast(Tattu.context.getString(toastText), duration, groupId);
     }
 
+    @Deprecated
     public ToastReference showToast(final String toastText, final long duration, int groupId) {
 
         final ToastReference reference = new ToastReference();

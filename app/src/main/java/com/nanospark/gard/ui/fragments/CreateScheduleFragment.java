@@ -20,7 +20,6 @@ import com.nanospark.gard.ui.custom.TimerPickerFragment;
 import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import mobi.tattu.utils.StringUtils;
@@ -77,9 +76,9 @@ public class CreateScheduleFragment extends BaseFragment {
         if (mSchedule.getDoors().contains(2)) mDoor2.setChecked(true);
 
         if (mSchedule.isOpenTimeSet())
-            mOpen.setText(Utils.getHour(createCalendarTime(mSchedule.getOpenHour(), mSchedule.getOpenMinute())));
+            mOpen.setText(Utils.getHour(mSchedule.getOpenHour(), mSchedule.getOpenMinute()));
         if (mSchedule.isCloseTimeSet())
-            mClose.setText(Utils.getHour(createCalendarTime(mSchedule.getCloseHour(), mSchedule.getCloseMinute())));
+            mClose.setText(Utils.getHour(mSchedule.getCloseHour(), mSchedule.getCloseMinute()));
 
         mOpen.setOnClickListener(v -> {
             showTimerPicker(v.getId());
@@ -101,25 +100,15 @@ public class CreateScheduleFragment extends BaseFragment {
 
     @Subscribe
     public void on(TimerPickerSelected event) {
-        Calendar calendar = createCalendarTime(event.hourOfDay, event.minute);
         if (event.id == mOpen.getId()) {
             mSchedule.setOpenHour(event.hourOfDay);
             mSchedule.setOpenMinute(event.minute);
-            mOpen.setText(Utils.getHour(calendar));
+            mOpen.setText(Utils.getHour(event.hourOfDay, event.minute));
         } else {
             mSchedule.setCloseHour(event.hourOfDay);
             mSchedule.setCloseMinute(event.minute);
-            mClose.setText(Utils.getHour(calendar));
+            mClose.setText(Utils.getHour(event.hourOfDay, event.minute));
         }
-    }
-
-    private Calendar createCalendarTime(int hour, int minute) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return calendar;
     }
 
     public boolean save() {

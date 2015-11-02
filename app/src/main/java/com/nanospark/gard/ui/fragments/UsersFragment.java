@@ -20,7 +20,6 @@ import com.nanospark.gard.model.user.UserManager;
 import com.nanospark.gard.ui.activity.CreateUserActivity;
 import com.nanospark.gard.ui.custom.BaseFragment;
 
-import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -119,12 +118,6 @@ public class UsersFragment extends BaseFragment {
         }
     }
 
-    private Calendar getCalendarHour(int hour, int minute) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        return calendar;
-    }
     private void showCreateUser() {
         startActivity(new Intent(getBaseActivity(), CreateUserActivity.class));
     }

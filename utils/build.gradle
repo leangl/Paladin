@@ -40,7 +40,6 @@ dependencies {
     compile 'com.google.android.gms:play-services-gcm:7.+'
     compile 'com.google.android.gms:play-services-location:7.+'
     compile 'com.google.android.gms:play-services-analytics:7.+'
-
     compile 'ch.acra:acra:4.6.+'
     compile 'com.squareup.retrofit:retrofit:1.9.+'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.+'

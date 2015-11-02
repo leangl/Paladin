@@ -158,7 +158,7 @@ public class User implements Serializable {
     }
 
     public String getHourRangeString() {
-        if (getSchedule() == null) return GarD.instance.getString(R.string.not_available_label);
+        if (getSchedule() == null) return GarD.instance.getString(R.string.not_available);
         return getSchedule().getHourRangeString();
     }
 

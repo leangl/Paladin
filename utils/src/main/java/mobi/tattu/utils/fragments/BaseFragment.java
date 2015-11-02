@@ -172,6 +172,10 @@ public class BaseFragment extends RoboFragment implements BaseActivity.OnBackLis
         getBaseActivity().toast(message);
     }
 
+    public void toast(Throwable error) {
+        toast(error != null ? error.getMessage() : "Error");
+    }
+	
     public <T extends View> T inflate(int resource, ViewGroup root, boolean attachToRoot) {
         return (T) LayoutInflater.from(getActivity()).inflate(resource, root, attachToRoot);
     }
