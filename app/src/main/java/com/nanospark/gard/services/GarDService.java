@@ -122,10 +122,11 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
 
     private void startIOIO() {
         stopIOIO();
-
-        ioioHelper = new IOIOAndroidApplicationHelper(this, this);
-        ioioHelper.create();
-        ioioHelper.start();
+        Tattu.runOnUiThread(() -> {
+            ioioHelper = new IOIOAndroidApplicationHelper(this, this);
+            ioioHelper.create();
+            ioioHelper.start();
+        }, 3000);
     }
 
     private void stopIOIO() {

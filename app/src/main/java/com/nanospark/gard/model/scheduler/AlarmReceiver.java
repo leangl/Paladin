@@ -5,14 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 
 import ioio.lib.spi.Log;
-import mobi.tattu.utils.persistance.datastore.DataStore;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
     public static final String ACTION = "alarm_fired";
 
     public static final String KEY_EXTRA_NAME = "extra_name";
-    //public static final String KEY_EXTRA_TIMESTAMP = "extra_timestamp";
 
     public AlarmReceiver() {
     }
@@ -20,7 +18,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String key = intent.getStringExtra(KEY_EXTRA_NAME);
-        ScheduleOld schedule = DataStore.getInstance().getObject(key, ScheduleOld.class).get();
+        Schedule schedule = ScheduleManager.getInstance().getSchedule(key);
         if (schedule != null) {
             if (schedule.trigger()) {
                 Log.i("Scheduler", "Schedule triggered: " + schedule);

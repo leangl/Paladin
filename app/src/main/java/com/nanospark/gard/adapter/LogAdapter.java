@@ -25,10 +25,8 @@ import mobi.tattu.utils.StringUtils;
  */
 public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
 
-
     private Context mContext;
     private List<Log> mLogArrayList;
-    private TextView mSubTitleTextView;
     private Calendar mCalendarOpen;
 
     public LogAdapter(List<Log> logArrayList) {
@@ -53,30 +51,34 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
         if (log.getEvent().equals(Log.EVENT_CLOSE)) {
             String uri = "drawable://" + R.drawable.ic_lock_2;
             ImageLoader.getInstance().displayImage(uri, holder.mLockImageView);
-            this.mSubTitleTextView.setText(getOpenedFor(mCalendarOpen, calendarClose));
-            mSubTitleTextView.setVisibility(View.VISIBLE);
+            holder.mSubTitleTextView.setText(getOpenedFor(mCalendarOpen, calendarClose));
+            holder.mSubTitleTextView.setVisibility(View.VISIBLE);
         }
-        mSubTitleTextView = holder.mSubTitleTextView;
+
         if (position == getItemCount() - 1) {
-            mSubTitleTextView.setText(getOpenedFor(mCalendarOpen, calendarClose));
-            mSubTitleTextView.setVisibility(View.VISIBLE);
+            holder.mSubTitleTextView.setText(getOpenedFor(mCalendarOpen, calendarClose));
+            holder.mSubTitleTextView.setVisibility(View.VISIBLE);
         }
+
         StringBuilder builder = getDate(log);
         holder.mTitleTextView.setText(Html.fromHtml(builder.toString()));
 
     }
 
     private String getOpenedFor(Calendar dateOpen, Calendar dateClose) {
+        if (dateOpen == null) return "";
+
         StringBuilder builder = new StringBuilder();
         int hour = diff(dateOpen.get(Calendar.HOUR_OF_DAY), dateClose.get(Calendar.HOUR_OF_DAY));
         int minutes = diff(dateOpen.get(Calendar.MINUTE), dateClose.get(Calendar.MINUTE));
         int seconds = diff(dateOpen.get(Calendar.SECOND), dateClose.get(Calendar.SECOND));
-        builder.append(getString(R.string.opened_for_label));
-        builder.append(StringUtils.SPACE);
-        appendHour(builder, hour, R.string.hours_label);
-        appendHour(builder, minutes, R.string.minutes_label);
-        appendHour(builder, seconds, R.string.seconds_label);
-
+        if (hour > 0 || minutes > 0 || seconds > 0) {
+            builder.append(getString(R.string.opened_for_label));
+            builder.append(StringUtils.SPACE);
+            appendHour(builder, hour, R.string.hours_label);
+            appendHour(builder, minutes, R.string.minutes_label);
+            appendHour(builder, seconds, R.string.seconds_label);
+        }
         return builder.toString();
     }
 
@@ -98,7 +100,7 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(log.getDate());
         mCalendarOpen = calendar;
-        return Utils.getDateLog(calendar,true);
+        return Utils.getDateLog(calendar, true);
     }
 
 

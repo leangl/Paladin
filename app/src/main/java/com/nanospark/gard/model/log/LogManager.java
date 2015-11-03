@@ -56,7 +56,7 @@ public class LogManager {
         for (int i = 0; i < logList.size(); i++) {
             Log log = logList.get(i);
             if (door.getId() == log.getDoorId()) {
-               return log;
+                return log;
             }
         }
         return null;
@@ -81,7 +81,9 @@ public class LogManager {
 
     @Subscribe
     public void on(CommandProcessed event) {
-        mDataStore.putObject(new Log(event));
+        if (event.command != null) {
+            mDataStore.putObject(new Log(event));
+        }
     }
 
 }

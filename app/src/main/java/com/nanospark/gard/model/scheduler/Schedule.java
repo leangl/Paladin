@@ -1,9 +1,12 @@
 package com.nanospark.gard.model.scheduler;
 
 import com.nanospark.gard.model.Day;
+import com.nanospark.gard.model.door.Door;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,7 +26,7 @@ public class Schedule implements Serializable, Comparable<Schedule> {
     private Integer closeHour;
     private Integer closeMinute;
     private Repeat repeat = Repeat.DAILY;
-    private List<Day> days;
+    private List<Day> days = Arrays.asList(Day.values()); // All days by default
 
     public Schedule() {
         this.id = UUID.randomUUID().toString();
@@ -128,5 +131,30 @@ public class Schedule implements Serializable, Comparable<Schedule> {
         public String toString() {
             return ResourceUtils.toString(this);
         }
+    }
+
+
+    public boolean isNow(Integer scheduleHour, Integer scheduleMinute) {
+        if (scheduleHour == null || scheduleMinute == null) return false;
+
+        Calendar calendar = Calendar.getInstance();
+        int day = calendar.get(Calendar.DAY_OF_WEEK);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        return days.contains(Day.fromCalendar(day)) && scheduleHour == hour && scheduleMinute == minute;
+    }
+
+    public boolean trigger() {
+        if (isNow(openHour, openMinute)) {
+            for (Integer doorId : doors) {
+                return Door.getInstance(doorId).send(new Door.Open("Scheduled action taken, door is in motion", false));
+            }
+        } else if (isNow(closeHour, closeMinute)) {
+            for (Integer doorId : doors) {
+                return Door.getInstance(doorId).send(new Door.Close("Scheduled action taken, door is in motion", false));
+            }
+        }
+        return false;
     }
 }

@@ -80,7 +80,7 @@ public class UserManager {
 
     @Subscribe
     public void on(CommandProcessed event) {
-        if (event.command.user != null && event.command.user.getSchedule() != null
+        if (event.command != null && event.command.user != null && event.command.user.getSchedule() != null
                 && Limit.EVENTS.equals(event.command.user.getSchedule())) {
             event.command.user.getSchedule().incrementEvents();
             update(event.command.user);

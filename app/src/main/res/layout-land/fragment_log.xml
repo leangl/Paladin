@@ -3,51 +3,34 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
-        android:scrollbars="vertical"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toLeftOf="@+id/fab_save"
-        android:layout_toRightOf="@+id/fab_save_hide"
-        android:layout_toEndOf="@+id/fab_save_hide" />
+        android:paddingBottom="10dp"
+        android:paddingLeft="80dp"
+        android:paddingRight="80dp"
+        android:paddingTop="10dp"
+        android:scrollbars="vertical"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:src="@drawable/ic_share"
-        app:rippleColor="@color/white"
-        android:layout_gravity="bottom"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        app:elevation="4dp"
-        app:backgroundTint="@color/red"
-        android:layout_marginBottom="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_marginLeft="30dp"
-        android:scaleType="center"/>
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_save_hide"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:src="@drawable/ic_share"
-        app:rippleColor="@color/white"
+        android:layout_alignParentRight="true"
         android:layout_gravity="bottom"
-        app:elevation="4dp"
-        app:backgroundTint="@color/red"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="30dp"
         android:layout_marginBottom="30dp"
-        android:visibility="invisible"
-        android:layout_marginRight="30dp" />
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:clickable="true"
+        android:scaleType="center"
+        android:src="@drawable/ic_share"
+        app:backgroundTint="@color/red"
+        app:elevation="4dp"
+        app:rippleColor="@color/white"/>
 
 </RelativeLayout>

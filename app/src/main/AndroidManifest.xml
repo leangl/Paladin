@@ -50,7 +50,7 @@
                 android:resource="@xml/device_filter"/>
         </activity>
 
-        <activity
+        <!--activity
             android:name=".ui.MainActivity"
             android:label="Paladin Beta"
             android:launchMode="singleTask">
@@ -73,7 +73,7 @@
             <meta-data
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/device_filter"/>
-        </activity>
+        </activity-->
 
         <activity android:name=".ui.activity.LogActivity"/>
 

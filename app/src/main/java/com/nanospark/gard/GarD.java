@@ -7,22 +7,17 @@ import com.nanospark.gard.events.CommandSent;
 import com.nanospark.gard.events.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.log.LogManager;
-import com.nanospark.gard.model.scheduler.ScheduleOld;
-import com.nanospark.gard.model.scheduler.SchedulerWizard;
+import com.nanospark.gard.model.scheduler.ScheduleManager;
 import com.nanospark.gard.model.user.UserManager;
-import com.nanospark.gard.services.GarDService;
 import com.nanospark.gard.sms.SmsManager;
 import com.nanospark.gard.ui.activity.MainActivityNew;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.squareup.otto.Subscribe;
 
-import java.util.Set;
-
 import mobi.tattu.utils.StringUtils;
 import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.ToastManager;
-import mobi.tattu.utils.persistance.datastore.DataStore;
 import roboguice.RoboGuice;
 
 /**
@@ -54,15 +49,10 @@ public class GarD extends Application {
         SmsManager.getInstance();
         LogManager.getInstance();
         UserManager.getInstance();
+        ScheduleManager.getInstance().init();
 
         // Start service as soon as app starts
-        GarDService.start();
-
-        // Start existing schedules
-        Set<ScheduleOld> schedules = DataStore.getInstance().getAll(ScheduleOld.class);
-        for (ScheduleOld schedule : schedules) {
-            SchedulerWizard.initializeAlarm(this, schedule);
-        }
+        //GarDService.start(); FIXME
 
         // Initialize Universal Image Loader
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();

@@ -385,7 +385,9 @@ public class SmsManager {
 
     @Subscribe
     public void on(CommandProcessed event) {
-        sendDoorAlert(event.door.getId() + " is " + event.command.toString(), event.command);
+        if (event.command != null) {
+            sendDoorAlert(event.door.getId() + " is " + event.command.toString(), event.command);
+        }
     }
 
     /**

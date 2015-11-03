@@ -38,7 +38,6 @@ public class LogFragment extends BaseFragment {
     private LogManager mLogManager;
     private List<Log> mLogArrayList;
 
-
     public static LogFragment newInstance() {
         LogFragment fragment = new LogFragment();
         return fragment;
