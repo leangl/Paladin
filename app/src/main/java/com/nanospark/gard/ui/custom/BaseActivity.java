@@ -15,14 +15,13 @@ import android.view.MenuItem;
 import com.google.inject.Inject;
 import com.nanospark.gard.R;
 import com.nanospark.gard.model.log.LogManager;
-import com.nanospark.gard.sms.SmsManager;
 import com.nanospark.gard.ui.activity.LogActivity;
+import com.nanospark.gard.ui.activity.SettingsActivity;
 import com.nanospark.gard.ui.fragments.MainFragment;
 import com.nanospark.gard.ui.fragments.SchedulesFragment;
 import com.nanospark.gard.ui.fragments.SettingsFragment;
 import com.nanospark.gard.ui.fragments.UsersFragment;
 
-import mobi.tattu.utils.DialogUtils;
 import mobi.tattu.utils.ToastManager;
 import mobi.tattu.utils.Utils;
 
@@ -40,12 +39,7 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Esto es para saber si esta en un tablet o un celular
-//        int orientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-//        if(getResources().getBoolean(R.bool.isTablet)){
-//            orientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-//        }
-//        setRequestedOrientation(orientation);
+
         setContentView(getLayout());
         this.mToolbar = (Toolbar) findViewById(R.id.toolbar);
         this.mToolbar.setTitle(R.string.title_toolbar);
@@ -76,7 +70,6 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
         tabLayout.addTab(tabLayout.newTab().setText(R.string.title_users));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.title_schedules));
 
-
         this.mViewPager = (ViewPager) findViewById(R.id.view_pager);
         BasePagerAdapter basePagerAdapter = new BasePagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
         this.mViewPager.setAdapter(basePagerAdapter);
@@ -91,12 +84,10 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
 
     @Override
     public void onTabUnselected(TabLayout.Tab tab) {
-
     }
 
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
-
     }
 
     private class BasePagerAdapter extends FragmentStatePagerAdapter {
@@ -137,11 +128,6 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
         }
     }
 
-
-    /**
-     * @param color del R.color.blue
-     * @return color tomado del resources
-     */
     public int getColorFromResource(int color) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return getResources().getColor(color, getTheme());
@@ -164,14 +150,15 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.settings:
-                DialogUtils.ask(this, "Fake SMS", fakeSmsText -> {
+                /*DialogUtils.ask(this, "Fake SMS", fakeSmsText -> {
                     SmsManager.fakeSms = fakeSmsText;
                     return true;
-                });
+                });*/
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case R.id.action_log:
                 if (mLogManager.getLogs().isEmpty()) {
-                    ToastManager.get().showToast(R.string.no_record_msg);
+                    ToastManager.show(R.string.no_record_msg);
                 } else {
                     startActivity(new Intent(this, LogActivity.class));
                 }

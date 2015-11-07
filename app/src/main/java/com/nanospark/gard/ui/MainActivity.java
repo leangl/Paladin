@@ -18,7 +18,7 @@ import com.google.inject.Inject;
 import com.nanospark.gard.R;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
-import com.nanospark.gard.events.CommandProcessed;
+import com.nanospark.gard.events.DoorStateChanged;
 import com.nanospark.gard.events.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.scheduler.DialogBuilder;
@@ -170,7 +170,7 @@ public class MainActivity extends mobi.tattu.utils.activities.BaseActivity imple
     }
 
     @Subscribe
-    public void on(CommandProcessed event) {
+    public void on(DoorStateChanged event) {
         refresh(mDoorOne);
     }
 

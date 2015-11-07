@@ -9,10 +9,12 @@ import com.nanospark.gard.model.door.Door;
 public class CommandProcessed {
 
     public final Door door;
+    public final Door.State state;
     public final Door.Command command;
 
-    public CommandProcessed(Door door, Door.Command command) {
+    public CommandProcessed(Door door, Door.State state, Door.Command command) {
         this.door = door;
+        this.state = state;
         this.command = command;
     }
 

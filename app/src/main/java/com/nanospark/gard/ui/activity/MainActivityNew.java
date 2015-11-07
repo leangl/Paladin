@@ -69,7 +69,7 @@ public class MainActivityNew extends BaseActivity {
     private void checkBoardConnected(Intent i) {
         if (UsbManager.ACTION_USB_ACCESSORY_ATTACHED.equals(i.getAction())) {
             Tattu.post(new BoardConnected());
-            ToastManager.get().showToast(R.string.board_connected_msg);
+            ToastManager.show(R.string.board_connected_msg);
         }
     }
 
@@ -77,7 +77,7 @@ public class MainActivityNew extends BaseActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Tattu.post(new BoardDisconnected());
-            ToastManager.get().showToast(R.string.board_disconnected_msg);
+            ToastManager.show(R.string.board_disconnected_msg);
         }
     };
 

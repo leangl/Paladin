@@ -284,7 +284,7 @@ public class SmsManager {
             return smsCommand.door.getId() + " is " + smsCommand.door.getState().toString().toLowerCase();
         } else {
             if (smsCommand.is(SmsCommand.OPEN)) {
-                if (smsCommand.door.isOpened()) {
+                if (smsCommand.door.isOpen()) {
                     return "The door is already open.";
                 }
                 smsCommand.door.send(new Door.Open("Message received, door is in motion", false, smsCommand.user));

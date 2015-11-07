@@ -32,9 +32,6 @@ public class VoiceRecognizer implements RecognitionListener {
 
     public static final float DEFAULT_THRESHOLD = 1e-40f;
 
-    private static final String KEY_OPEN = "open";
-    private static final String KEY_CLOSE = "close";
-
     private State currentState = State.STOPPED;
     private SpeechRecognizer recognizer;
     private Door door;
@@ -103,10 +100,10 @@ public class VoiceRecognizer implements RecognitionListener {
 
         // Create keyword-activation search.
         if (StringUtils.isNotBlank(door.getOpenPhrase())) {
-            recognizer.addKeyphraseSearch(KEY_OPEN + door.getId(), door.getOpenPhrase().toLowerCase());
+            recognizer.addKeyphraseSearch(Door.State.OPEN.name() + door.getId(), door.getOpenPhrase().toLowerCase());
         }
         if (StringUtils.isNotBlank(door.getClosePhrase())) {
-            recognizer.addKeyphraseSearch(KEY_CLOSE + door.getId(), door.getClosePhrase().toLowerCase());
+            recognizer.addKeyphraseSearch(Door.State.CLOSED.name() + door.getId(), door.getClosePhrase().toLowerCase());
         }
     }
 
@@ -127,7 +124,7 @@ public class VoiceRecognizer implements RecognitionListener {
     }
 
     @Subscribe
-    public void on(CommandProcessed event) {
+    public void on(DoorStateChanged event) {
         switchPhrase();
     }
 
@@ -186,8 +183,10 @@ public class VoiceRecognizer implements RecognitionListener {
     private void switchPhrase() {
         if (recognizer != null) {
             recognizer.stop();
-            boolean result = recognizer.startListening(door.getState().name() + door.getId());
-            Log.d(TAG, "startListening " + result);
+            if (door.getState() != Door.State.UNKNOWN) {
+                boolean result = recognizer.startListening(door.getState().name() + door.getId());
+                Log.d(TAG, "startListening " + result);
+            }
         }
     }
 

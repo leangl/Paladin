@@ -49,7 +49,6 @@
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/device_filter"/>
         </activity>
-
         <!--activity
             android:name=".ui.MainActivity"
             android:label="Paladin Beta"
@@ -74,8 +73,21 @@
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/device_filter"/>
         </activity-->
-
-        <activity android:name=".ui.activity.LogActivity"/>
+        <activity
+            android:name=".ui.activity.CreateUserActivity"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="adjustPan|adjustResize"/>
+        <activity
+            android:name=".ui.activity.CreateScheduleActivity"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="adjustPan|adjustResize"/>
+        <activity
+            android:name=".ui.activity.SettingsActivity"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="adjustPan|adjustResize"/>
+        <activity
+            android:name=".ui.activity.LogActivity"
+            android:screenOrientation="landscape"/>
 
         <service android:name=".services.GarDService"/>
 
@@ -93,16 +105,6 @@
             android:enabled="true"
             android:exported="true">
         </receiver>
-
-        <activity
-            android:name=".ui.activity.CreateUserActivity"
-            android:screenOrientation="landscape"
-            android:windowSoftInputMode="adjustPan|adjustResize"/>
-
-        <activity
-            android:name=".ui.activity.CreateScheduleActivity"
-            android:screenOrientation="landscape"
-            android:windowSoftInputMode="adjustPan|adjustResize"/>
 
     </application>
 

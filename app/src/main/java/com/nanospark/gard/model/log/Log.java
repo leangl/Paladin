@@ -1,28 +1,30 @@
 package com.nanospark.gard.model.log;
 
-import com.nanospark.gard.events.CommandProcessed;
+import android.text.Html;
+
+import com.nanospark.gard.events.DoorStateChanged;
+import com.nanospark.gard.model.door.Door;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by Leandro on 1/10/2015.
  */
 public class Log implements Serializable {
 
-    public static final String EVENT_OPEN = "open";
-    public static final String EVENT_CLOSE = "close";
-
     private int doorId;
-    private String event;
+    private Door.State event;
     private Date date;
 
     public Log() {
     }
 
-    public Log(CommandProcessed event) {
+    public Log(DoorStateChanged event) {
         this.doorId = event.door.getId();
-        this.event = event.command.isOpen() ? EVENT_OPEN : EVENT_CLOSE;
+        this.event = event.state;
         this.date = new Date();
     }
 
@@ -38,10 +40,10 @@ public class Log implements Serializable {
     public void setDoorId(int doorId) {
         this.doorId = doorId;
     }
-    public String getEvent() {
+    public Door.State getEvent() {
         return event;
     }
-    public void setEvent(String event) {
+    public void setEvent(Door.State event) {
         this.event = event;
     }
 
@@ -63,5 +65,27 @@ public class Log implements Serializable {
         result = 31 * result + event.hashCode();
         result = 31 * result + date.hashCode();
         return result;
+    }
+
+    public String getDateString(boolean withSeparator) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        String dayOfWeek = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US);
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        StringBuilder builder = new StringBuilder();
+
+        if (withSeparator) {
+            builder.append("<b>");
+        }
+        builder.append(dayOfWeek);
+        builder.append(" ");
+        builder.append(dayOfMonth);
+        builder.append(", ");
+        if (withSeparator) {
+            builder.append("</b>");
+        }
+        builder.append(com.nanospark.gard.Utils.getHour(calendar));
+
+        return Html.fromHtml(builder.toString()).toString();
     }
 }

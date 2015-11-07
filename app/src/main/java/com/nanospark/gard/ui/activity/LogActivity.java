@@ -1,6 +1,5 @@
 package com.nanospark.gard.ui.activity;
 
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.Menu;
 
@@ -13,16 +12,9 @@ import com.nanospark.gard.ui.fragments.LogFragment;
  */
 public class LogActivity extends BaseActivity {
 
-
     @Override
     public Fragment getFragment() {
         return LogFragment.newInstance();
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
     }
 
     @Override

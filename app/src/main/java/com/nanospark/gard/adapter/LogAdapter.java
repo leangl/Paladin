@@ -1,9 +1,7 @@
 package com.nanospark.gard.adapter;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,26 +9,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nanospark.gard.R;
-import com.nanospark.gard.Utils;
+import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.log.Log;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
-import java.util.Calendar;
 import java.util.List;
-
-import mobi.tattu.utils.StringUtils;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by cristian on 10/10/15.
  */
 public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
 
+    public static final String SPACE = " ";
+
     private Context mContext;
-    private List<Log> mLogArrayList;
-    private Calendar mCalendarOpen;
+    private List<Log> mLogs;
 
     public LogAdapter(List<Log> logArrayList) {
-        this.mLogArrayList = logArrayList;
+        mLogs = logArrayList;
     }
 
     @Override
@@ -42,52 +38,61 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
         return viewHolder;
     }
 
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Log log = this.mLogArrayList.get(position);
-        Calendar calendarClose = Calendar.getInstance();
-        calendarClose.setTime(log.getDate());
-
-        if (log.getEvent().equals(Log.EVENT_CLOSE)) {
-            String uri = "drawable://" + R.drawable.ic_lock_2;
-            ImageLoader.getInstance().displayImage(uri, holder.mLockImageView);
-            holder.mSubTitleTextView.setText(getOpenedFor(mCalendarOpen, calendarClose));
-            holder.mSubTitleTextView.setVisibility(View.VISIBLE);
+    public Log getPreviousOpenLog(int position, int doorId) {
+        Log previous = null;
+        for (int i = position + 1; i < mLogs.size(); i++) {
+            Log log = mLogs.get(i);
+            if (log.getDoorId() == doorId && log.getEvent() == Door.State.OPEN) {
+                return log;
+            }
         }
-
-        if (position == getItemCount() - 1) {
-            holder.mSubTitleTextView.setText(getOpenedFor(mCalendarOpen, calendarClose));
-            holder.mSubTitleTextView.setVisibility(View.VISIBLE);
-        }
-
-        StringBuilder builder = getDate(log);
-        holder.mTitleTextView.setText(Html.fromHtml(builder.toString()));
-
+        return previous;
     }
 
-    private String getOpenedFor(Calendar dateOpen, Calendar dateClose) {
-        if (dateOpen == null) return "";
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        Log log = mLogs.get(position);
+        if (log.getEvent() == Door.State.CLOSED) {
+            holder.image.setImageResource(R.drawable.ic_lock_2);
+            Log previous = getPreviousOpenLog(position, log.getDoorId());
+            if (previous != null) {
+                holder.subTitle.setText(getOpenedFor(log, previous));
+                holder.subTitle.setVisibility(View.VISIBLE);
+            } else {
+                holder.subTitle.setVisibility(View.INVISIBLE);
+            }
+        } else {
+            holder.image.setImageResource(R.drawable.ic_unlock_2);
+            holder.subTitle.setVisibility(View.INVISIBLE);
+        }
+        holder.title.setText(log.getDateString(true));
+    }
+
+    private String getOpenedFor(Log log, Log previous) {
+        long delta = log.getDate().getTime() - previous.getDate().getTime();
+        long hours = TimeUnit.MILLISECONDS.toHours(delta);
+        delta = delta - TimeUnit.HOURS.toMillis(hours);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(delta);
+        delta = delta - TimeUnit.MINUTES.toMillis(minutes);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(delta);
 
         StringBuilder builder = new StringBuilder();
-        int hour = diff(dateOpen.get(Calendar.HOUR_OF_DAY), dateClose.get(Calendar.HOUR_OF_DAY));
-        int minutes = diff(dateOpen.get(Calendar.MINUTE), dateClose.get(Calendar.MINUTE));
-        int seconds = diff(dateOpen.get(Calendar.SECOND), dateClose.get(Calendar.SECOND));
-        if (hour > 0 || minutes > 0 || seconds > 0) {
+        if (hours > 0 || minutes > 0 || seconds > 0) {
             builder.append(getString(R.string.opened_for_label));
-            builder.append(StringUtils.SPACE);
-            appendHour(builder, hour, R.string.hours_label);
-            appendHour(builder, minutes, R.string.minutes_label);
-            appendHour(builder, seconds, R.string.seconds_label);
+            builder.append(SPACE);
+            appendTime(builder, hours, R.string.hours_label);
+            appendTime(builder, minutes, R.string.minutes_label);
+            appendTime(builder, seconds, R.string.seconds_label);
         }
         return builder.toString();
     }
 
-    private void appendHour(StringBuilder builder, int value, int text) {
+    private void appendTime(StringBuilder builder, long value, int text) {
         if (value > 0) {
             builder.append(value);
-            builder.append(StringUtils.SPACE);
+            builder.append(SPACE);
             builder.append(getString(text));
-            builder.append(StringUtils.SPACE);
+            builder.append(SPACE);
         }
     }
 
@@ -95,34 +100,21 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.ViewHolder> {
         return (valueMax - valueMin) * -1;
     }
 
-    @NonNull
-    public StringBuilder getDate(Log log) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(log.getDate());
-        mCalendarOpen = calendar;
-        return Utils.getDateLog(calendar, true);
-    }
-
-
     @Override
     public int getItemCount() {
-        return mLogArrayList.size();
+        return mLogs.size();
     }
 
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
-        public ImageView mLockImageView;
-        public TextView mTitleTextView;
-        public TextView mSubTitleTextView;
+        public ImageView image;
+        public TextView title;
+        public TextView subTitle;
 
         public ViewHolder(View v) {
             super(v);
-            mLockImageView = (ImageView) v.findViewById(R.id.imageview_lock);
-            mTitleTextView = (TextView) v.findViewById(R.id.textView_title);
-            mSubTitleTextView = (TextView) v.findViewById(R.id.textView_subtitle);
+            image = (ImageView) v.findViewById(R.id.imageview_lock);
+            title = (TextView) v.findViewById(R.id.textView_title);
+            subTitle = (TextView) v.findViewById(R.id.textView_subtitle);
         }
     }
 

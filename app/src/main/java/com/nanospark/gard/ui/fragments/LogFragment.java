@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 
 import com.google.inject.Inject;
 import com.nanospark.gard.R;
-import com.nanospark.gard.Utils;
 import com.nanospark.gard.adapter.LogAdapter;
 import com.nanospark.gard.model.log.Log;
 import com.nanospark.gard.model.log.LogManager;
@@ -25,7 +24,6 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 
-import mobi.tattu.utils.StringUtils;
 import mobi.tattu.utils.ToastManager;
 import mobi.tattu.utils.image.AsyncTask;
 
@@ -33,6 +31,9 @@ import mobi.tattu.utils.image.AsyncTask;
  * Created by cristian on 10/10/15.
  */
 public class LogFragment extends BaseFragment {
+
+    public static final String COMMA = ",";
+    public static final String NEW_LINE_FILE = "\r\n";
 
     @Inject
     private LogManager mLogManager;
@@ -106,11 +107,11 @@ public class LogFragment extends BaseFragment {
 
                 StringBuilder builder = new StringBuilder();
                 builder.append(getString(R.string.door_label));
-                builder.append(StringUtils.COMMA);
+                builder.append(COMMA);
                 builder.append(getString(R.string.event_label));
-                builder.append(StringUtils.COMMA);
+                builder.append(COMMA);
                 builder.append(getString(R.string.date_label));
-                builder.append(StringUtils.NEW_LINE_FILE);
+                builder.append(NEW_LINE_FILE);
 
                 fileWriter.write(builder.toString());
                 builder = new StringBuilder();
@@ -120,13 +121,11 @@ public class LogFragment extends BaseFragment {
                     calendar.setTime(log.getDate());
 
                     builder.append(log.getDoorId());
-                    builder.append(StringUtils.COMMA);
+                    builder.append(COMMA);
 
-                    builder.append(log.getEvent());
-                    builder.append(StringUtils.COMMA);
-
-                    builder.append(Utils.getDateLog(calendar, false).toString());
-                    builder.append(StringUtils.NEW_LINE_FILE);
+                    builder.append(log.getEvent().name());
+                    builder.append(log.getDateString(false));
+                    builder.append(NEW_LINE_FILE);
                     fileWriter.write(builder.toString());
                 }
                 fileWriter.close();

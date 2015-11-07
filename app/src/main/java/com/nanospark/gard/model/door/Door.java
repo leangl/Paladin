@@ -12,8 +12,10 @@ import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.CommandFailed;
 import com.nanospark.gard.events.CommandProcessed;
 import com.nanospark.gard.events.CommandSent;
+import com.nanospark.gard.events.DoorStateChanged;
 import com.nanospark.gard.events.VoiceRecognitionDisabled;
 import com.nanospark.gard.events.VoiceRecognitionEnabled;
+import com.nanospark.gard.events.VoiceRecognizer;
 import com.nanospark.gard.model.user.User;
 import com.nanospark.gard.sms.SmsManager;
 import com.squareup.otto.Subscribe;
@@ -35,29 +37,32 @@ import roboguice.RoboGuice;
  */
 public class Door {
 
-    private State state = State.UNKNOWN;
-    private int id;
-    private int inputPinNumber;
-    private int outputPinNumber;
-    private DigitalOutput outputPin;
-    private DigitalInput inputPin;
-    private boolean activatePin;
-    private Boolean lastState;
-    private boolean voiceEnabled;
-    private Config config;
+    private int mId;
+    private State mState = State.UNKNOWN;
+    private int mControlPinNumber;
+    private int mClosedPinNumber;
+    private int mOpenPinNumber;
+    private DigitalOutput mOutputPin;
+    private DigitalInput mClosedPin;
+    private DigitalInput mOpenPin;
+    private boolean mActivatePin;
+    private Config mConfig;
     private Handler mAutoCloseHandler;
     private Handler mActivationTimeoutHandler;
     private Command mPendingCommand;
+    private boolean mBoardConnected = false;
+    private boolean mVoiceEnabled;
 
     @Inject
     private DataStore mDataStore;
     @Inject
     private SmsManager mSmsManager;
 
-    public Door(int id, Integer outputPinNumber, Integer inputPinNumber) {
-        this.id = id;
-        this.outputPinNumber = outputPinNumber;
-        this.inputPinNumber = inputPinNumber;
+    public Door(int id, Integer controlPinNumber, Integer closedPinNumber, Integer openPinNumber) {
+        mId = id;
+        mControlPinNumber = controlPinNumber;
+        mClosedPinNumber = closedPinNumber;
+        mOpenPinNumber = openPinNumber;
         mDataStore = DataStore.getInstance();
         mAutoCloseHandler = new Handler(Looper.getMainLooper());
         mActivationTimeoutHandler = new Handler(Looper.getMainLooper());
@@ -136,23 +141,26 @@ public class Door {
         return command.apply(this);
     }
 
-    public void confirm(boolean opened) {
-        Log.i(toString(), "Confirmed door: " + id + " - opened: " + opened);
-        this.state = State.from(opened);
-        mActivationTimeoutHandler.removeCallbacksAndMessages(null);
-        Tattu.post(new CommandProcessed(this, mPendingCommand));
-        mPendingCommand = null;
+    public void confirm(State state) {
+        Log.i(toString(), "Confirmed door: " + mId + " - state: " + state);
+        mState = state;
+        Tattu.post(new DoorStateChanged(this, mState));
+        if (mState != State.UNKNOWN) {
+            mActivationTimeoutHandler.removeCallbacksAndMessages(null);
+            Tattu.post(new CommandProcessed(this, mState, mPendingCommand));
+            mPendingCommand = null;
+        }
     }
 
     private void startAutoClose() {
-        if (!this.isAutoCloseEnabled()) return;
+        if (!isAutoCloseEnabled()) return;
 
         long startTime = System.currentTimeMillis();
         mAutoCloseHandler.removeCallbacksAndMessages(null);
         mAutoCloseHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (isOpened()) {
+                if (isOpen()) {
                     send(new Close("Auto closing", false));
                 } else {
                     long currentTime = System.currentTimeMillis();
@@ -164,14 +172,14 @@ public class Door {
                     }
                 }
             }
-        }, this.getAutoCloseUnit().toMillis(this.getAutoCloseValue()) + 10000); // as per wireframe: Wait {Auto-Close Interval} + 10s
+        }, getAutoCloseUnit().toMillis(getAutoCloseValue()) + 10000); // as per wireframe: Wait {Auto-Close Interval} + 10s
     }
 
     @Subscribe
     public void on(CommandSent event) {
         if (event.door != this) return;
 
-        activatePin = true;
+        mActivatePin = true;
         mPendingCommand = event.command;
         mActivationTimeoutHandler.removeCallbacksAndMessages(null);
         mActivationTimeoutHandler.postDelayed(new Runnable() {
@@ -183,7 +191,7 @@ public class Door {
                 increment++;
                 if (increment < 3) {
                     Log.d(Door.this.toString(), "Retrying command: " + event.command.toString());
-                    activatePin = true;
+                    mActivatePin = true;
                     mActivationTimeoutHandler.postDelayed(this, 20000);
                 } else {
                     Log.d(Door.this.toString(), "Retry failed: " + event.command.toString());
@@ -195,104 +203,157 @@ public class Door {
     }
 
     private void on(BoardDisconnected event) {
-        this.state = State.UNKNOWN;
+        mBoardConnected = false;
     }
 
     private void on(BoardConnected event) {
-        // FIXME check door state before deciding if it's open
-        this.state = State.OPEN;
+        mBoardConnected = true;
+    }
+
+    @Subscribe
+    public void on(VoiceRecognizer.StateChanged event) {
+        if (event.door.equals(this)) {
+            mVoiceEnabled = event.state == VoiceRecognizer.State.STARTED;
+        } else {
+            mVoiceEnabled = false;
+        }
+    }
+
+    public boolean isVoiceEnabled() {
+        return mVoiceEnabled;
     }
 
     public State getState() {
-        return state;
+        return !mBoardConnected ? State.UNKNOWN : mState;
     }
 
-    public boolean isOpened() {
-        return State.OPEN.equals(state);
+    public boolean isOpen() {
+        return State.OPEN.equals(mState);
     }
 
     public boolean isClosed() {
-        return State.CLOSE.equals(state);
+        return State.CLOSED.equals(mState);
     }
 
     public boolean isReady() {
-        return !State.UNKNOWN.equals(state);
+        return !State.UNKNOWN.equals(mState);
     }
 
     public int getId() {
-        return id;
+        return mId;
     }
 
     public void disableVoiceRecognition() {
-        this.voiceEnabled = false;
         Tattu.post(new VoiceRecognitionDisabled(this));
-        persist();
     }
 
     public void enableVoiceRecognition() {
-        this.voiceEnabled = true;
         Tattu.post(new VoiceRecognitionEnabled(this));
-        persist();
     }
 
     public String getName() {
-        return config.doorName;
+        return mConfig.name;
     }
 
     public void setName(String name) {
-        this.config.doorName = name;
+        mConfig.name = name;
         persist();
     }
 
     public String getOpenPhrase() {
-        return config.openPhrase;
+        return mConfig.openPhrase;
     }
 
     public void setOpenPhrase(String openPhrase) {
-        this.config.openPhrase = openPhrase;
+        mConfig.openPhrase = openPhrase.toLowerCase();
         persist();
     }
 
     public String getClosePhrase() {
-        return config.closePhrase;
+        return mConfig.closePhrase;
     }
 
     public void setClosePhrase(String closePhrase) {
-        this.config.closePhrase = closePhrase;
+        mConfig.closePhrase = closePhrase.toLowerCase();
+        persist();
+    }
+
+    public boolean isEnabled() {
+        return mConfig.enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        mConfig.enabled = enabled;
+        persist();
+    }
+
+    public boolean isOpenSwitchEnabled() {
+        return mConfig.openSwitchEnabled;
+    }
+
+    public void setOpenSwitchEnabled(boolean enabled) {
+        mConfig.openSwitchEnabled = enabled;
+        persist();
+    }
+
+    public boolean isCloseSwitchEnabled() {
+        return mConfig.closeSwitchEnabled;
+    }
+
+    public void setCloseSwitchEnabled(boolean enabled) {
+        mConfig.closeSwitchEnabled = enabled;
         persist();
     }
 
     private void restore() {
-        config = mDataStore.getObject(getId(), Config.class).get();
-        if (config == null) {
-            config = new Config();
-            config.doorName = "Door " + getId();
-            config.openPhrase = GarD.instance.getString(R.string.default_open);
-            config.closePhrase = GarD.instance.getString(R.string.default_close);
+        mConfig = mDataStore.getObject(getId(), Config.class).get();
+        if (mConfig == null) {
+            mConfig = new Config();
+            mConfig.name = "Door " + getId();
+            mConfig.openPhrase = GarD.instance.getString(R.string.default_open);
+            mConfig.closePhrase = GarD.instance.getString(R.string.default_close);
         }
     }
 
     private void persist() {
-        mDataStore.putObject(getId(), config);
+        mDataStore.putObject(getId(), mConfig);
     }
 
     public void setup(IOIO ioio) throws ConnectionLostException {
-        outputPin = ioio.openDigitalOutput(outputPinNumber, false);
-        inputPin = ioio.openDigitalInput(inputPinNumber, DigitalInput.Spec.Mode.PULL_DOWN);
+        mOutputPin = ioio.openDigitalOutput(mControlPinNumber, false);
+        mClosedPin = ioio.openDigitalInput(mClosedPinNumber, DigitalInput.Spec.Mode.PULL_DOWN);
+        mOpenPin = ioio.openDigitalInput(mOpenPinNumber, DigitalInput.Spec.Mode.PULL_DOWN);
     }
 
     public void loop() throws ConnectionLostException, InterruptedException {
-        if (activatePin) {
-            activatePin = false;
+        if (mActivatePin) {
+            mActivatePin = false;
             // high for 2 seconds and then low again
-            outputPin.write(true);
+            mOutputPin.write(true);
             Thread.sleep(2000);
-            outputPin.write(false);
+            mOutputPin.write(false);
         } else {
-            boolean state = inputPin.read(); // true is closed
-            if (lastState == null || !lastState.equals(state)) {
-                lastState = state;
-                confirm(!state);
+            if (isOpenSwitchEnabled() && isCloseSwitchEnabled()) {
+                boolean isClosed = mClosedPin.read(); // true is closed
+                boolean isOpen = mOpenPin.read(); // true is open
+                Boolean triState = null;
+                if (isClosed != isOpen) { // both pin LOW or HIGH means state is UNKNOWN
+                    triState = isOpen;
+                }
+                State state = State.from(triState);
+                if (!mState.equals(state)) {
+                    confirm(state);
+                }
+            } else if (isCloseSwitchEnabled()) {
+                State state = State.from(!mClosedPin.read()); // true is closed
+                if (!mState.equals(state)) {
+                    confirm(state);
+                }
+            } else if (isOpenSwitchEnabled()) {
+                State state = State.from(mOpenPin.read()); // true is open
+                if (!mState.equals(state)) {
+                    confirm(state);
+                }
             }
             Thread.sleep(100);
         }
@@ -307,7 +368,7 @@ public class Door {
     public static class One extends Door {
         @Inject
         private One() {
-            super(1, 4, 5);
+            super(1, 2, 4, 5);
         }
 
         @Subscribe
@@ -322,6 +383,11 @@ public class Door {
 
         @Subscribe
         public void on(BoardDisconnected event) {
+            super.on(event);
+        }
+
+        @Subscribe
+        public void on(VoiceRecognizer.StateChanged event) {
             super.on(event);
         }
 
@@ -331,7 +397,7 @@ public class Door {
     public static class Two extends Door {
         @Inject
         private Two() {
-            super(2, 6, 7);
+            super(2, 3, 6, 7);
         }
 
         @Subscribe
@@ -349,12 +415,19 @@ public class Door {
             super.on(event);
         }
 
+        @Subscribe
+        public void on(VoiceRecognizer.StateChanged event) {
+            super.on(event);
+        }
     }
 
     public static class Config {
-        public String doorName;
+        public String name;
         public String openPhrase;
         public String closePhrase;
+        public boolean enabled = true;
+        public boolean openSwitchEnabled = true;
+        public boolean closeSwitchEnabled = true;
     }
 
     public static abstract class Command {
@@ -376,10 +449,6 @@ public class Door {
 
         public abstract String toString();
 
-        public boolean isOpen() {
-            return this instanceof Open;
-        }
-
     }
 
     public static class Open extends Command {
@@ -400,18 +469,18 @@ public class Door {
                 return false;
             }
             if (!door.isReady()) {
-                Log.w(toString(), "Door not ready: " + door.id);
+                Log.w(toString(), "Door not ready: " + door.mId);
                 ToastManager.get().showToast("The door is not ready.", 1);
                 return false;
             }
-            if (!door.isOpened()) {
-                Log.i(toString(), "Opening door: " + door.id);
+            if (!door.isOpen()) {
+                Log.i(toString(), "Opening door: " + door.mId);
                 Log.i(toString(), message);
                 door.startAutoClose();
                 Tattu.post(new CommandSent(door, this, message));
                 return true;
             } else {
-                Log.w(toString(), "Door already open: " + door.id);
+                Log.w(toString(), "Door already open: " + door.mId);
                 ToastManager.get().showToast("The door is already open.", 1);
                 return false;
             }
@@ -436,17 +505,17 @@ public class Door {
         @Override
         protected boolean apply(Door door) {
             if (!door.isReady()) {
-                Log.w(toString(), "Door not ready: " + door.id);
+                Log.w(toString(), "Door not ready: " + door.mId);
                 ToastManager.get().showToast("The door is not ready.", 1);
                 return false;
             }
-            if (door.isOpened()) {
-                Log.i(toString(), "Closing door: " + door.id);
+            if (door.isOpen()) {
+                Log.i(toString(), "Closing door: " + door.mId);
                 Log.i(toString(), message);
                 Tattu.post(new CommandSent(door, this, message));
                 return true;
             } else {
-                Log.w(toString(), "Door already closed: " + door.id);
+                Log.w(toString(), "Door already closed: " + door.mId);
                 ToastManager.get().showToast("The door is already closed.", 1);
                 return false;
             }
@@ -470,8 +539,8 @@ public class Door {
 
         @Override
         protected boolean apply(Door door) {
-            Log.i(toString(), "Toggle door: " + door.id);
-            if (door.isOpened()) {
+            Log.i(toString(), "Toggle door: " + door.mId);
+            if (door.isOpen()) {
                 return door.send(new Close(message, forced));
             } else if (door.isClosed()) {
                 return door.send(new Open(message, forced));
@@ -486,7 +555,7 @@ public class Door {
     }
 
     public enum State {
-        OPEN("Open"), CLOSE("Closed"), UNKNOWN("Unknown");
+        OPEN("Open"), CLOSED("Closed"), UNKNOWN("Unknown");
 
         public final String description;
 
@@ -494,8 +563,20 @@ public class Door {
             this.description = description;
         }
 
-        public static State from(boolean opened) {
-            return opened ? OPEN : CLOSE;
+        public static State from(Boolean opened) {
+            return opened == null ? UNKNOWN : opened ? OPEN : CLOSED;
+        }
+
+        public Boolean toBoolean() {
+            switch (this) {
+                case OPEN:
+                    return true;
+                case CLOSED:
+                    return false;
+                case UNKNOWN:
+                default:
+                    return null;
+            }
         }
 
         @Override
