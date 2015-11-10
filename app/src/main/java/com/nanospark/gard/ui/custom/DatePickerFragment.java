@@ -5,8 +5,6 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.widget.DatePicker;
 
-import com.nanospark.gard.events.DatePickerSelected;
-
 import java.util.Calendar;
 
 import mobi.tattu.utils.Tattu;
@@ -46,4 +44,23 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
     public void onDateSet(DatePicker view, int year, int month, int day) {
         Tattu.post(new DatePickerSelected(view, year, month, day, this.mId));
     }
+
+    public static class DatePickerSelected {
+        public final DatePicker view;
+        public final int year;
+        public final int month;
+        public final int day;
+        public final int id;
+
+        public DatePickerSelected(DatePicker view, int year, int month, int day, int id) {
+            this.view = view;
+            this.year = year;
+            this.month = month;
+            this.day = day;
+            this.id = id;
+
+        }
+
+    }
+
 }

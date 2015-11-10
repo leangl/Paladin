@@ -1,8 +1,12 @@
-package com.nanospark.gard.events;
+package com.nanospark.gard.voice;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.nanospark.gard.GarD;
+import com.nanospark.gard.events.DoorStateChanged;
+import com.nanospark.gard.events.PhraseRecognized;
+import com.nanospark.gard.events.VoiceRecognitionDisabled;
+import com.nanospark.gard.events.VoiceRecognitionEnabled;
 import com.nanospark.gard.model.door.Door;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;

@@ -4,7 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import com.nanospark.gard.events.CommandSent;
-import com.nanospark.gard.events.VoiceRecognizer;
+import com.nanospark.gard.voice.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.log.LogManager;
 import com.nanospark.gard.model.scheduler.ScheduleManager;

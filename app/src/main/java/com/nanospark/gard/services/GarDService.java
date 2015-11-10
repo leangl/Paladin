@@ -9,7 +9,7 @@ import com.nanospark.gard.GarD;
 import com.nanospark.gard.R;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
-import com.nanospark.gard.events.VoiceRecognizer;
+import com.nanospark.gard.voice.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.sms.SmsManager;
 import com.squareup.otto.Produce;

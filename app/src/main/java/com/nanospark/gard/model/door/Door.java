@@ -15,7 +15,7 @@ import com.nanospark.gard.events.CommandSent;
 import com.nanospark.gard.events.DoorStateChanged;
 import com.nanospark.gard.events.VoiceRecognitionDisabled;
 import com.nanospark.gard.events.VoiceRecognitionEnabled;
-import com.nanospark.gard.events.VoiceRecognizer;
+import com.nanospark.gard.voice.VoiceRecognizer;
 import com.nanospark.gard.model.user.User;
 import com.nanospark.gard.sms.SmsManager;
 import com.squareup.otto.Subscribe;

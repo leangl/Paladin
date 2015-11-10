@@ -21,8 +21,6 @@ import android.widget.TextView;
 import com.google.inject.Inject;
 import com.nanospark.gard.R;
 import com.nanospark.gard.Utils;
-import com.nanospark.gard.events.DatePickerSelected;
-import com.nanospark.gard.events.TimerPickerSelected;
 import com.nanospark.gard.model.user.ControlSchedule;
 import com.nanospark.gard.model.user.Limit;
 import com.nanospark.gard.model.user.User;
@@ -345,7 +343,7 @@ public class CreateUserFragment extends BaseFragment {
     }
 
     @Subscribe
-    public void on(TimerPickerSelected timerPickerSelected) {
+    public void on(TimerPickerFragment.TimerPickerSelected timerPickerSelected) {
         Calendar calendar = Utils.createCalendarTime(timerPickerSelected.hourOfDay, timerPickerSelected.minute);
         if (timerPickerSelected.id == R.id.textview_start_time) {
             mControlSchedule.setStartHour(timerPickerSelected.hourOfDay);
@@ -360,7 +358,7 @@ public class CreateUserFragment extends BaseFragment {
     }
 
     @Subscribe
-    public void on(DatePickerSelected datePickerSelected) {
+    public void on(DatePickerFragment.DatePickerSelected datePickerSelected) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DAY_OF_MONTH, datePickerSelected.day);
         calendar.set(Calendar.MONTH, datePickerSelected.month);

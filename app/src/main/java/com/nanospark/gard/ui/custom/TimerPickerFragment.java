@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.widget.TimePicker;
 
-import com.nanospark.gard.events.TimerPickerSelected;
-
 import java.util.Calendar;
 
 import mobi.tattu.utils.Tattu;
@@ -15,7 +13,7 @@ import mobi.tattu.utils.Tattu;
 /**
  * Created by cristian on 17/10/15.
  */
-public class TimerPickerFragment extends android.support.v4.app.DialogFragment implements TimePickerDialog.OnTimeSetListener{
+public class TimerPickerFragment extends android.support.v4.app.DialogFragment implements TimePickerDialog.OnTimeSetListener {
 
     private static String ARG_ID;
     private int mId;
@@ -23,11 +21,12 @@ public class TimerPickerFragment extends android.support.v4.app.DialogFragment i
     public static TimerPickerFragment newInstance(int id) {
 
         Bundle args = new Bundle();
-        args.putInt(ARG_ID,id);
+        args.putInt(ARG_ID, id);
         TimerPickerFragment fragment = new TimerPickerFragment();
         fragment.setArguments(args);
         return fragment;
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,8 +46,23 @@ public class TimerPickerFragment extends android.support.v4.app.DialogFragment i
     }
 
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        Tattu.post(new TimerPickerSelected(mId,hourOfDay,view,minute));
+        Tattu.post(new TimerPickerSelected(mId, hourOfDay, view, minute));
     }
 
+    public static class TimerPickerSelected {
+
+        public final TimePicker view;
+        public final int hourOfDay;
+        public final int minute;
+        public final int id;
+
+
+        public TimerPickerSelected(int id, int hourOfDay, TimePicker view, int minute) {
+            this.id = id;
+            this.hourOfDay = hourOfDay;
+            this.view = view;
+            this.minute = minute;
+        }
+    }
 
 }

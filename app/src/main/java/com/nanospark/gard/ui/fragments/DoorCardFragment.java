@@ -15,7 +15,7 @@ import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.CommandFailed;
 import com.nanospark.gard.events.CommandProcessed;
 import com.nanospark.gard.events.DoorStateChanged;
-import com.nanospark.gard.events.VoiceRecognizer;
+import com.nanospark.gard.voice.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.log.Log;
 import com.nanospark.gard.model.log.LogManager;

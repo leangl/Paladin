@@ -11,7 +11,6 @@ import android.widget.EditText;
 import com.google.inject.Inject;
 import com.nanospark.gard.R;
 import com.nanospark.gard.Utils;
-import com.nanospark.gard.events.TimerPickerSelected;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.scheduler.Schedule;
 import com.nanospark.gard.model.scheduler.ScheduleManager;
@@ -99,7 +98,7 @@ public class CreateScheduleFragment extends BaseFragment {
     }
 
     @Subscribe
-    public void on(TimerPickerSelected event) {
+    public void on(TimerPickerFragment.TimerPickerSelected event) {
         if (event.id == mOpen.getId()) {
             mSchedule.setOpenHour(event.hourOfDay);
             mSchedule.setOpenMinute(event.minute);
