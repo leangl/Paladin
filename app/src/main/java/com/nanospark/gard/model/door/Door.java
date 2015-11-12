@@ -31,6 +31,7 @@ import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.ToastManager;
 import mobi.tattu.utils.persistance.datastore.DataStore;
 import roboguice.RoboGuice;
+import roboguice.util.Ln;
 
 /**
  * Created by Leandro on 9/8/2015.
@@ -138,6 +139,10 @@ public class Door {
     }
 
     public boolean send(Command command) {
+        if (!isEnabled()) {
+            Ln.i("Command not processed, Door is disabled.");
+            return false;
+        }
         return command.apply(this);
     }
 

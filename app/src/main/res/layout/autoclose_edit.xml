@@ -9,16 +9,23 @@
               android:paddingRight="20dp"
               android:paddingTop="10dp">
 
-    <EditText
-        android:id="@+id/value"
+    <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Interval"
-        android:inputType="number"
-        android:maxLength="3"
-        android:maxLines="1"
-        android:singleLine="true"
-        tools:text="999"/>
+        android:layout_marginLeft="10dp">
+
+        <EditText
+            android:id="@+id/value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Interval"
+            android:inputType="number"
+            android:maxLength="3"
+            android:maxLines="1"
+            android:singleLine="true"
+            tools:text="999"/>
+
+    </android.support.design.widget.TextInputLayout>
 
     <Spinner
         android:id="@+id/unit"

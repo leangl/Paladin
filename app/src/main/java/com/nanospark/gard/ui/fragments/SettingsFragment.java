@@ -2,15 +2,22 @@ package com.nanospark.gard.ui.fragments;
 
 
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 
+import com.google.inject.Inject;
 import com.nanospark.gard.R;
 import com.nanospark.gard.model.door.Door;
+import com.nanospark.gard.sms.SmsManager;
+import com.nanospark.gard.sms.twilio.TwilioAccount;
 import com.nanospark.gard.ui.custom.BaseFragment;
 
 import mobi.tattu.utils.StringUtils;
@@ -22,6 +29,10 @@ import roboguice.inject.InjectView;
  */
 public class SettingsFragment extends BaseFragment {
 
+    @InjectView(R.id.phone)
+    private TextView mPhone;
+    @InjectView(R.id.imageview_menu)
+    private View mSmsMenu;
     @InjectView(R.id.door1)
     private CheckBox mDoor1;
     @InjectView(R.id.name1)
@@ -39,6 +50,9 @@ public class SettingsFragment extends BaseFragment {
     @InjectView(R.id.close2)
     private CheckBox mClose2;
 
+    @Inject
+    private SmsManager mSmsManager;
+
     public static SettingsFragment newInstance() {
         return new SettingsFragment();
     }
@@ -51,6 +65,30 @@ public class SettingsFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mSmsMenu.setOnClickListener(v -> {
+            PopupMenu popupMenu = new PopupMenu(getBaseActivity(), v);
+            popupMenu.inflate(R.menu.autoclose);
+            popupMenu.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()) {
+                    case R.id.action_edit:
+                        editSms();
+                        break;
+                    case R.id.action_enable:
+                        mSmsManager.enableSms();
+                        break;
+                    case R.id.action_disable:
+                        mSmsManager.disableSms();
+                        break;
+                }
+                return true;
+            });
+            popupMenu.getMenu().findItem(R.id.action_enable).setVisible(!mSmsManager.isSmsEnabled());
+            popupMenu.getMenu().findItem(R.id.action_disable).setVisible(mSmsManager.isSmsEnabled());
+            popupMenu.show();
+        });
+
+        loadPhoneNumber();
 
         Door door1 = Door.getInstance(1);
         mName1.setText(door1.getName());
@@ -95,4 +133,66 @@ public class SettingsFragment extends BaseFragment {
 
         return true;
     }
+
+    private void loadPhoneNumber() {
+        mPhone.setText(mSmsManager.getAccount().getPhone());
+    }
+
+
+    private int touchCount;
+    public void editSms() {
+        touchCount = 0;
+
+        View content = inflate(R.layout.sms_edit, null, false);
+        EditText phoneView = (EditText) content.findViewById(R.id.phone);
+        EditText sidView = (EditText) content.findViewById(R.id.twilio_sid);
+        EditText tokenView = (EditText) content.findViewById(R.id.twilio_token);
+        TwilioAccount account = mSmsManager.getAccount();
+        phoneView.setText(account.getPhone());
+        sidView.setText(account.getSid());
+        tokenView.setText(account.getToken());
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                .setTitle("SMS Phone Number")
+                .setPositiveButton(R.string.accept, (dialog, whichButton) -> {
+                })
+                .setNegativeButton(R.string.cancel, (dialog, whichButton) -> {
+                })
+                .setView(content);
+
+        AlertDialog dialog = builder.show();
+        dialog.findViewById(android.support.v7.appcompat.R.id.alertTitle).setOnClickListener(v -> {
+            touchCount++;
+            if (touchCount == 4) {
+                touchCount = 0;
+                content.findViewById(R.id.advanced).setVisibility(View.VISIBLE);
+            }
+        });
+
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
+            if (StringUtils.isBlank(phoneView.getText())) {
+                toast("Please enter a valid phone number");
+                return;
+            }
+            if (StringUtils.isBlank(sidView.getText())) {
+                toast("Please enter a valid Twilio SID");
+                return;
+            }
+            if (StringUtils.isBlank(tokenView.getText())) {
+                toast("Please enter a valid Twilio Token");
+                return;
+            }
+
+            account.setPhone(phoneView.getText().toString());
+            account.setSid(sidView.getText().toString());
+            account.setToken(tokenView.getText().toString());
+
+            mSmsManager.setTwilioAccount(account);
+
+            loadPhoneNumber();
+
+            dialog.dismiss();
+        });
+    }
+
 }

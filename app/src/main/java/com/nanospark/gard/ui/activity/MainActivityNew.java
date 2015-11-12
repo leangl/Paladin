@@ -55,7 +55,7 @@ public class MainActivityNew extends BaseActivity {
             @Override
             public void onPositiveButton(DialogInterface dialog) {
                 dialog.dismiss();
-                SmsManager.getInstance().enableSms();
+                SmsManager.getInstance().resumeSms();
             }
 
             @Override

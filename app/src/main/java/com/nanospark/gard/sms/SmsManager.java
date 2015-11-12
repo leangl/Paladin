@@ -54,9 +54,9 @@ public class SmsManager {
     private static long MESSAGES_CHECK_TIME = TimeUnit.SECONDS.toMillis(1);
     private static long MESSAGES_RETRY_TIME = TimeUnit.SECONDS.toMillis(1);
 
+    private SmsConfig mConfig;
     private TwilioApi mApi;
     private Handler smsHandler;
-    private boolean mSmsSuspended = false;
     private List<Long> mLastSentTimestamps;
 
     public static String fakeSms;
@@ -80,6 +80,11 @@ public class SmsManager {
         mLastSentTimestamps = new ArrayList<>(20);
 
         Tattu.register(this);
+
+        mConfig = DataStore.getInstance().getObject(SmsConfig.class.getSimpleName(), SmsConfig.class).get();
+        if (mConfig == null) {
+            mConfig = new SmsConfig();
+        }
     }
 
     public static final SmsManager getInstance() {
@@ -99,41 +104,61 @@ public class SmsManager {
     }
 
     private RequestInterceptor mBasicAuthInterceptor = request -> {
-        TwilioAccount account = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class).get();
-        if (account != null) {
+        TwilioAccount account = getAccount();
+        if (account != null && account.isValid()) {
             String credentials = account.getSid() + ":" + account.getToken();
             String string = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
             request.addHeader("Authorization", string);
         }
     };
 
-    public void disableSms() {
-        mSmsSuspended = true;
-        Tattu.post(new SmsSuspended());
+    public void saveConfig() {
+        DataStore.getInstance().putObject(SmsConfig.class.getSimpleName(), mConfig);
+    }
+
+    public void setTwilioAccount(TwilioAccount account) {
+        mConfig.account = account;
+        saveConfig();
     }
 
     public void enableSms() {
-        mSmsSuspended = false;
+        mConfig.enabled = true;
+        saveConfig();
+    }
+
+    public void disableSms() {
+        mConfig.enabled = false;
+        saveConfig();
+    }
+
+    public boolean isSmsEnabled() {
+        return mConfig.enabled;
+    }
+
+    public void suspendSms() {
+        mConfig.suspended = true;
+        saveConfig();
+        Tattu.post(new SmsSuspended());
+    }
+
+    public void resumeSms() {
+        mConfig.suspended = false;
+        saveConfig();
     }
 
     public boolean isSmsSuspended() {
-        return mSmsSuspended;
+        return mConfig.suspended;
     }
 
     public Observable<Void> sendMessage(String message, String to) {
 
         if (exceededLimit()) {
-            disableSms();
+            suspendSms();
             return Observable.empty();
         }
 
-        TwilioAccount account = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class).get();
-        if (account != null) {
-            if (!account.isValid()) {
-                Log.e("TWILIO", "Account not set!");
-                return Observable.error(new Exception());
-            }
-
+        TwilioAccount account = getAccount();
+        if (account != null && account.isValid()) {
             return mApi.sendMessage(account.getSid(), message, account.getPhone(), to).map(result -> {
                 Log.i("TWILIO", "Messages sent: " + message + " to " + to);
                 mLastSentTimestamps.add(System.currentTimeMillis());
@@ -158,6 +183,11 @@ public class SmsManager {
         }
 
         return false;
+    }
+
+    public TwilioAccount getAccount() {
+        //account = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class).get();
+        return mConfig.account;
     }
 
     /**
@@ -411,10 +441,16 @@ public class SmsManager {
 
     @Produce
     public SmsSuspended produceSuspended() {
-        if (mSmsSuspended) {
+        if (isSmsSuspended()) {
             return new SmsSuspended();
         }
         return null;
+    }
+
+    public static class SmsConfig {
+        public TwilioAccount account = new TwilioAccount("+17152204298", "SKa21285e73ff6b5fbabc6e970d18dbcb9", "UyMTD7Uhyptchd6bqVJKIMNZqpY0nEtz");
+        public boolean enabled = true;
+        public boolean suspended = false;
     }
 
 }

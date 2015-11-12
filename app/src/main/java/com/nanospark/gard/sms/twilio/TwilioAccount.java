@@ -13,6 +13,14 @@ public class TwilioAccount implements Serializable {
     private String sid;
     private String token;
 
+    public TwilioAccount() {}
+
+    public TwilioAccount(String phone, String sid, String token) {
+        this.phone = phone;
+        this.sid = sid;
+        this.token = token;
+    }
+
     public String getPhone() {
         return phone;
     }
