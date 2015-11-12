@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -144,6 +145,10 @@ public class SettingsFragment extends BaseFragment {
         touchCount = 0;
 
         View content = inflate(R.layout.sms_edit, null, false);
+
+        TextView cautionSms = (TextView) content.findViewById(R.id.caution_sms);
+        cautionSms.setText(Html.fromHtml(getString(R.string.caution_sms)));
+        
         EditText phoneView = (EditText) content.findViewById(R.id.phone);
         EditText sidView = (EditText) content.findViewById(R.id.twilio_sid);
         EditText tokenView = (EditText) content.findViewById(R.id.twilio_token);
