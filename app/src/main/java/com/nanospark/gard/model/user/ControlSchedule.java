@@ -3,6 +3,8 @@ package com.nanospark.gard.model.user;
 import com.nanospark.gard.model.Day;
 import com.nanospark.gard.model.door.Door;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -13,7 +15,7 @@ import roboguice.util.Ln;
 /**
  * Created by Leandro on 1/10/2015.
  */
-public class ControlSchedule {
+public class ControlSchedule implements Serializable {
 
     private Integer startMinute;
     private Integer startHour;
@@ -27,7 +29,7 @@ public class ControlSchedule {
     private Integer limitMonth;
     private Integer limitYear;
     private Integer limitEvents;
-    private List<Integer> days;
+    private List<Integer> days = new ArrayList<>();
     private boolean repeatEveryOtherWeek;
     private boolean repeatWeeks;
     private Integer repeatWeeksNumber;

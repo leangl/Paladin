@@ -2,10 +2,10 @@ package com.nanospark.gard.model.scheduler;
 
 import com.nanospark.gard.model.Day;
 import com.nanospark.gard.model.door.Door;
+import com.nanospark.gard.model.user.ControlSchedule;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
@@ -25,12 +25,12 @@ public class Schedule implements Serializable, Comparable<Schedule> {
     private Integer openMinute;
     private Integer closeHour;
     private Integer closeMinute;
-    private Repeat repeat = Repeat.DAILY;
-    private List<Day> days = Arrays.asList(Day.values()); // All days by default
+    private ControlSchedule controlSchedule;
 
     public Schedule() {
         this.id = UUID.randomUUID().toString();
         createDate = System.currentTimeMillis();
+        controlSchedule = new ControlSchedule();
     }
 
     public String getId() {
@@ -81,18 +81,11 @@ public class Schedule implements Serializable, Comparable<Schedule> {
     public void setOpenMinute(Integer openMinute) {
         this.openMinute = openMinute;
     }
-
-    public List<Day> getDays() {
-        return days;
+    public ControlSchedule getControlSchedule() {
+        return controlSchedule;
     }
-    public void setDays(List<Day> days) {
-        this.days = days;
-    }
-    public Repeat getRepeat() {
-        return repeat;
-    }
-    public void setRepeat(Repeat repeat) {
-        this.repeat = repeat;
+    public void setControlSchedule(ControlSchedule controlSchedule) {
+        this.controlSchedule = controlSchedule;
     }
 
     public boolean isOpenTimeSet() {
@@ -133,7 +126,6 @@ public class Schedule implements Serializable, Comparable<Schedule> {
         }
     }
 
-
     public boolean isNow(Integer scheduleHour, Integer scheduleMinute) {
         if (scheduleHour == null || scheduleMinute == null) return false;
 
@@ -142,7 +134,7 @@ public class Schedule implements Serializable, Comparable<Schedule> {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
 
-        return days.contains(Day.fromCalendar(day)) && scheduleHour == hour && scheduleMinute == minute;
+        return getControlSchedule().getDays().contains(Day.fromCalendar(day)) && scheduleHour == hour && scheduleMinute == minute;
     }
 
     public boolean trigger() {

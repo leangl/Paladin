@@ -134,7 +134,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <include layout="@layout/schedule_layout"/>
+            <include layout="@layout/repeat_layout"/>
         </LinearLayout>
     </ScrollView>
 
