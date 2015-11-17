@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId "com.nanospark.gard"
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 18 // for alarm repeating at exact times
         versionCode 1
         versionName "1.0"
     }

@@ -68,7 +68,7 @@ public class UsersFragment extends BaseFragment {
         if (size > 0) {
             this.mGridLayout.removeAllViews();
             for (int i = 0; i < size; i++) {
-                View userView = LayoutInflater.from(getBaseActivity()).inflate(R.layout.user_layout, null, false);
+                View userView = LayoutInflater.from(getBaseActivity()).inflate(R.layout.user_layout, this.mGridLayout, false);
                 User user = mUserList.get(i);
 
                 TextView name = (TextView) userView.findViewById(R.id.textview_user_name);

@@ -35,6 +35,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import mobi.tattu.utils.StringUtils;
+import mobi.tattu.utils.ToastManager;
 import mobi.tattu.utils.annotations.SaveState;
 import roboguice.inject.InjectView;
 
@@ -65,6 +66,7 @@ public class CreateScheduleFragment extends BaseFragment {
     private TextView mTimeEndTextView;
     private TextView mDateStartTextView;
     private ControlSchedule mControlSchedule;
+    private View mHourContainer;
 
     public static CreateScheduleFragment newInstance(Schedule schedule) {
         CreateScheduleFragment instance = new CreateScheduleFragment();
@@ -114,6 +116,7 @@ public class CreateScheduleFragment extends BaseFragment {
         View scheduleContainer = getView().findViewById(R.id.schedule_container);
         LinearLayout daysContainer = (LinearLayout) scheduleContainer.findViewById(R.id.days_container);
 
+        this.mHourContainer = scheduleContainer.findViewById(R.id.hour_container);
         this.mTimeStartTextView = (TextView) scheduleContainer.findViewById(R.id.textview_start_time);
         this.mTimeEndTextView = (TextView) scheduleContainer.findViewById(R.id.textview_end_time);
         this.mDateStartTextView = (TextView) scheduleContainer.findViewById(R.id.textview_start_day);
@@ -122,6 +125,8 @@ public class CreateScheduleFragment extends BaseFragment {
         CheckBox repeatEveryDayCheckBox = (CheckBox) scheduleContainer.findViewById(R.id.checkbox_repeat_every_day);
         CheckBox repeatCheckBox = (CheckBox) scheduleContainer.findViewById(R.id.checkbox_repeat);
         Spinner limitSpinner = (Spinner) scheduleContainer.findViewById(R.id.spinner_date_event);
+
+        this.mHourContainer.setVisibility(View.GONE);
 
         this.mRepeatEventWeeksEditText.setEnabled(false);
 
@@ -261,26 +266,26 @@ public class CreateScheduleFragment extends BaseFragment {
 
     private void loadData(CheckBox repeatEveryDayCheckBox, CheckBox repeatCheckBox, Spinner limitSpinner) {
         ControlSchedule controlSchedule = mControlSchedule;
-            if (controlSchedule.isStartTimeSet()) {
-                mTimeStartTextView.setText(Utils.getHour(controlSchedule.getStartHour(), controlSchedule.getStartMinute()));
-            }
-            if (controlSchedule.isEndTimeSet()) {
-                mTimeEndTextView.setText(Utils.getHour(controlSchedule.getEndHour(), controlSchedule.getEndMinute()));
-            }
+        if (controlSchedule.isStartTimeSet()) {
+            mTimeStartTextView.setText(Utils.getHour(controlSchedule.getStartHour(), controlSchedule.getStartMinute()));
+        }
+        if (controlSchedule.isEndTimeSet()) {
+            mTimeEndTextView.setText(Utils.getHour(controlSchedule.getEndHour(), controlSchedule.getEndMinute()));
+        }
 
-            if (controlSchedule.isStartDateSet()) {
-                mDateStartTextView.setText(getDay(controlSchedule.getStartDay(), controlSchedule.getStartMonth(), controlSchedule.getStartYear()));
-            }
+        if (controlSchedule.isStartDateSet()) {
+            mDateStartTextView.setText(getDay(controlSchedule.getStartDay(), controlSchedule.getStartMonth(), controlSchedule.getStartYear()));
+        }
 
-            repeatEveryDayCheckBox.setChecked(controlSchedule.isRepeatEveryOtherWeek());
-            repeatCheckBox.setChecked(controlSchedule.isRepeatWeeks());
-            if (controlSchedule.getRepeatWeeksNumber() != null) {
-                mRepeatEventWeeksEditText.setText(controlSchedule.getRepeatWeeksNumber() + "");
-            }
-            if (controlSchedule.getLimit() != null) {
-                limitSpinner.setTag(true);
-                limitSpinner.setSelection(getIndex(limitSpinner, controlSchedule.getLimit()));
-            }
+        repeatEveryDayCheckBox.setChecked(controlSchedule.isRepeatEveryOtherWeek());
+        repeatCheckBox.setChecked(controlSchedule.isRepeatWeeks());
+        if (controlSchedule.getRepeatWeeksNumber() != null) {
+            mRepeatEventWeeksEditText.setText(controlSchedule.getRepeatWeeksNumber() + "");
+        }
+        if (controlSchedule.getLimit() != null) {
+            limitSpinner.setTag(true);
+            limitSpinner.setSelection(getIndex(limitSpinner, controlSchedule.getLimit()));
+        }
     }
 
     private int getIndex(Spinner spinner, Object object) {
@@ -321,6 +326,25 @@ public class CreateScheduleFragment extends BaseFragment {
         if (mDoor2.isChecked()) doors.add(2);
         mSchedule.setDoors(doors);
 
+        if (this.mRepeatEventWeeksEditText.isEnabled()) {
+            if (validateField(mRepeatEventWeeksEditText.getText(), "Week")) {
+                this.mSchedule.getControlSchedule().setRepeatWeeks(true);
+                this.mSchedule.getControlSchedule().setRepeatWeeksNumber(Integer.parseInt(mRepeatEventWeeksEditText.getText().toString()));
+            } else {
+                toast("Please enter the Repeat Weeks number");
+                return false;
+            }
+        }
+
+        if (mControlSchedule != null && Limit.EVENTS.equals(mControlSchedule.getLimit())) {
+            try {
+                mControlSchedule.setLimitEvents(Integer.parseInt(mDateEventEditText.getText().toString()));
+            } catch (Exception e) {
+                toast("Number of Events is not a valid number");
+                return false;
+            }
+        }
+
         mManager.add(mSchedule);
 
         return true;
@@ -337,6 +361,29 @@ public class CreateScheduleFragment extends BaseFragment {
         }
         if (StringUtils.isBlank(mOpen.getText()) && StringUtils.isBlank(mClose.getText())) {
             toast("Enter open or close time");
+            return false;
+        }
+        return validateSchedule();
+    }
+
+    private boolean validateSchedule() {
+        String dayStart = this.mDateStartTextView.getText().toString();
+        String limitText = this.mDateEventEditText.getText().toString();
+        if (!validateField(dayStart, "Start Date")) {
+            return false;
+        }
+        if (Limit.DATE.equals(mControlSchedule.getLimit()) && !validateField(limitText, "End Date")) {
+            return false;
+        }
+        if (Limit.EVENTS.equals(mControlSchedule.getLimit()) && !validateField(limitText, "Number of Events")) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validateField(CharSequence text, String nameField) {
+        if (StringUtils.isBlank(text)) {
+            ToastManager.show(getString(R.string.field_empty_msg, nameField));
             return false;
         }
         return true;

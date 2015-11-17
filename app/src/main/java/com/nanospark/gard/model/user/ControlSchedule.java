@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import mobi.tattu.utils.annotations.Nullable;
 import roboguice.util.Ln;
 
 /**
@@ -33,8 +34,12 @@ public class ControlSchedule implements Serializable {
     private boolean repeatEveryOtherWeek;
     private boolean repeatWeeks;
     private Integer repeatWeeksNumber;
-    private Long createTimestamp;
-    private Integer triggeredEvents;
+    private long createTimestamp;
+    private Integer triggeredEvents = 0;
+
+    public ControlSchedule() {
+        this.createTimestamp = System.currentTimeMillis();
+    }
 
     public List<Integer> getDays() {
         return days;
@@ -132,10 +137,10 @@ public class ControlSchedule implements Serializable {
     public void setStartYear(Integer startYear) {
         this.startYear = startYear;
     }
-    public Long getCreateTimestamp() {
+    public long getCreateTimestamp() {
         return createTimestamp;
     }
-    public void setCreateTimestamp(Long createTimestamp) {
+    public void setCreateTimestamp(long createTimestamp) {
         this.createTimestamp = createTimestamp;
     }
     public Integer getTriggeredEvents() {
@@ -196,9 +201,9 @@ public class ControlSchedule implements Serializable {
             }
         }
         StringBuilder sb = new StringBuilder();
-        if (repeatEveryOtherWeek || (repeatWeeks && repeatWeeksNumber == 2)) {
+        if (repeatEveryOtherWeek || (repeatWeeks && repeatWeeksNumber != null && repeatWeeksNumber == 2)) {
             sb.append("Every other ");
-        } else if ((repeatWeeks && repeatWeeksNumber > 2)) {
+        } else if ((repeatWeeks && repeatWeeksNumber != null && repeatWeeksNumber > 2)) {
             if (repeatWeeksNumber == 3) {
                 sb.append("Every 3rd ");
             } else if (repeatWeeksNumber == 4) {
@@ -219,7 +224,11 @@ public class ControlSchedule implements Serializable {
         return sb.toString();
     }
 
-    public boolean isAllowed(Door door) {
+    public boolean isAllowed() {
+        return isAllowed(null);
+    }
+
+    public boolean isAllowed(@Nullable Door door) { // TODO door is of no use for now
         Calendar today = Calendar.getInstance();
         if (isStartTimeSet()) {
             int minute = today.get(Calendar.MINUTE);

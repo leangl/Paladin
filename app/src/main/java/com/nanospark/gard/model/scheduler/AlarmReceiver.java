@@ -8,16 +8,15 @@ import ioio.lib.spi.Log;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
-    public static final String ACTION = "alarm_fired";
-
-    public static final String KEY_EXTRA_NAME = "extra_name";
+    public static final String EXTRA_ACTION = "extra_action";
+    public static final String EXTRA_ID = "extra_id";
 
     public AlarmReceiver() {
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        String key = intent.getStringExtra(KEY_EXTRA_NAME);
+        String key = intent.getStringExtra(EXTRA_ID);
         Schedule schedule = ScheduleManager.getInstance().getSchedule(key);
         if (schedule != null) {
             if (schedule.trigger()) {

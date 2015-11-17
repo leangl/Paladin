@@ -1,5 +1,6 @@
 package com.nanospark.gard.ui.fragments;
 
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,12 +15,13 @@ import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.CommandFailed;
 import com.nanospark.gard.events.CommandProcessed;
+import com.nanospark.gard.events.CommandSent;
 import com.nanospark.gard.events.DoorStateChanged;
-import com.nanospark.gard.voice.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.log.Log;
 import com.nanospark.gard.model.log.LogManager;
 import com.nanospark.gard.ui.custom.BaseFragment;
+import com.nanospark.gard.voice.VoiceRecognizer;
 import com.squareup.otto.Subscribe;
 
 import mobi.tattu.utils.annotations.SaveState;
@@ -124,7 +126,13 @@ public class DoorCardFragment extends BaseFragment {
 
     private void refreshState() {
         mTextviewOpen.setText(mDoor.getState().toString());
-        mImageViewDoor.setImageResource(mDoor.isOpen() ? R.drawable.ic_door_opened : R.drawable.ic_door_closed);
+        mImageViewDoor.setBackgroundResource(mDoor.isOpen() ? R.drawable.ic_door_opened_big : R.drawable.ic_door_closed_big);
+    }
+
+    private void startAnimation(int drawableResId) {
+        mImageViewDoor.setBackgroundResource(mDoor.isOpen() ? R.drawable.door_open_animation : R.drawable.door_close_animation);
+        AnimationDrawable animation = (AnimationDrawable) mImageViewDoor.getBackground();
+        animation.start();
     }
 
     private void setLastOpened() {
@@ -182,6 +190,15 @@ public class DoorCardFragment extends BaseFragment {
     @Subscribe
     public void on(DoorStateChanged event) {
         refreshState(event.door);
+    }
+
+    @Subscribe
+    public void on(CommandSent event) {
+        if (event.command instanceof Door.Open) {
+            startAnimation(R.drawable.door_open_animation);
+        } else if (event.command instanceof Door.Close) {
+            startAnimation(R.drawable.door_close_animation);
+        }
     }
 
     @Subscribe

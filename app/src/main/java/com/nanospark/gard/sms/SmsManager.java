@@ -51,8 +51,8 @@ public class SmsManager {
 
     private static final String TAG = SmsManager.class.getSimpleName();
 
-    private static long MESSAGES_CHECK_TIME = TimeUnit.SECONDS.toMillis(1);
-    private static long MESSAGES_RETRY_TIME = TimeUnit.SECONDS.toMillis(1);
+    private static long MESSAGES_CHECK_TIME = TimeUnit.SECONDS.toMillis(5);
+    private static long MESSAGES_RETRY_TIME = TimeUnit.SECONDS.toMillis(15);
 
     private SmsConfig mConfig;
     private TwilioApi mApi;
@@ -157,6 +157,9 @@ public class SmsManager {
             return Observable.empty();
         }
 
+        if (!isSmsEnabled()) {
+            return Observable.empty();
+        }
         TwilioAccount account = getAccount();
         if (account != null && account.isValid()) {
             return mApi.sendMessage(account.getSid(), message, account.getPhone(), to).map(result -> {
@@ -165,7 +168,7 @@ public class SmsManager {
                 return null;
             });
         } else {
-            Log.e("TWILIO", "Account not set!");
+            Log.e("TWILIO", "SMS enabled but account not set!");
             return Observable.error(new Exception());
         }
     }
@@ -205,13 +208,8 @@ public class SmsManager {
             fakeSms = null;
             return Observable.just(sms);
         }
-        TwilioAccount account = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class).get();
-        if (account != null) {
-            if (!account.isValid()) {
-                Log.e("TWILIO", "Account not set!");
-                return Observable.error(new Exception());
-            }
-
+        TwilioAccount account = getAccount();
+        if (isSmsEnabled() && account != null && account.isValid()) {
             return mApi.getMessages(account.getSid(), account.getPhone()).map(response -> {
                 JsonArray messages = response.getAsJsonObject().getAsJsonArray("messages");
                 if (messages.size() > 0) {
@@ -247,7 +245,7 @@ public class SmsManager {
             });
         } else {
             Log.e("TWILIO", "Account not set!");
-            return Observable.error(new Exception());
+            return Observable.error(new IllegalStateException());
         }
     }
 
@@ -259,6 +257,12 @@ public class SmsManager {
     private Runnable checkMessages = new Runnable() {
         @Override
         public void run() {
+            if (!isSmsEnabled()) {
+                Ln.d("SMS is disabled");
+                smsHandler.removeCallbacksAndMessages(null);
+                smsHandler.postDelayed(checkMessages, MESSAGES_RETRY_TIME);
+                return;
+            }
             getNewMessage().subscribe(message -> {
                 // if new message is received
                 if (message != null) {
@@ -448,7 +452,7 @@ public class SmsManager {
     }
 
     public static class SmsConfig {
-        public TwilioAccount account = new TwilioAccount("+17152204298", "SKa21285e73ff6b5fbabc6e970d18dbcb9", "UyMTD7Uhyptchd6bqVJKIMNZqpY0nEtz");
+        public TwilioAccount account = new TwilioAccount("+17152204298", "ACb000804b50f276502aeab919ee16b4a0", "307f30b80e7a21e5c526cdc968ba75f6");
         public boolean enabled = true;
         public boolean suspended = false;
     }

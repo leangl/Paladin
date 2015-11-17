@@ -101,8 +101,9 @@ public class ScheduleManager {
 
     private PendingIntent getPendingIntent(Schedule schedule, String action) {
         Intent intent = new Intent(GarD.instance, AlarmReceiver.class);
-        intent.putExtra(AlarmReceiver.KEY_EXTRA_NAME, schedule.getId());
-        intent.putExtra(AlarmReceiver.ACTION, action);
+        intent.setAction(schedule.getId() + "/" + action); // unique name for this schedule
+        intent.putExtra(AlarmReceiver.EXTRA_ID, schedule.getId());
+        intent.putExtra(AlarmReceiver.EXTRA_ACTION, action);
         return PendingIntent.getBroadcast(GarD.instance, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }

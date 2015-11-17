@@ -590,4 +590,8 @@ public class Door {
         }
     }
 
+    public Command getPendingCommand() {
+        return mPendingCommand;
+    }
+
 }

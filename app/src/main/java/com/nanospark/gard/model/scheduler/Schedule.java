@@ -1,6 +1,5 @@
 package com.nanospark.gard.model.scheduler;
 
-import com.nanospark.gard.model.Day;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.user.ControlSchedule;
 
@@ -134,7 +133,7 @@ public class Schedule implements Serializable, Comparable<Schedule> {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
 
-        return getControlSchedule().getDays().contains(Day.fromCalendar(day)) && scheduleHour == hour && scheduleMinute == minute;
+        return getControlSchedule().isAllowed();
     }
 
     public boolean trigger() {

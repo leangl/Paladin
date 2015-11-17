@@ -115,7 +115,7 @@ public class SchedulesFragment extends BaseFragment {
             if (schedule.isCloseTimeSet())
                 closeAt.setText(Utils.getHour(schedule.getCloseHour(), schedule.getCloseMinute()));
 
-            repeat.setText(schedule.getControlSchedule().toString());
+            repeat.setText(schedule.getControlSchedule().getDayLimitString());
 
             cardView.findViewById(R.id.imageview_menu).setOnClickListener(v -> {
                 PopupMenu popupMenu = new PopupMenu(getBaseActivity(), v);
