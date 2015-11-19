@@ -19,11 +19,4 @@
         <item name="colorControlHighlight">@color/white</item>
     </style>
 
-    <style name="ToolbarSubTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle">
-        <item name="android:textSize">10sp</item>
-    </style>
-
-    <!--style name="EditTextStyle" parent="AppTheme">
-        <item name="colorAccent">@color/red</item>
-    </style-->
 </resources>

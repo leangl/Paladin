@@ -1,9 +1,7 @@
 package com.nanospark.gard.ui.activity;
 
 import android.support.v4.app.Fragment;
-import android.view.Menu;
 
-import com.nanospark.gard.R;
 import com.nanospark.gard.ui.custom.BaseActivity;
 import com.nanospark.gard.ui.fragments.LogFragment;
 
@@ -17,18 +15,4 @@ public class LogActivity extends BaseActivity {
         return LogFragment.newInstance();
     }
 
-    @Override
-    public int getLayout() {
-        return R.layout.activity_main;
-    }
-
-    @Override
-    public boolean containsTab() {
-        return false;
-    }
-
-    @Override
-    public boolean createMenu(Menu menu) {
-        return true;
-    }
 }

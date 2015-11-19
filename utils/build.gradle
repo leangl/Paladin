@@ -5,7 +5,7 @@ buildscript {
 }
 
 plugins {
-    id "me.tatarka.retrolambda" version "3.2.3"
+    id "me.tatarka.retrolambda" version "3.2.4"
 }
 apply plugin: 'com.android.library'
 apply plugin: 'com.google.gms.google-services'
@@ -50,4 +50,5 @@ dependencies {
     compile 'io.reactivex:rxandroid:1.0.1'
     compile 'io.reactivex:rxjava:1.0.14'
     compile 'com.google.code.gson:gson:2.3.1'
+    compile 'com.trello:navi:0.1.1'
 }

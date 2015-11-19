@@ -47,16 +47,6 @@ public class CreateScheduleActivity extends BaseActivity {
     }
 
     @Override
-    public int getLayout() {
-        return R.layout.activity_main;
-    }
-
-    @Override
-    public boolean containsTab() {
-        return false;
-    }
-
-    @Override
     public Fragment getFragment() {
         Schedule schedule = (Schedule) getIntent().getSerializableExtra(ARG_SCHEDULE);
         mFragment = CreateScheduleFragment.newInstance(schedule);

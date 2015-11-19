@@ -1,131 +1,42 @@
 package com.nanospark.gard.ui.custom;
 
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 
-import com.google.inject.Inject;
 import com.nanospark.gard.R;
-import com.nanospark.gard.model.log.LogManager;
-import com.nanospark.gard.ui.activity.LogActivity;
-import com.nanospark.gard.ui.activity.SettingsActivity;
-import com.nanospark.gard.ui.fragments.MainFragment;
-import com.nanospark.gard.ui.fragments.SchedulesFragment;
-import com.nanospark.gard.ui.fragments.SettingsFragment;
-import com.nanospark.gard.ui.fragments.UsersFragment;
 
-import mobi.tattu.utils.ToastManager;
-import mobi.tattu.utils.Utils;
+import mobi.tattu.utils.ResourceUtils;
+import roboguice.inject.ContentView;
 
 /**
  * Created by cristian on 23/09/15.
  */
-public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActivity implements TabLayout.OnTabSelectedListener {
+@ContentView(R.layout.activity_main)
+public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActivity {
 
-    private ViewPager mViewPager;
-
-    @Inject
-    private LogManager mLogManager;
     private Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(getLayout());
         this.mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        this.mToolbar.setTitle(R.string.title_toolbar);
-        this.mToolbar.setSubtitle(R.string.subtile_toolbar);
-        this.mToolbar.setSubtitleTextColor(getColorFromResource(R.color.white));
-        this.mToolbar.setTitleTextColor(getColorFromResource(R.color.white));
-        setSupportActionBar(this.mToolbar);
+        if (this.mToolbar != null) {
+            this.mToolbar.setTitleTextColor(getColorFromResource(R.color.white));
+            setSupportActionBar(this.mToolbar);
+        }
 
-        if (containsTab()) {
-            initTabs();
-        } else {
+        Fragment f = getFragment();
+        if (f != null) {
             start(getFragment(), false);
         }
 
     }
 
-    public abstract int getLayout();
-
-    public abstract boolean containsTab();
-
-    public abstract Fragment getFragment();
-
-    private void initTabs() {
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab);
-        tabLayout.setTabTextColors(getResources().getColorStateList(R.color.tab_selector));
-        tabLayout.setSelectedTabIndicatorColor(getResources().getColor(R.color.white));
-        tabLayout.addTab(tabLayout.newTab().setText(R.string.title_main));
-        tabLayout.addTab(tabLayout.newTab().setText(R.string.title_users));
-        tabLayout.addTab(tabLayout.newTab().setText(R.string.title_schedules));
-
-        this.mViewPager = (ViewPager) findViewById(R.id.view_pager);
-        BasePagerAdapter basePagerAdapter = new BasePagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
-        this.mViewPager.setAdapter(basePagerAdapter);
-        this.mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.setOnTabSelectedListener(this);
-    }
-
-    @Override
-    public void onTabSelected(TabLayout.Tab tab) {
-        this.mViewPager.setCurrentItem(tab.getPosition());
-    }
-
-    @Override
-    public void onTabUnselected(TabLayout.Tab tab) {
-    }
-
-    @Override
-    public void onTabReselected(TabLayout.Tab tab) {
-    }
-
-    private class BasePagerAdapter extends FragmentStatePagerAdapter {
-        private int mCount;
-        private final int MAIN_FRAGMENT = 0;
-        private final int USERS_FRAGMENT = 1;
-        private final int SCHEDULES_FRAGMENT = 2;
-        private final int SETTINGS_FRAGMENT = 3;
-
-        public BasePagerAdapter(FragmentManager fm, int count) {
-            super(fm);
-            this.mCount = count;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            Fragment fragment = null;
-            switch (position) {
-                case MAIN_FRAGMENT:
-                    fragment = MainFragment.newInstance();
-                    break;
-                case USERS_FRAGMENT:
-                    fragment = UsersFragment.newInstance();
-                    break;
-                case SCHEDULES_FRAGMENT:
-                    fragment = SchedulesFragment.newInstance();
-                    break;
-                case SETTINGS_FRAGMENT:
-                    fragment = SettingsFragment.newInstance();
-                    break;
-            }
-            return fragment;
-        }
-
-        @Override
-        public int getCount() {
-            return this.mCount;
-        }
+    public Fragment getFragment() {
+        return null;
     }
 
     public int getColorFromResource(int color) {
@@ -136,53 +47,16 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return createMenu(menu);
-    }
-
-    public boolean createMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.settings:
-                /*DialogUtils.ask(this, "Fake SMS", fakeSmsText -> {
-                    SmsManager.fakeSms = fakeSmsText;
-                    return true;
-                });*/
-                startActivity(new Intent(this, SettingsActivity.class));
-                break;
-            case R.id.action_log:
-                if (mLogManager.getLogs().isEmpty()) {
-                    ToastManager.show(R.string.no_record_msg);
-                } else {
-                    startActivity(new Intent(this, LogActivity.class));
-                }
-                break;
-            case android.R.id.home:
-                onBackPressed();
-                break;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-        return true;
-
-    }
-
     public void showHomeIcon() {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setHomeButtonEnabled(true);
             getSupportActionBar().setShowHideAnimationEnabled(true);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(Utils.getDrawableResources(this, R.drawable.ic_action_navigation_arrow_back));
+            getSupportActionBar().setHomeAsUpIndicator(ResourceUtils.getDrawableResources(this, R.drawable.ic_action_navigation_arrow_back));
 
         }
-
     }
+
     public Toolbar getToolbar() {
         return this.mToolbar;
     }

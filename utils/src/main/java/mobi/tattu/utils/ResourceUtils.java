@@ -1,6 +1,9 @@
 package mobi.tattu.utils;
 
+import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 
 /**
  * Created by Leandro on 21/7/2015.
@@ -31,7 +34,24 @@ public class ResourceUtils {
     }
 
     public static String toString(Enum<?> e) {
-        return ResourceUtils.stringByName(e.getDeclaringClass().getSimpleName().toLowerCase() + "." + e.name().toLowerCase());
+        return ResourceUtils.stringByName(e.getDeclaringClass().getSimpleName().toLowerCase() + "." + e.name().toLowerCase(), e.name().toLowerCase());
+    }
+
+    /**
+     * Devuelve un ImageView buscando en el los resources
+     *
+     * @param context
+     * @param id      Imagen
+     * @return Drawable
+     */
+    public static Drawable getDrawableResources(Context context, int id) {
+        Drawable image = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            image = context.getResources().getDrawable(id, null);
+        } else {
+            image = context.getResources().getDrawable(id);
+        }
+        return image;
     }
 
 }

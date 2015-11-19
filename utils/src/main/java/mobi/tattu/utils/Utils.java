@@ -6,7 +6,6 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.net.ConnectivityManager;
@@ -32,6 +31,7 @@ import mobi.tattu.utils.log.Logger;
  * Created by Leandro on 30/05/2015.
  */
 public class Utils {
+
     public static String MULTIVALUE_PREFERENCE_SEPARATOR = "|";
     private static final SimpleDateFormat FILENAME_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd_hhmm");
     private static final char[] FILE_ILLEGAL_CHARACTERS = {'/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':'};
@@ -112,7 +112,6 @@ public class Utils {
     }
 
     public static Comparator<Size> SIZE_COMPARATOR = new Comparator<Size>() {
-
         @Override
         public int compare(Size lhs, Size rhs) {
             if (lhs.height * lhs.width > rhs.height * rhs.width) {
@@ -124,7 +123,6 @@ public class Utils {
         }
 
     };
-
 
     /**
      * Get the size in bytes of a bitmap.
@@ -236,28 +234,11 @@ public class Utils {
         return BuildConfig.DEBUG;
     }
 
-    //    /**
-//     * Devuelve un ImageView buscando en el los resources
-//     * @param context
-//     * @param id Imagen
-//     * @return Drawable
-//     */
-//    public static Drawable getDrawableResources(Context context, int id){
-//        Drawable image = null;
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-//            image = context.getResources().getDrawable(id,null);
-//        }else{
-//            image = context.getResources().getDrawable(id);
-//        }
-//        return image;
-//    }
-
     public static boolean hasHoneycomb() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
     }
 
     public static void init(Application app) {
-
         Thread.UncaughtExceptionHandler defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler((thread, ex) -> {
             Logger.e("ERROR", ex);
@@ -324,27 +305,6 @@ public class Utils {
             }
         }
         return null;
-    }
-
-    @Deprecated
-    public static boolean isEmpty(String text) {
-        return StringUtils.isEmpty(text);
-    }
-
-
-    @Deprecated
-    public static boolean isBlank(String text) {
-        return StringUtils.isBlank(text);
-    }
-
-    @Deprecated
-    public static boolean isNotBlank(String text) {
-        return StringUtils.isNotBlank(text);
-    }
-
-    @Deprecated
-    public static boolean equals(String s1, String s2) {
-        return StringUtils.equals(s1, s2);
     }
 
     /**
@@ -458,23 +418,6 @@ public class Utils {
             }
         }
         return Utils.joinMultiValue(newVals);
-    }
-
-    /**
-     * Devuelve un ImageView buscando en el los resources
-     *
-     * @param context
-     * @param id      Imagen
-     * @return Drawable
-     */
-    public static Drawable getDrawableResources(Context context, int id) {
-        Drawable image = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            image = context.getResources().getDrawable(id, null);
-        } else {
-            image = context.getResources().getDrawable(id);
-        }
-        return image;
     }
 
     /**

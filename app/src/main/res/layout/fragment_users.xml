@@ -1,48 +1,45 @@
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-    <include layout="@layout/toolbar"/>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:fillViewport="true"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
         tools:context="com.nanospark.gard.ui.fragments.UsersFragment">
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <!-- TODO: Update blank fragment layout -->
 
-            <android.support.v7.widget.GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentTop="true"
-                android:layout_margin="10dp"
-                app:rowCount="2"
-                app:columnCount="4"
-                app:useDefaultMargins="true"
-                android:id="@+id/gridlayout">
-            </android.support.v7.widget.GridLayout>
+        <android.support.v7.widget.GridLayout
+            android:id="@+id/gridlayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            app:columnCount="4"
+            app:useDefaultMargins="true">
 
-            <android.support.design.widget.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/fb_add_user"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_margin="30dp"
-                app:rippleColor="@color/white"
-                app:elevation="4dp"
-                app:backgroundTint="@color/red"
-                android:src="@drawable/ic_add_user"
-                android:scaleType="center"/>
+            <include
+                layout="@layout/user_layout"
+                app:layout_columnWeight="1"
+                app:layout_row="1"
+                app:layout_rowWeight="1"/>
 
-
-        </RelativeLayout>
+        </android.support.v7.widget.GridLayout>
     </ScrollView>
 
-</LinearLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fb_add_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="30dp"
+        android:scaleType="center"
+        android:src="@drawable/ic_add_user"
+        app:backgroundTint="@color/red"
+        app:elevation="4dp"
+        app:rippleColor="@color/white"/>
+</RelativeLayout>

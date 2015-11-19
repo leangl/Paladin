@@ -23,7 +23,9 @@ public class SettingsActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         getToolbar().setTitle(R.string.title_settings);
+
         TextView textView = (TextView) getViewInToolbar(R.id.textview_menu_overflow);
         textView.setVisibility(View.VISIBLE);
         textView.setText("SAVE");
@@ -40,16 +42,6 @@ public class SettingsActivity extends BaseActivity {
             }
         });
 
-    }
-
-    @Override
-    public int getLayout() {
-        return R.layout.activity_main;
-    }
-
-    @Override
-    public boolean containsTab() {
-        return false;
     }
 
     @Override

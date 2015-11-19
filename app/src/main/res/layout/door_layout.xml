@@ -125,10 +125,10 @@
                 android:layout_below="@+id/container_center"
                 android:layout_toEndOf="@+id/textView2"
                 android:layout_toRightOf="@+id/textView2"
-                android:background="@drawable/edittexttheme_edit_text_holo_light"
                 android:gravity="center_vertical"
                 android:hint="@string/default_open"
                 android:inputType="text"
+                android:maxLines="1"
                 android:text="@string/default_open"/>
 
             <TextView
@@ -150,10 +150,10 @@
                 android:layout_below="@+id/edittext_open_voice"
                 android:layout_toEndOf="@+id/textView2"
                 android:layout_toRightOf="@+id/textView2"
-                android:background="@drawable/edittexttheme_edit_text_holo_light"
                 android:gravity="center_vertical"
                 android:hint="@string/default_close"
                 android:inputType="text"
+                android:maxLines="1"
 
                 android:text="@string/default_close"/>
 
