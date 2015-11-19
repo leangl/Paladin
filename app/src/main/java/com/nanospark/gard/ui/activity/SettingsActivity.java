@@ -11,6 +11,8 @@ import com.nanospark.gard.R;
 import com.nanospark.gard.ui.custom.BaseActivity;
 import com.nanospark.gard.ui.fragments.SettingsFragment;
 
+import rx.android.schedulers.AndroidSchedulers;
+
 /**
  * Created by cristian on 16/10/15.
  */
@@ -26,8 +28,15 @@ public class SettingsActivity extends BaseActivity {
         textView.setVisibility(View.VISIBLE);
         textView.setText("SAVE");
         textView.setOnClickListener(v -> {
-            if (mFragment != null && mFragment.save()) {
-                finish();
+            if (mFragment != null) {
+                showLoading(false);
+                mFragment.save().observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(ok -> {
+                            stopLoading();
+                            if (ok) {
+                                finish();
+                            }
+                        });
             }
         });
 

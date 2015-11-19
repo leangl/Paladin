@@ -1,6 +1,5 @@
 package com.nanospark.gard.ui.fragments;
 
-
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -20,10 +19,11 @@ import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.sms.SmsManager;
 import com.nanospark.gard.sms.twilio.TwilioAccount;
 import com.nanospark.gard.ui.custom.BaseFragment;
+import com.nanospark.gard.weather.WeatherManager;
 
 import mobi.tattu.utils.StringUtils;
 import roboguice.inject.InjectView;
-
+import rx.Observable;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -50,9 +50,17 @@ public class SettingsFragment extends BaseFragment {
     private CheckBox mOpen2;
     @InjectView(R.id.close2)
     private CheckBox mClose2;
+    @InjectView(R.id.weather)
+    private CheckBox mWeather;
+    @InjectView(R.id.zipcode)
+    private EditText mZipcode;
+    @InjectView(R.id.city)
+    private TextView mCity;
 
     @Inject
     private SmsManager mSmsManager;
+    @Inject
+    private WeatherManager mWeatherManager;
 
     public static SettingsFragment newInstance() {
         return new SettingsFragment();
@@ -102,6 +110,10 @@ public class SettingsFragment extends BaseFragment {
         mDoor2.setChecked(door2.isEnabled());
         mOpen2.setChecked(door2.isOpenSwitchEnabled());
         mClose2.setChecked(door2.isCloseSwitchEnabled());
+
+        mWeather.setChecked(mWeatherManager.isEnabled());
+        mZipcode.setText(mWeatherManager.getCity().getZipCode());
+        mCity.setText(mWeatherManager.getCity().toString());
     }
 
     @Override
@@ -109,15 +121,15 @@ public class SettingsFragment extends BaseFragment {
         return true;
     }
 
-    public boolean save() {
+    public Observable<Boolean> save() {
 
         if (StringUtils.isBlank(mName1)) {
             toast("Please enter door 1 name");
-            return false;
+            return Observable.just(false);
         }
         if (StringUtils.isBlank(mName2)) {
             toast("Please enter door 2 name");
-            return false;
+            return Observable.just(false);
         }
 
         Door door1 = Door.getInstance(1);
@@ -132,13 +144,27 @@ public class SettingsFragment extends BaseFragment {
         door2.setOpenSwitchEnabled(mOpen2.isChecked());
         door2.setCloseSwitchEnabled(mClose2.isChecked());
 
-        return true;
+        mWeatherManager.setEnabled(mWeather.isChecked());
+        String zipCode = mZipcode.getText().toString();
+        if (StringUtils.isBlank(zipCode)) {
+            toast("Enter city zipcode");
+            return Observable.just(false);
+        }
+        if (!mWeatherManager.getCity().getZipCode().equals(zipCode)) {
+            return mWeatherManager.setCity(zipCode)
+                    .map(city -> true)
+                    .onErrorReturn(error -> {
+                        toast("No city found for that zipcode");
+                        return false;
+                    });
+        } else {
+            return Observable.just(true);
+        }
     }
 
     private void loadPhoneNumber() {
         mPhone.setText(mSmsManager.getAccount().getPhone());
     }
-
 
     private int touchCount;
     public void editSms() {
@@ -148,7 +174,7 @@ public class SettingsFragment extends BaseFragment {
 
         TextView cautionSms = (TextView) content.findViewById(R.id.caution_sms);
         cautionSms.setText(Html.fromHtml(getString(R.string.caution_sms)));
-        
+
         EditText phoneView = (EditText) content.findViewById(R.id.phone);
         EditText sidView = (EditText) content.findViewById(R.id.twilio_sid);
         EditText tokenView = (EditText) content.findViewById(R.id.twilio_token);

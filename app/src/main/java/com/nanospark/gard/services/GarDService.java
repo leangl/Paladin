@@ -72,7 +72,7 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
 
             mNotification = new NotificationCompat.Builder(GarDService.this)
                     .setContentTitle("GarD is active")
-                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setSmallIcon(R.drawable.ic_stat_paladin)
                     .build();
             startForeground(123, mNotification);
 

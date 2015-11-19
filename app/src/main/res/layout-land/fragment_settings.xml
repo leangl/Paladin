@@ -215,11 +215,20 @@
                 android:layout_marginRight="10dp"
                 android:background="@color/user_divider"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40dp"
+                android:layout_marginTop="20dp"
+                android:text="Weather"
+                android:textAllCaps="true"
+                android:textSize="20sp"/>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="50dp"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="5dp">
 
                 <CheckBox
                     android:id="@+id/weather"
@@ -232,14 +241,25 @@
                     android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/door1"
+                    android:digits="0123456789abcdefghijklmnñopqrstuvwxyz"
                     android:enabled="true"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
                     android:hint="Zipcode"
+                    android:inputType="number"
+                    android:maxLength="8"
                     android:maxLines="1"
                     android:singleLine="true"
                     android:textSize="18sp"/>
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/city"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="90dp"
+                android:layout_marginTop="5dp"
+                tools:text="New York City, US"/>
 
         </LinearLayout>
     </ScrollView>

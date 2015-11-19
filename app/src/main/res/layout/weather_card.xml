@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:id="@+id/container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="350dp"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardBackgroundColor="@color/cardview_background"
+        card_view:cardCornerRadius="4dp"
+        card_view:cardPreventCornerOverlap="false"
+        card_view:cardUseCompatPadding="false"
+        card_view:contentPadding="0dp">
+
+        <ProgressBar
+            android:id="@+id/progress"
+            style="@android:style/Widget.Holo.ProgressBar.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true"/>
+
+        <TextView
+            android:id="@+id/error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="Error updating weather.\nTouch to retry."
+            android:textSize="18sp"
+            android:visibility="invisible"
+            tools:visibility="visible"/>
+
+        <LinearLayout
+            android:id="@+id/card_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:maxWidth="270dp"
+                    android:singleLine="true"
+                    tools:text="275.6° New York City"/>
+
+                <TextView
+                    android:id="@+id/last_update_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/title"
+                    android:text="Last update: "
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/last_update"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/title"
+                    android:layout_toRightOf="@id/last_update_title"
+                    android:text="4 hours ago"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <ImageView
+                    android:id="@+id/weather_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/last_update_title"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@id/title"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerInside"
+                    tools:src="@drawable/weather_sunny_interval"/>
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/forecast_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp">
+
+                <include
+                    layout="@layout/weather_day"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
+
+                <include
+                    layout="@layout/weather_day"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
+
+                <include
+                    layout="@layout/weather_day"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
+
+                <include
+                    layout="@layout/weather_day"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+</FrameLayout>

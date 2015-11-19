@@ -50,6 +50,8 @@ public class DoorCardFragment extends BaseFragment {
     private TextView mLastOpenedlabel;
     @InjectView(R.id.textview_last_opened)
     private TextView mTextViewLastOpened;
+    @InjectView(R.id.container_center)
+    private View mContainerCenter;
 
     @Inject
     private LogManager mLogManager;
@@ -126,11 +128,13 @@ public class DoorCardFragment extends BaseFragment {
 
     private void refreshState() {
         mTextviewOpen.setText(mDoor.getState().toString());
+        mTextviewOpen.setTextColor(getResources().getColor(mDoor.isOpen() ? R.color.door_open : R.color.door_closed));
         mImageViewDoor.setBackgroundResource(mDoor.isOpen() ? R.drawable.ic_door_opened_big : R.drawable.ic_door_closed_big);
+        mContainerCenter.setBackgroundColor(getResources().getColor(mDoor.isOpen() ? R.color.door_open : R.color.door_closed));
     }
 
     private void startAnimation(int drawableResId) {
-        mImageViewDoor.setBackgroundResource(mDoor.isOpen() ? R.drawable.door_open_animation : R.drawable.door_close_animation);
+        mImageViewDoor.setBackgroundResource(drawableResId);
         AnimationDrawable animation = (AnimationDrawable) mImageViewDoor.getBackground();
         animation.start();
     }
@@ -194,10 +198,12 @@ public class DoorCardFragment extends BaseFragment {
 
     @Subscribe
     public void on(CommandSent event) {
-        if (event.command instanceof Door.Open) {
-            startAnimation(R.drawable.door_open_animation);
-        } else if (event.command instanceof Door.Close) {
-            startAnimation(R.drawable.door_close_animation);
+        if (event.door.equals(mDoor)) {
+            if (event.command instanceof Door.Open) {
+                startAnimation(R.drawable.door_open_animation);
+            } else if (event.command instanceof Door.Close) {
+                startAnimation(R.drawable.door_close_animation);
+            }
         }
     }
 

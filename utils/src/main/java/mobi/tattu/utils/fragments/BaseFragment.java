@@ -180,4 +180,8 @@ public class BaseFragment extends RoboFragment implements BaseActivity.OnBackLis
         return (T) LayoutInflater.from(getActivity()).inflate(resource, root, attachToRoot);
     }
 
+    public <T extends View> T findViewById(View parent, int id) {
+        return (T) parent.findViewById(id);
+    }
+
 }

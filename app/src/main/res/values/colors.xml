@@ -9,16 +9,13 @@
     <color name="toolbar_background">@color/background_material_dark</color>
     <!--<color name="activity_main_background">#eeeeee</color>-->
 
-    <color name="door_one_background">#ee9c26</color>
-    <color name="door_two_background">#a6e04b</color>
-    <color name="door_one_text_open_color">#ee9c26</color>
+    <color name="door_open">#a6e04b</color>
+    <color name="door_closed">#ee9c26</color>
 
-    <color name="text_color_open_door_two">#a6e04b</color>
     <color name="text_color_bold">#6e6e6e</color>
     <color name="secondary_text_default_material_dark">#b3b16f6f</color>
     <color name="edittexttheme_color">#6e6e6e</color>
     <color name="user_divider">#b1b1b1</color>
     <color name="text_color_pass">#f44336</color>
-
 
 </resources>

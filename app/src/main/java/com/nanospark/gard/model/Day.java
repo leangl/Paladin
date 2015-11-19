@@ -26,4 +26,12 @@ public enum Day {
                 return name().substring(0, 1);
         }
     }
+
+    public String abbr(int length) {
+        String abbr = abbr();
+        if (length > abbr.length()) {
+            abbr = abbr + name().substring(abbr.length(), name().length() < length ? name().length() : length);
+        }
+        return abbr;
+    }
 }

@@ -29,6 +29,7 @@ public class MainFragment extends com.nanospark.gard.ui.custom.BaseFragment {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         showFragment(R.id.door_one_container, DoorCardFragment.newInstance(1));
         showFragment(R.id.door_two_container, DoorCardFragment.newInstance(2));
+        showFragment(R.id.weather_container, WeatherCardFragment.newInstance());
         return view;
     }
 

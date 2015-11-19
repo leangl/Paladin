@@ -72,7 +72,7 @@ public class SmsManager {
                 .setEndpoint("https://api.twilio.com")
                 .setConverter(new GsonConverter(gson))
                 .setRequestInterceptor(mBasicAuthInterceptor)
-                .setLogLevel(RestAdapter.LogLevel.FULL).setLog(msg -> Log.i("retrofit", msg))
+                .setLogLevel(RestAdapter.LogLevel.FULL).setLog(Ln::i)
                 .build();
 
         mApi = restAdapter.create(TwilioApi.class);
