@@ -51,8 +51,8 @@ public class SmsManager {
 
     private static final String TAG = SmsManager.class.getSimpleName();
 
-    private static long MESSAGES_CHECK_TIME = TimeUnit.SECONDS.toMillis(5);
-    private static long MESSAGES_RETRY_TIME = TimeUnit.SECONDS.toMillis(15);
+    private static long MESSAGES_CHECK_TIME = TimeUnit.SECONDS.toMillis(1);
+    private static long MESSAGES_RETRY_TIME = TimeUnit.SECONDS.toMillis(1);
 
     private SmsConfig mConfig;
     private TwilioApi mApi;
