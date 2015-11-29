@@ -52,12 +52,20 @@ public class DataStore {
         return result;
     }
 
-    public <T> F.Option<T> getObject(Object key, Class<T> type) {
+    public <T> F.Option<T> get(Object key, Class<T> type) {
         try {
             return F.Option.Some(fromJson(type, getRootEntry(key, type)));
         } catch (ObjectNotFoundException e) {
             return F.Option.None();
         }
+    }
+
+    /**
+     * @deprecated Use get(Object, Class)
+     */
+    @Deprecated
+    public <T> F.Option<T> getObject(Object key, Class<T> type) {
+        return get(key, type);
     }
 
     public boolean contains(Object object) {
@@ -103,9 +111,15 @@ public class DataStore {
      * TODO should include Class parameter to avoid persisting subtypes into different stores
      *
      * @param object
+     * @deprecated use put(Object) instead
      */
+    @Deprecated
     public void putObject(Object object) {
-        putObject(object, object);
+        put(object);
+    }
+
+    public void put(Object object) {
+        put(object, object);
     }
 
     /**
@@ -137,8 +151,14 @@ public class DataStore {
      * TODO should include Class parameter to avoid persisting subtypes into different stores
      *
      * @param object
+     * @deprecated use put(Object, Object) instead
      */
+    @Deprecated
     public void putObject(Object key, Object object) {
+        put(key, object);
+    }
+
+    public void put(Object key, Object object) {
         SharedPreferences prefs = getSharedPreferences(object.getClass());
 
         JsonObject root = new JsonObject();
@@ -159,7 +179,7 @@ public class DataStore {
     }
 
     private SharedPreferences getSharedPreferences(Class<?> type) {
-        return mCtx.getSharedPreferences(type.getCanonicalName(), Context.MODE_PRIVATE);
+        return Tattu.context.getSharedPreferences(type.getCanonicalName(), Context.MODE_PRIVATE);
     }
 
     private List<TypeAdapterFactory> mAdapters = new ArrayList<>();

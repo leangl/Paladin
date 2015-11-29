@@ -36,10 +36,20 @@
         android:layout_alignParentBottom="true"
         android:layout_below="@+id/toolbar"
         android:layout_centerHorizontal="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:scaleType="centerCrop"
         android:src="@drawable/bg1"/>
 
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
+        android:layout_centerHorizontal="true"/>
+
     <ImageView
+        android:id="@+id/logo_text"
         android:layout_width="130dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar"
@@ -48,12 +58,5 @@
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
         android:src="@drawable/logo_text"/>
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/view_pager"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/toolbar"
-        android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

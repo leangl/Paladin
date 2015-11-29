@@ -1,5 +1,6 @@
 package com.nanospark.gard.model.scheduler;
 
+import com.nanospark.gard.Utils;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.user.ControlSchedule;
 
@@ -147,5 +148,13 @@ public class Schedule implements Serializable, Comparable<Schedule> {
             }
         }
         return false;
+    }
+
+    public Calendar getOpenTime() {
+        return isOpenTimeSet() ? Utils.createCalendarTime(openHour, openMinute) : null;
+    }
+
+    public Calendar getCloseTime() {
+        return isCloseTimeSet() ? Utils.createCalendarTime(closeHour, closeMinute) : null;
     }
 }

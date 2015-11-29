@@ -11,6 +11,7 @@
 
     <color name="door_open">#a6e04b</color>
     <color name="door_closed">#ee9c26</color>
+    <color name="door_unknown">#c2c2c2</color>
 
     <color name="text_color_bold">#6e6e6e</color>
     <color name="secondary_text_default_material_dark">#b3b16f6f</color>

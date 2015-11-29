@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:card_view="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_margin="10dp">
 
     <android.support.v7.widget.CardView
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal|top"
         android:layout_margin="10dp"
         card_view:cardBackgroundColor="@color/cardview_background"
         card_view:cardCornerRadius="4dp"
@@ -62,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:paddingBottom="10dp"
+                    android:paddingBottom="25dp"
                     android:text="(715) 378 4568"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/red"/>
@@ -77,7 +77,9 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="90dp">
+                android:layout_height="90dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="10dp">
 
                 <ImageView
                     android:id="@+id/imageview_receive_alerts"
@@ -88,7 +90,8 @@
                     android:layout_alignParentTop="true"
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="10dp"
-                    android:src="@drawable/ic_alert_disabled"/>
+                    android:src="@drawable/ic_alert_disabled"
+                    android:layout_marginBottom="10dp"/>
 
                 <TextView
                     android:id="@+id/textView5"
@@ -165,4 +168,4 @@
         </LinearLayout>
     </android.support.v7.widget.CardView>
 
-</RelativeLayout>
+</FrameLayout>

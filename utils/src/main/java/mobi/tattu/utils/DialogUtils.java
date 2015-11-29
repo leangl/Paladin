@@ -111,6 +111,7 @@ public class DialogUtils {
                                               F.Function2<List<T>, AlertDialog, Boolean> listener) {
 
         List<T> selectedItems = new ArrayList<>(items.size());
+        selectedItems.addAll(preselected);
 
         final ArrayAdapter<T> arrayAdapter = new DialogListAdapter<>(ctx, R.layout.select_dialog_multichoice_material, items, disabled);
         AlertDialog dialog = new AlertDialog.Builder(ctx)

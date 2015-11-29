@@ -38,16 +38,17 @@ public class WeatherManager {
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint("http://api.openweathermap.org")
                 .setConverter(new GsonConverter(gson))
-                .setLogLevel(RestAdapter.LogLevel.FULL).setLog(Ln::i)
+                .setLogLevel(RestAdapter.LogLevel.FULL).setLog(Ln::d)
                 .build();
 
         mApi = restAdapter.create(OpenWeatherMapApi.class);
 
-        mConfig = DataStore.getInstance().getObject(Config.class.getSimpleName(), Config.class).get();
+        mConfig = DataStore.getInstance().get(Config.class.getSimpleName(), Config.class).get();
         if (mConfig == null) {
             mConfig = new Config();
             mConfig.city = new City("US", 0l, "New York City", "10001"); // defaults to NY
         }
+        mForecast = DataStore.getInstance().get(Forecast.class.getSimpleName(), Forecast.class).get();
     }
 
     public static final WeatherManager getInstance() {
@@ -78,6 +79,8 @@ public class WeatherManager {
                     }
 
                     mForecast = forecast;
+                    DataStore.getInstance().put(Forecast.class.getSimpleName(), mForecast);
+
                     return forecast;
                 }).onErrorReturn(error -> {
                     if (mForecast != null) {

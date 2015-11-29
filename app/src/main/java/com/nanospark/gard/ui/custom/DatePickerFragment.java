@@ -12,30 +12,32 @@ import mobi.tattu.utils.Tattu;
 
 public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
     private static String ARG_ID = "arg_id";
+    private static String ARG_CAL = "arg_cal";
     private int mId;
+    private Calendar mCalendar;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.mId = getArguments().getInt(ARG_ID);
-    }
-
-    public static DatePickerFragment newInstance(int id) {
+    public static DatePickerFragment newInstance(int id, Calendar cal) {
         Bundle args = new Bundle();
         args.putInt(ARG_ID, id);
+        args.putSerializable(ARG_CAL, cal != null ? cal : Calendar.getInstance());
         DatePickerFragment fragment = new DatePickerFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mId = getArguments().getInt(ARG_ID);
+        mCalendar = (Calendar) getArguments().getSerializable(ARG_CAL);
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the current date as the default date in the picker
-        final Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
+        int year = mCalendar.get(Calendar.YEAR);
+        int month = mCalendar.get(Calendar.MONTH);
+        int day = mCalendar.get(Calendar.DAY_OF_MONTH);
 
         // Create a new instance of DatePickerDialog and return it
         return new DatePickerDialog(getActivity(), this, year, month, day);

@@ -52,7 +52,7 @@ public class GarD extends Application {
         ScheduleManager.getInstance().init();
 
         // Start service as soon as app starts
-        //GarDService.start(); FIXME
+        //GarDService.startChecking(); FIXME
 
         // Initialize Universal Image Loader
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
@@ -69,7 +69,7 @@ public class GarD extends Application {
         if (StringUtils.isNotBlank(message)) {
             Tattu.runOnUiThread(() -> {
                 Log.i("GarD", message);
-                ToastManager.get().showToast(message, 10000, 1);
+                ToastManager.get().show(message, 10000, 1);
             });
         }
     }

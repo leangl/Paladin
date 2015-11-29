@@ -71,7 +71,8 @@ public class UserManager {
     }
 
     public User findByPhone(String phone) {
-        return find((user) -> user.getPhone().trim().equalsIgnoreCase(phone.trim()));
+        F.Function<String, String> filter = (number) -> number.trim().replace("+1", "");
+        return find((user) -> filter.apply(user.getPhone()).equalsIgnoreCase(filter.apply(phone)));
     }
 
     public void delete(User user) {

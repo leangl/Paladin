@@ -1,7 +1,13 @@
 package com.nanospark.gard;
 
+import android.os.Environment;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Locale;
+
+import mobi.tattu.utils.ToastManager;
 
 /**
  * Created by cristian on 11/10/15.
@@ -36,4 +42,27 @@ public class Utils {
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar;
     }
+
+    public static Calendar createCalendarDate(int year, int month, int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        return calendar;
+    }
+
+    public static void saveLogcat() {
+        final File path = new File(Environment.getExternalStorageDirectory(), "paladin_" + System.currentTimeMillis() + ".log");
+        try {
+            if (path.exists()) {
+                path.delete();
+            }
+            Runtime.getRuntime().exec("logcat -d -f " + path);
+            ToastManager.show("Log saved: " + path);
+        } catch (IOException e) {
+            ToastManager.show("Error saving log: " + path);
+        }
+    }
+
+
 }

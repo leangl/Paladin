@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.READ_LOGS"/>
 
     <uses-feature
         android:name="com.android.future.usb.accessory"
@@ -27,7 +28,7 @@
             android:name=".ui.activity.MainActivityNew"
             android:launchMode="singleTask"
             android:screenOrientation="landscape"
-            android:windowSoftInputMode="stateHidden">
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -52,18 +53,19 @@
         <activity
             android:name=".ui.activity.CreateUserActivity"
             android:screenOrientation="landscape"
-            android:windowSoftInputMode="adjustPan|adjustResize"/>
+            android:windowSoftInputMode="adjustPan"/>
         <activity
             android:name=".ui.activity.CreateScheduleActivity"
             android:screenOrientation="landscape"
-            android:windowSoftInputMode="adjustPan|adjustResize"/>
+            android:windowSoftInputMode="adjustPan"/>
         <activity
             android:name=".ui.activity.SettingsActivity"
             android:screenOrientation="landscape"
-            android:windowSoftInputMode="adjustPan|adjustResize"/>
+            android:windowSoftInputMode="adjustPan"/>
         <activity
             android:name=".ui.activity.LogActivity"
-            android:screenOrientation="landscape"/>
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="adjustPan"/>
 
         <service android:name=".services.GarDService"/>
 

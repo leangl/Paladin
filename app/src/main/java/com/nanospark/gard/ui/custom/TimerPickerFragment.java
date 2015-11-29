@@ -14,14 +14,15 @@ import mobi.tattu.utils.Tattu;
  * Created by cristian on 17/10/15.
  */
 public class TimerPickerFragment extends android.support.v4.app.DialogFragment implements TimePickerDialog.OnTimeSetListener {
-
-    private static String ARG_ID;
+    private static String ARG_ID = "arg_id";
+    private static String ARG_CAL = "arg_cal";
     private int mId;
+    private Calendar mCalendar;
 
-    public static TimerPickerFragment newInstance(int id) {
-
+    public static TimerPickerFragment newInstance(int id, Calendar cal) {
         Bundle args = new Bundle();
         args.putInt(ARG_ID, id);
+        args.putSerializable(ARG_CAL, cal != null ? cal : Calendar.getInstance());
         TimerPickerFragment fragment = new TimerPickerFragment();
         fragment.setArguments(args);
         return fragment;
@@ -30,19 +31,18 @@ public class TimerPickerFragment extends android.support.v4.app.DialogFragment i
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.mId = getArguments().getInt(ARG_ID);
+        mId = getArguments().getInt(ARG_ID);
+        mCalendar = (Calendar) getArguments().getSerializable(ARG_CAL);
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the current time as the default values for the picker
-        final Calendar c = Calendar.getInstance();
-        int hour = c.get(Calendar.HOUR_OF_DAY);
-        int minute = c.get(Calendar.MINUTE);
+        int hour = mCalendar.get(Calendar.HOUR_OF_DAY);
+        int minute = mCalendar.get(Calendar.MINUTE);
 
         // Create a new instance of TimePickerDialog and return it
-        return new TimePickerDialog(getActivity(), this, hour, minute,
-                DateFormat.is24HourFormat(getActivity()));
+        return new TimePickerDialog(getActivity(), this, hour, minute, DateFormat.is24HourFormat(getActivity()));
     }
 
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {

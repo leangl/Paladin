@@ -78,7 +78,6 @@
                             android:id="@+id/edittext_password"
                             android:layout_width="80dp"
                             android:layout_height="wrap_content"
-                            android:inputType="number"
                             android:maxLength="4"/>
 
                     </LinearLayout>

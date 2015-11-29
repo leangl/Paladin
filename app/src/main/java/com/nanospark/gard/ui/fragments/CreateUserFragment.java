@@ -177,13 +177,13 @@ public class CreateUserFragment extends BaseFragment {
 
                 if (limit.equals(Limit.DATE)) {
                     if (parent.getTag() == null) {
-                        showDatePicker(view.getId());
+                        showDatePicker(view.getId(), mControlSchedule.getEndDate());
                     }
                     mDateEventEditText.setVisibility(View.VISIBLE);
                     mDateEventEditText.setFocusable(false);
                     mDateEventEditText.setFocusableInTouchMode(false);
                     mDateEventEditText.setOnClickListener(v -> {
-                        showDatePicker(v.getId());
+                        showDatePicker(view.getId(), mControlSchedule.getEndDate());
                     });
                     if (mControlSchedule != null && mControlSchedule.isEndDateSet()) {
                         mDateEventEditText.setText(getDay(mControlSchedule.getLimitDay(), mControlSchedule.getLimitMonth(), mControlSchedule.getLimitYear()));
@@ -219,13 +219,13 @@ public class CreateUserFragment extends BaseFragment {
         });
         initDays(daysContainer);
         this.mTimeStartTextView.setOnClickListener(v -> {
-            showTimerPicker(R.id.textview_start_time);
+            showTimerPicker(R.id.textview_start_time, mControlSchedule.getStartTime());
         });
         this.mTimeEndTextView.setOnClickListener(v -> {
-            showTimerPicker(R.id.textview_end_time);
+            showTimerPicker(R.id.textview_end_time, mControlSchedule.getEndTime());
         });
         this.mDateStartTextView.setOnClickListener(v -> {
-            showDatePicker(R.id.textview_start_day);
+            showDatePicker(R.id.textview_start_day, mControlSchedule.getStartDate());
         });
         Calendar today = Calendar.getInstance();
         mDateStartTextView.setText(getDay(today.get(Calendar.DAY_OF_MONTH), today.get(Calendar.MONTH), today.get(Calendar.YEAR)));
@@ -285,13 +285,13 @@ public class CreateUserFragment extends BaseFragment {
         return index;
     }
 
-    private void showDatePicker(int id) {
-        DatePickerFragment datePickerFragment = DatePickerFragment.newInstance(id);
+    private void showDatePicker(int id, Calendar defaultCal) {
+        DatePickerFragment datePickerFragment = DatePickerFragment.newInstance(id, defaultCal);
         datePickerFragment.show(getBaseActivity().getSupportFragmentManager(), datePickerFragment.toString());
     }
 
-    private void showTimerPicker(int id) {
-        TimerPickerFragment timerPickerFragment = TimerPickerFragment.newInstance(id);
+    private void showTimerPicker(int id, Calendar defaultCal) {
+        TimerPickerFragment timerPickerFragment = TimerPickerFragment.newInstance(id, defaultCal);
         timerPickerFragment.show(getBaseActivity().getSupportFragmentManager(), timerPickerFragment.toString());
     }
 
@@ -393,7 +393,6 @@ public class CreateUserFragment extends BaseFragment {
         controlSchedule.setLimitDay(null);
         controlSchedule.setLimitMonth(null);
         controlSchedule.setLimitYear(null);
-
     }
 
     public void resetTimeEnd(ControlSchedule controlSchedule, TextView textView) {

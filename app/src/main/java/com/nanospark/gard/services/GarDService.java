@@ -61,7 +61,7 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
         super.onDestroy();
         stopIOIO();
         mVoiceRecognizer.stop();
-        mClient.stop();
+        mClient.stopChecking();
     }
 
     @Override
@@ -71,12 +71,12 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
             started = true;
 
             mNotification = new NotificationCompat.Builder(GarDService.this)
-                    .setContentTitle("GarD is active")
+                    .setContentTitle("Paladin is running")
                     .setSmallIcon(R.drawable.ic_stat_paladin)
                     .build();
             startForeground(123, mNotification);
 
-            mClient.start();
+            mClient.startChecking();
         }
 
         startIOIO();

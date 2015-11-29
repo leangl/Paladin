@@ -148,7 +148,7 @@ public class VoiceRecognizer implements RecognitionListener {
     }
 
     /**
-     * This callback is called when we stop the recognizer.
+     * This callback is called when we stopChecking the recognizer.
      */
     @Override
     public void onResult(Hypothesis hypothesis) {
@@ -169,7 +169,7 @@ public class VoiceRecognizer implements RecognitionListener {
     }
 
     /**
-     * We stop recognizer here to get a final result
+     * We stopChecking recognizer here to get a final result
      */
     @Override
     public void onEndOfSpeech() {

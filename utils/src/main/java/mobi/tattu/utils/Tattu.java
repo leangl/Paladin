@@ -10,8 +10,12 @@ import android.os.Process;
 
 import com.squareup.otto.Bus;
 
+import mobi.tattu.utils.events.AppInstalled;
+import mobi.tattu.utils.events.AppUpdated;
 import mobi.tattu.utils.log.Logger;
+import mobi.tattu.utils.persistance.datastore.DataStore;
 import mobi.tattu.utils.preferences.Config;
+import roboguice.util.Ln;
 
 /**
  * Created by Leandro on 16/02/2015.
@@ -35,6 +39,31 @@ public class Tattu {
 
         //ToastManager.get().init(R.layout.toast, R.id.toast_text);
         Config.get().setDefaultPreferences(false, null);
+
+        //checkVersion();
+    }
+
+    private static void checkVersion() throws Exception {
+        Integer currentVersionCode = Class.forName(context.getPackageName() + ".BuildConfig").getField("VERSION_CODE").getInt(null);
+        Integer previousVersionCode = DataStore.getInstance().get("VERSION_CODE", Integer.class).get();
+        if (previousVersionCode == null) {
+            // First install
+            DataStore.getInstance().put("VERSION_CODE", currentVersionCode);
+            post(new AppInstalled());
+            Ln.i("App installed: " + currentVersionCode);
+        } else {
+            if (previousVersionCode < currentVersionCode) {
+                // App updated
+                DataStore.getInstance().put("VERSION_CODE", currentVersionCode);
+                post(new AppUpdated(previousVersionCode, currentVersionCode));
+                Ln.i("App updated: " + previousVersionCode + " > " + currentVersionCode);
+            } else if (previousVersionCode > currentVersionCode) {
+                // App downgraded
+                Ln.e("App downgraded: " + previousVersionCode + " > " + currentVersionCode);
+            } else {
+                Ln.d("Version not changed");
+            }
+        }
     }
 
     public static final void runOnUiThread(Runnable r) {

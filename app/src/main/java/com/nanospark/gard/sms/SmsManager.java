@@ -49,10 +49,8 @@ import static com.nanospark.gard.sms.twilio.TwilioApi.DATE_FORMAT;
 @Singleton
 public class SmsManager {
 
-    private static final String TAG = SmsManager.class.getSimpleName();
-
     private static long MESSAGES_CHECK_TIME = TimeUnit.SECONDS.toMillis(1);
-    private static long MESSAGES_RETRY_TIME = TimeUnit.SECONDS.toMillis(1);
+    private static long MESSAGES_RETRY_TIME = TimeUnit.SECONDS.toMillis(30);
 
     private SmsConfig mConfig;
     private TwilioApi mApi;
@@ -72,7 +70,7 @@ public class SmsManager {
                 .setEndpoint("https://api.twilio.com")
                 .setConverter(new GsonConverter(gson))
                 .setRequestInterceptor(mBasicAuthInterceptor)
-                .setLogLevel(RestAdapter.LogLevel.FULL).setLog(Ln::i)
+                .setLogLevel(RestAdapter.LogLevel.FULL).setLog(Ln::d)
                 .build();
 
         mApi = restAdapter.create(TwilioApi.class);
@@ -81,7 +79,7 @@ public class SmsManager {
 
         Tattu.register(this);
 
-        mConfig = DataStore.getInstance().getObject(SmsConfig.class.getSimpleName(), SmsConfig.class).get();
+        mConfig = DataStore.getInstance().get(SmsConfig.class.getSimpleName(), SmsConfig.class).get();
         if (mConfig == null) {
             mConfig = new SmsConfig();
         }
@@ -91,13 +89,13 @@ public class SmsManager {
         return RoboGuice.getInjector(GarD.instance).getInstance(SmsManager.class);
     }
 
-    public void start() {
+    public void startChecking() {
         // Start checking for incoming SMS messages
         smsHandler.removeCallbacksAndMessages(null);
-        smsHandler.postDelayed(checkMessages, MESSAGES_CHECK_TIME);
+        smsHandler.post(checkMessages);
     }
 
-    public void stop() {
+    public void stopChecking() {
         if (smsHandler != null) {
             smsHandler.removeCallbacksAndMessages(null);
         }
@@ -113,7 +111,8 @@ public class SmsManager {
     };
 
     public void saveConfig() {
-        DataStore.getInstance().putObject(SmsConfig.class.getSimpleName(), mConfig);
+        DataStore.getInstance().put(SmsConfig.class.getSimpleName(), mConfig);
+        startChecking();
     }
 
     public void setTwilioAccount(TwilioAccount account) {
@@ -151,7 +150,6 @@ public class SmsManager {
     }
 
     public Observable<Void> sendMessage(String message, String to) {
-
         if (exceededLimit()) {
             suspendSms();
             return Observable.empty();
@@ -189,7 +187,6 @@ public class SmsManager {
     }
 
     public TwilioAccount getAccount() {
-        //account = DataStore.getInstance().getObject(TwilioAccount.class.getSimpleName(), TwilioAccount.class).get();
         return mConfig.account;
     }
 
@@ -204,7 +201,7 @@ public class SmsManager {
         if (fakeSms != null) {
             JsonObject sms = new JsonObject();
             sms.addProperty("body", fakeSms);
-            sms.addProperty("from", "1");
+            sms.addProperty("from", "+19");
             fakeSms = null;
             return Observable.just(sms);
         }
@@ -221,7 +218,7 @@ public class SmsManager {
                                 Date timestamp = DATE_FORMAT.parse(messageObj.get("date_sent").getAsString());
                                 boolean after = true;
                                 Calendar lastCal = Calendar.getInstance();
-                                Date lastTimestamp = DataStore.getInstance().getObject("LAST_TIMESTAMP", Date.class).get();
+                                Date lastTimestamp = DataStore.getInstance().get("LAST_TIMESTAMP", Date.class).get();
                                 if (lastTimestamp != null) {
                                     lastCal.setTime(lastTimestamp);
 
@@ -231,7 +228,7 @@ public class SmsManager {
                                     after = messageCal.after(lastCal);
                                 }
                                 if (after) {
-                                    DataStore.getInstance().putObject("LAST_TIMESTAMP", timestamp);
+                                    DataStore.getInstance().put("LAST_TIMESTAMP", timestamp);
                                     return messageObj;
                                 }
                             } catch (ParseException e) {
@@ -259,8 +256,10 @@ public class SmsManager {
         public void run() {
             if (!isSmsEnabled()) {
                 Ln.d("SMS is disabled");
-                smsHandler.removeCallbacksAndMessages(null);
-                smsHandler.postDelayed(checkMessages, MESSAGES_RETRY_TIME);
+                return;
+            }
+            if (isSmsSuspended()) {
+                Ln.d("SMS is suspended");
                 return;
             }
             getNewMessage().subscribe(message -> {
@@ -434,13 +433,13 @@ public class SmsManager {
                     && user.getNotify().notify(command)) {
                 count++;
                 sendMessage(alert, user.getPhone()).subscribe(success -> {
-                    Log.d(TAG, "SMS success");
+                    Ln.d("SMS success");
                 }, error -> {
-                    Log.e(TAG, "SMS error", error);
+                    Ln.e("SMS error", error);
                 });
             }
         }
-        Log.d(TAG, "Sending alert to #" + count);
+        Ln.d("Sending alert to #" + count);
     }
 
     @Produce

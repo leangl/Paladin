@@ -1,5 +1,6 @@
 package com.nanospark.gard.model.user;
 
+import com.nanospark.gard.Utils;
 import com.nanospark.gard.model.Day;
 import com.nanospark.gard.model.door.Door;
 
@@ -254,7 +255,7 @@ public class ControlSchedule implements Serializable {
             if (year < startYear ||
                     (year == startYear &&
                             (month < startMonth || (month == startMonth && day < startDay)))) {
-                Ln.i("Today is before start date: yyyy/MM/dd", year, month, day);
+                Ln.i("Today is before startChecking date: yyyy/MM/dd", year, month, day);
                 return false;
             }
         }
@@ -323,6 +324,22 @@ public class ControlSchedule implements Serializable {
 
     public boolean isEndDateSet() {
         return Limit.DATE.equals(limit) && limitDay != null && limitMonth != null && limitYear != null;
+    }
+
+    public Calendar getStartDate() {
+        return isStartDateSet() ? Utils.createCalendarDate(startYear, startMonth, startDay) : null;
+    }
+
+    public Calendar getEndDate() {
+        return isEndDateSet() ? Utils.createCalendarDate(limitYear, limitMonth, limitDay) : null;
+    }
+
+    public Calendar getStartTime() {
+        return isStartTimeSet() ? Utils.createCalendarTime(startHour, startMinute) : null;
+    }
+
+    public Calendar getEndTime() {
+        return isEndTimeSet() ? Utils.createCalendarTime(endHour, endMinute) : null;
     }
 
 }

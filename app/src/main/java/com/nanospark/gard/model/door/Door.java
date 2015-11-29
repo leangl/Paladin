@@ -15,9 +15,9 @@ import com.nanospark.gard.events.CommandSent;
 import com.nanospark.gard.events.DoorStateChanged;
 import com.nanospark.gard.events.VoiceRecognitionDisabled;
 import com.nanospark.gard.events.VoiceRecognitionEnabled;
-import com.nanospark.gard.voice.VoiceRecognizer;
 import com.nanospark.gard.model.user.User;
 import com.nanospark.gard.sms.SmsManager;
+import com.nanospark.gard.voice.VoiceRecognizer;
 import com.squareup.otto.Subscribe;
 
 import java.util.concurrent.TimeUnit;
@@ -34,9 +34,9 @@ import roboguice.RoboGuice;
 import roboguice.util.Ln;
 
 /**
- * Created by Leandro on 9/8/2015.
+ * Created by Leandro on 9/8/2015
  */
-public class Door {
+public abstract class Door {
 
     private int mId;
     private State mState = State.UNKNOWN;
@@ -114,7 +114,7 @@ public class Door {
 
     private static AutoCloseConfig getAutoCloseConfig() {
         if (sAutoCloseConfig == null) {
-            sAutoCloseConfig = DataStore.getInstance().getObject(AutoCloseConfig.class.getSimpleName(), AutoCloseConfig.class).get();
+            sAutoCloseConfig = DataStore.getInstance().get(AutoCloseConfig.class.getSimpleName(), AutoCloseConfig.class).get();
             if (sAutoCloseConfig == null) {
                 sAutoCloseConfig = new AutoCloseConfig();
             }
@@ -123,7 +123,7 @@ public class Door {
     }
 
     public static void persist(AutoCloseConfig config) {
-        DataStore.getInstance().putObject(AutoCloseConfig.class.getSimpleName(), config);
+        DataStore.getInstance().put(AutoCloseConfig.class.getSimpleName(), config);
     }
 
     public static AutoCloseConfig sAutoCloseConfig;
@@ -155,6 +155,9 @@ public class Door {
             Tattu.post(new CommandProcessed(this, mState, mPendingCommand));
             mPendingCommand = null;
         }
+        /*if (isOpen()) {
+            startAutoClose();
+        }*/
     }
 
     private void startAutoClose() {
@@ -311,17 +314,16 @@ public class Door {
     }
 
     private void restore() {
-        mConfig = mDataStore.getObject(getId(), Config.class).get();
+        mConfig = mDataStore.get(getId(), Config.class).get();
         if (mConfig == null) {
-            mConfig = new Config();
-            mConfig.name = "Door " + getId();
-            mConfig.openPhrase = GarD.instance.getString(R.string.default_open);
-            mConfig.closePhrase = GarD.instance.getString(R.string.default_close);
+            mConfig = getDefaultConfig();
         }
     }
 
+    protected abstract Config getDefaultConfig();
+
     private void persist() {
-        mDataStore.putObject(getId(), mConfig);
+        mDataStore.put(getId(), mConfig);
     }
 
     public void setup(IOIO ioio) throws ConnectionLostException {
@@ -396,6 +398,18 @@ public class Door {
             super.on(event);
         }
 
+        @Override
+        protected Config getDefaultConfig() {
+            Config config = new Config();
+            config.enabled = true;
+            config.closeSwitchEnabled = true;
+            config.openSwitchEnabled = false;
+            config.name = "Door " + getId();
+            config.openPhrase = GarD.instance.getString(R.string.default_open);
+            config.closePhrase = GarD.instance.getString(R.string.default_close);
+            return config;
+        }
+
     }
 
     @Singleton
@@ -424,15 +438,27 @@ public class Door {
         public void on(VoiceRecognizer.StateChanged event) {
             super.on(event);
         }
+
+        @Override
+        protected Config getDefaultConfig() {
+            Config config = new Config();
+            config.enabled = false;
+            config.closeSwitchEnabled = false;
+            config.openSwitchEnabled = false;
+            config.name = "Door " + getId();
+            config.openPhrase = GarD.instance.getString(R.string.default_open);
+            config.closePhrase = GarD.instance.getString(R.string.default_close);
+            return config;
+        }
     }
 
     public static class Config {
         public String name;
         public String openPhrase;
         public String closePhrase;
-        public boolean enabled = true;
-        public boolean openSwitchEnabled = true;
-        public boolean closeSwitchEnabled = true;
+        public boolean enabled;
+        public boolean openSwitchEnabled;
+        public boolean closeSwitchEnabled;
     }
 
     public static abstract class Command {

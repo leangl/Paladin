@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.ListView;
 
 import mobi.tattu.utils.R;
+import mobi.tattu.utils.Tattu;
 
 /**
  * Created by Leandro on 8/8/2015.
@@ -92,22 +93,26 @@ public abstract class BaseDrawerActivity extends BaseActivity implements Navigat
     public boolean onNavigationItemSelected(MenuItem menuItem) {
         mDrawerLayout.closeDrawers();
 
-        if (mNavigationView.getMenu().getItem(0).getItemId() == menuItem.getItemId()) {
-            for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
-                getSupportFragmentManager().popBackStack();
-            }
-            menuItem.setChecked(true);
-        } else {
-            Fragment fragment = getFragmentForDrawerItem(menuItem.getItemId()); // FIXME es poco eficiente, se pide una instancia sin saber realmente si va a mostrarse
-            if (fragment != null) {
-                FragmentManager fm = getSupportFragmentManager();
-                if (fm.getBackStackEntryCount() == 0 || !fragment.getClass().getSimpleName().equals(fm.getBackStackEntryAt(fm.getBackStackEntryCount() - 1).getName())) {
-                    fm.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                    start(fragment, true);
+        // Ejecutar de forma diferida para q la animacion se va fluida
+        Tattu.runOnUiThread(() -> {
+            if (mNavigationView.getMenu().getItem(0).getItemId() == menuItem.getItemId()) {
+                for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++) {
+                    getSupportFragmentManager().popBackStack();
                 }
                 menuItem.setChecked(true);
+            } else {
+                Fragment fragment = getFragmentForDrawerItem(menuItem.getItemId()); // FIXME es poco eficiente, se pide una instancia sin saber realmente si va a mostrarse
+                if (fragment != null) {
+                    FragmentManager fm = getSupportFragmentManager();
+                    if (fm.getBackStackEntryCount() == 0 || !fragment.getClass().getSimpleName().equals(fm.getBackStackEntryAt(fm.getBackStackEntryCount() - 1).getName())) {
+                        fm.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                        start(fragment, true);
+                    }
+                    menuItem.setChecked(true);
+                }
             }
-        }
+        }, 250);
+
         return true;
     }
 

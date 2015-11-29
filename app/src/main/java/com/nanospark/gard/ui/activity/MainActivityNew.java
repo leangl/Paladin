@@ -14,9 +14,11 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import com.google.inject.Inject;
 import com.nanospark.gard.R;
+import com.nanospark.gard.Utils;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.SmsSuspended;
@@ -30,6 +32,7 @@ import com.nanospark.gard.ui.fragments.SchedulesFragment;
 import com.nanospark.gard.ui.fragments.UsersFragment;
 import com.squareup.otto.Subscribe;
 
+import mobi.tattu.utils.DialogUtils;
 import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.ToastManager;
 import roboguice.inject.ContentView;
@@ -43,7 +46,8 @@ public class MainActivityNew extends BaseActivity implements TabLayout.OnTabSele
 
     @InjectView(R.id.view_pager)
     private ViewPager mViewPager;
-
+    @InjectView(R.id.logo_text)
+    private ImageView mLogoText;
     @Inject
     private LogManager mLogManager;
 
@@ -53,6 +57,19 @@ public class MainActivityNew extends BaseActivity implements TabLayout.OnTabSele
         registerReceiver(mUsbReceiver, new IntentFilter(UsbManager.ACTION_USB_ACCESSORY_DETACHED));
         getSupportActionBar().setIcon(R.drawable.logo_white);
         initTabs();
+
+        mLogoText.setOnClickListener(v -> {
+            //fakeSms();
+            Utils.saveLogcat();
+        });
+    }
+
+
+    private void fakeSms() {
+        DialogUtils.ask(this, "Fake SMS", fakeSmsText -> {
+            SmsManager.fakeSms = fakeSmsText;
+            return true;
+        });
     }
 
     @Subscribe
@@ -71,6 +88,16 @@ public class MainActivityNew extends BaseActivity implements TabLayout.OnTabSele
             }
         });
         dialogFragment.show(getSupportFragmentManager(), DialogFragment.class.getCanonicalName());
+    }
+
+    @Subscribe
+    public void on(BoardConnected event) {
+        getSupportActionBar().setIcon(R.drawable.logo_white);
+    }
+
+    @Subscribe
+    public void on(BoardDisconnected event) {
+        getSupportActionBar().setIcon(R.drawable.logo_grey);
     }
 
     private void checkBoardConnected(Intent i) {
@@ -188,10 +215,6 @@ public class MainActivityNew extends BaseActivity implements TabLayout.OnTabSele
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.settings:
-                /*DialogUtils.ask(this, "Fake SMS", fakeSmsText -> {
-                    SmsManager.fakeSms = fakeSmsText;
-                    return true;
-                });*/
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case R.id.action_log:

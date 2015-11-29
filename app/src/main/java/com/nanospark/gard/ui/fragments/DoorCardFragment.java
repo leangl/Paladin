@@ -113,9 +113,6 @@ public class DoorCardFragment extends BaseFragment {
             mContainer.setVisibility(View.VISIBLE);
             mDoorName.setText(mDoor.getName());
             refreshState();
-            mEditTextOpen.setText(mDoor.getOpenPhrase());
-            mEditTextClose.setText(mDoor.getClosePhrase());
-            setLastOpened();
             refreshVoiceState();
         }
     }
@@ -128,9 +125,11 @@ public class DoorCardFragment extends BaseFragment {
 
     private void refreshState() {
         mTextviewOpen.setText(mDoor.getState().toString());
-        mTextviewOpen.setTextColor(getResources().getColor(mDoor.isOpen() ? R.color.door_open : R.color.door_closed));
-        mImageViewDoor.setBackgroundResource(mDoor.isOpen() ? R.drawable.ic_door_opened_big : R.drawable.ic_door_closed_big);
-        mContainerCenter.setBackgroundColor(getResources().getColor(mDoor.isOpen() ? R.color.door_open : R.color.door_closed));
+        mTextviewOpen.setTextColor(getResources().getColor(!mDoor.isReady() ? R.color.door_unknown : mDoor.isOpen() ? R.color.door_open : R.color.door_closed));
+        mImageViewDoor.setBackgroundResource(mDoor.isOpen() ? R.drawable.door_4 : R.drawable.door_4);
+        mContainerCenter.setBackgroundColor(getResources().getColor(!mDoor.isReady() ? R.color.door_unknown : mDoor.isOpen() ? R.color.door_open : R.color.door_closed));
+
+        refreshLastOpened();
     }
 
     private void startAnimation(int drawableResId) {
@@ -139,14 +138,14 @@ public class DoorCardFragment extends BaseFragment {
         animation.start();
     }
 
-    private void setLastOpened() {
+    private void refreshLastOpened() {
         Log mLastLog = mLogManager.getLastLog(mDoor);
         if (mLastLog != null) {
-            this.mTextViewLastOpened.setVisibility(View.VISIBLE);
+            mTextViewLastOpened.setVisibility(View.VISIBLE);
             mLastOpenedlabel.setVisibility(View.VISIBLE);
-            this.mTextViewLastOpened.setText(mLastLog.getDateString(true));
+            mTextViewLastOpened.setText(mLastLog.getDateString(true));
         } else {
-            this.mTextViewLastOpened.setVisibility(View.INVISIBLE);
+            mTextViewLastOpened.setVisibility(View.INVISIBLE);
             mLastOpenedlabel.setVisibility(View.INVISIBLE);
         }
     }
@@ -160,6 +159,8 @@ public class DoorCardFragment extends BaseFragment {
                 mImageViewVoice.setImageResource(R.drawable.ic_no_sound_);
             }
         }
+        mEditTextOpen.setText(mDoor.getOpenPhrase());
+        mEditTextClose.setText(mDoor.getClosePhrase());
     }
 
     public Door getDoor() {
@@ -173,12 +174,12 @@ public class DoorCardFragment extends BaseFragment {
 
     @Subscribe
     public void on(BoardConnected event) {
-        this.refreshState(mDoor);
+        refreshState(mDoor);
     }
 
     @Subscribe
     public void on(BoardDisconnected boardDisconnected) {
-        this.refreshState(mDoor);
+        refreshState(mDoor);
     }
 
     @Subscribe
