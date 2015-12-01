@@ -2,7 +2,6 @@ package com.nanospark.gard.sms;
 
 import android.os.Handler;
 import android.util.Base64;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -161,12 +160,12 @@ public class SmsManager {
         TwilioAccount account = getAccount();
         if (account != null && account.isValid()) {
             return mApi.sendMessage(account.getSid(), message, account.getPhone(), to).map(result -> {
-                Log.i("TWILIO", "Messages sent: " + message + " to " + to);
+                Ln.i("Messages sent: " + message + " to " + to);
                 mLastSentTimestamps.add(System.currentTimeMillis());
                 return null;
             });
         } else {
-            Log.e("TWILIO", "SMS enabled but account not set!");
+            Ln.e("SMS enabled but account not set!");
             return Observable.error(new Exception());
         }
     }
@@ -241,7 +240,7 @@ public class SmsManager {
                 return null;
             });
         } else {
-            Log.e("TWILIO", "Account not set!");
+            Ln.e("Account not set!");
             return Observable.error(new IllegalStateException());
         }
     }
@@ -278,16 +277,16 @@ public class SmsManager {
                             replyMessage = handleAuthentication(from, body);
                         }
                     } catch (Exception e) {
-                        Log.e("TWILIO", "Invalid command: " + body, e);
+                        Ln.e("Invalid command: " + body, e);
                         replyMessage = "Invalid command. Format has to be: {door} {command}";
                     }
 
                     Ln.i(replyMessage);
 
                     sendMessage(replyMessage, from).subscribe(success -> {
-                        Log.i("TWILIO", "Reply sent successfully");
+                        Ln.i("Reply sent successfully");
                     }, error -> {
-                        Log.e("TWILIO", "Error sending reply.", error);
+                        Ln.e("Error sending reply.", error);
                     });
                 }
                 // Reschedule message log check
@@ -305,7 +304,7 @@ public class SmsManager {
     private String handle(SmsCommand smsCommand) throws Exception {
         if (smsCommand.user == null) {
             pendingCommands.put(smsCommand.from, smsCommand);
-            return "Seems like you're using a different phone, please text your user name and pass code now to process command";
+            return "Seems like you're using a different phone, please text your user name and pass code (if you have one) to process command";
         }
         if (smsCommand.user.isPasswordRequired() && !smsCommand.user.isPasswordCorrect(smsCommand.password)) {
             return "Pass code is invalid";
@@ -341,79 +340,30 @@ public class SmsManager {
         if (TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - command.timestamp) >= 5) {
             throw new Exception("Authentication challenge expired for " + from);
         }
-        String[] bodyParts = body.split(" ");
-        if (bodyParts.length < 2) {
+        if (StringUtils.isEmpty(body)) {
             throw new Exception("Invalid authentication format");
         }
+        String[] bodyParts = body.split(" ");
 
         User user = mUserManager.findByName(bodyParts[0]);
         if (user == null) {
             return "There is no user by that name";
         }
-
         command.user = user;
-        command.password = bodyParts[1].trim();
 
-        // FIXME duplicated code...
-        if (!command.user.isPasswordRequired() || command.user.isPasswordCorrect(command.password)) {
-            pendingCommands.remove(from); // clear pending command
+        // clear pending command if authentication is successful (pass is correct or not required)
+        if (command.user.isPasswordRequired()) {
+            if (bodyParts.length > 1) {
+                command.password = bodyParts[1].trim();
+                if (command.user.isPasswordCorrect(command.password)) {
+                    pendingCommands.remove(from);
+                }
+            }
+        } else {
+            pendingCommands.remove(from);
         }
 
         return handle(command);
-    }
-
-    private static class SmsCommand {
-
-        public static final String OPEN = "open";
-        public static final String CLOSE = "close";
-        public static final String STATUS = "status";
-
-        private long timestamp;
-        private Door door;
-        private String from;
-        private User user;
-        private String command;
-        private String password;
-
-        public SmsCommand(Door door, User user, String from, String command, String password) {
-            this.timestamp = System.currentTimeMillis();
-            this.door = door;
-            this.user = user;
-            this.from = from;
-            this.command = command;
-            this.password = password;
-        }
-
-        public static SmsCommand fromBody(User user, String from, String body) throws Exception {
-            String[] bodyParts = body.split(" ");
-            int doorNumber = Integer.parseInt(bodyParts[0]);
-            String command = bodyParts[1];
-
-            String password = null;
-            if (user != null && user.isPasswordRequired() && bodyParts.length > 2) {
-                password = bodyParts[2];
-            }
-
-            return new SmsCommand(Door.getInstance(doorNumber), user, from, command, password);
-        }
-
-        public static boolean isSmsCommand(String body) throws Exception {
-            String[] bodyParts = body.split(" ");
-            if (bodyParts.length < 2) {
-                return false;
-            }
-            try {
-                Integer.parseInt(bodyParts[0]);
-            } catch (Exception e) {
-                return false;
-            }
-            return true;
-        }
-
-        public boolean is(String command) {
-            return command.equalsIgnoreCase(this.command);
-        }
-
     }
 
     @Subscribe

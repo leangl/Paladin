@@ -33,8 +33,6 @@ import com.squareup.otto.Subscribe;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import mobi.tattu.utils.ToastManager;
-
 /**
  * Created by cristian on 17/10/15.
  */
@@ -130,9 +128,7 @@ public class CreateUserFragment extends BaseFragment {
             }
             scheduleContainer.setVisibility(visibilty);
         });
-        this.mRequirePassCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            this.mPasswordEditText.setEnabled(isChecked);
-        });
+        this.mRequirePassCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> this.mPasswordEditText.setEnabled(isChecked));
         this.mNotifyCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             this.mDoorEventSpinner.setEnabled(isChecked);
             if (!isChecked) {
@@ -155,9 +151,7 @@ public class CreateUserFragment extends BaseFragment {
 
         this.mRepeatEventWeeksEditText.setEnabled(false);
 
-        repeatEveryDayCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            mControlSchedule.setRepeatEveryOtherWeek(isChecked);
-        });
+        repeatEveryDayCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> mControlSchedule.setRepeatEveryOtherWeek(isChecked));
 
         repeatCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             mControlSchedule.setRepeatWeeks(isChecked);
@@ -182,9 +176,7 @@ public class CreateUserFragment extends BaseFragment {
                     mDateEventEditText.setVisibility(View.VISIBLE);
                     mDateEventEditText.setFocusable(false);
                     mDateEventEditText.setFocusableInTouchMode(false);
-                    mDateEventEditText.setOnClickListener(v -> {
-                        showDatePicker(view.getId(), mControlSchedule.getEndDate());
-                    });
+                    mDateEventEditText.setOnClickListener(v -> showDatePicker(view.getId(), mControlSchedule.getEndDate()));
                     if (mControlSchedule != null && mControlSchedule.isEndDateSet()) {
                         mDateEventEditText.setText(getDay(mControlSchedule.getLimitDay(), mControlSchedule.getLimitMonth(), mControlSchedule.getLimitYear()));
                     } else {
@@ -218,15 +210,9 @@ public class CreateUserFragment extends BaseFragment {
             }
         });
         initDays(daysContainer);
-        this.mTimeStartTextView.setOnClickListener(v -> {
-            showTimerPicker(R.id.textview_start_time, mControlSchedule.getStartTime());
-        });
-        this.mTimeEndTextView.setOnClickListener(v -> {
-            showTimerPicker(R.id.textview_end_time, mControlSchedule.getEndTime());
-        });
-        this.mDateStartTextView.setOnClickListener(v -> {
-            showDatePicker(R.id.textview_start_day, mControlSchedule.getStartDate());
-        });
+        this.mTimeStartTextView.setOnClickListener(v -> showTimerPicker(R.id.textview_start_time, mControlSchedule.getStartTime()));
+        this.mTimeEndTextView.setOnClickListener(v -> showTimerPicker(R.id.textview_end_time, mControlSchedule.getEndTime()));
+        this.mDateStartTextView.setOnClickListener(v -> showDatePicker(R.id.textview_start_day, mControlSchedule.getStartDate()));
         Calendar today = Calendar.getInstance();
         mDateStartTextView.setText(getDay(today.get(Calendar.DAY_OF_MONTH), today.get(Calendar.MONTH), today.get(Calendar.YEAR)));
 
@@ -384,7 +370,7 @@ public class CreateUserFragment extends BaseFragment {
             }
         } else {
             if (this.mDateEventEditText.getVisibility() == View.VISIBLE) {
-                ToastManager.get().showToast(R.string.error_date_msg);
+                toast(R.string.error_date_msg);
             }
         }
     }
@@ -395,18 +381,12 @@ public class CreateUserFragment extends BaseFragment {
         controlSchedule.setLimitYear(null);
     }
 
-    public void resetTimeEnd(ControlSchedule controlSchedule, TextView textView) {
-        controlSchedule.setEndHour(null);
-        controlSchedule.setEndMinute(null);
-        textView.setHint(R.string.hint_time_limits);
-    }
-
     public String getDay(int day, int month, int year) {
-        return month + "/" + day + "/" + year;
+        return (month + 1) + "/" + day + "/" + year;
     }
 
     public boolean validateStartTime(Calendar startTime, Calendar endTime) {
-        return startTime == null ? true : startTime.before(endTime);
+        return startTime == null || startTime.before(endTime);
     }
 
     public boolean save() {
@@ -418,13 +398,13 @@ public class CreateUserFragment extends BaseFragment {
 
         if (userName == null || !userName.equals(this.mNameEditText.getText().toString())) {
             if (mUserManager.exists(name)) {
-                ToastManager.get().showToast(getString(R.string.error_name_msg));
+                toast(getString(R.string.error_name_msg));
                 return false;
             } else {
                 if (User.isUsernameValid(name)) {
                     this.mUser.setName(name);
                 } else {
-                    ToastManager.get().showToast(getString(R.string.error_name_invalid));
+                    toast(getString(R.string.error_name_invalid));
                     return false;
                 }
             }
@@ -490,7 +470,7 @@ public class CreateUserFragment extends BaseFragment {
 
     private boolean validateField(String text, String nameField) {
         if (TextUtils.isEmpty(text)) {
-            ToastManager.get().showToast(getString(R.string.field_empty_msg, nameField));
+            toast(getString(R.string.field_empty_msg, nameField));
             return false;
         }
         return true;

@@ -103,7 +103,7 @@ public class MainActivityNew extends BaseActivity implements TabLayout.OnTabSele
     private void checkBoardConnected(Intent i) {
         if (UsbManager.ACTION_USB_ACCESSORY_ATTACHED.equals(i.getAction())) {
             Tattu.post(new BoardConnected());
-            ToastManager.show(R.string.board_connected_msg);
+            //ToastManager.show(R.string.board_connected_msg);
         }
     }
 
@@ -111,7 +111,7 @@ public class MainActivityNew extends BaseActivity implements TabLayout.OnTabSele
         @Override
         public void onReceive(Context context, Intent intent) {
             Tattu.post(new BoardDisconnected());
-            ToastManager.show(R.string.board_disconnected_msg);
+            //ToastManager.show(R.string.board_disconnected_msg);
         }
     };
 
@@ -131,7 +131,9 @@ public class MainActivityNew extends BaseActivity implements TabLayout.OnTabSele
     @Override
     protected void onResume() {
         super.onResume();
+        //if (!GarD.isBoardConnected()) {
         GarDService.start(); // restart ioio
+        //}
     }
 
     @Override

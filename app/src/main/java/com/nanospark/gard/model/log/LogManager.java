@@ -53,7 +53,7 @@ public class LogManager {
     @Subscribe
     public void on(DoorStateChanged event) {
         if (event.state != Door.State.UNKNOWN) {
-            mDataStore.putObject(new Log(event));
+            mDataStore.put(new Log(event));
         }
     }
 

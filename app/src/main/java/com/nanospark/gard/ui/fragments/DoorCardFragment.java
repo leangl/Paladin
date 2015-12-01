@@ -126,7 +126,9 @@ public class DoorCardFragment extends BaseFragment {
     private void refreshState() {
         mTextviewOpen.setText(mDoor.getState().toString());
         mTextviewOpen.setTextColor(getResources().getColor(!mDoor.isReady() ? R.color.door_unknown : mDoor.isOpen() ? R.color.door_open : R.color.door_closed));
-        mImageViewDoor.setBackgroundResource(mDoor.isOpen() ? R.drawable.door_4 : R.drawable.door_4);
+        if (mDoor.isReady()) {
+            mImageViewDoor.setBackgroundResource(mDoor.isOpen() ? R.drawable.door_0 : R.drawable.door_4);
+        }
         mContainerCenter.setBackgroundColor(getResources().getColor(!mDoor.isReady() ? R.color.door_unknown : mDoor.isOpen() ? R.color.door_open : R.color.door_closed));
 
         refreshLastOpened();
@@ -180,6 +182,7 @@ public class DoorCardFragment extends BaseFragment {
     @Subscribe
     public void on(BoardDisconnected boardDisconnected) {
         refreshState(mDoor);
+        mImageViewDoor.setBackgroundResource(R.drawable.door_4);
     }
 
     @Subscribe

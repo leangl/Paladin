@@ -3,14 +3,17 @@ package com.nanospark.gard;
 import android.app.Application;
 import android.util.Log;
 
+import com.nanospark.gard.events.BoardConnected;
+import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.CommandSent;
-import com.nanospark.gard.voice.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.log.LogManager;
 import com.nanospark.gard.model.scheduler.ScheduleManager;
 import com.nanospark.gard.model.user.UserManager;
+import com.nanospark.gard.services.GarDService;
 import com.nanospark.gard.sms.SmsManager;
 import com.nanospark.gard.ui.activity.MainActivityNew;
+import com.nanospark.gard.voice.VoiceRecognizer;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.squareup.otto.Subscribe;
@@ -27,6 +30,8 @@ public class GarD extends Application {
 
     public final static int DOOR_ONE_ID = 1;
     public final static int DOOR_TWO_ID = 2;
+
+    private static boolean sBoardConnected;
 
     static {
         RoboGuice.setUseAnnotationDatabases(false);
@@ -52,7 +57,7 @@ public class GarD extends Application {
         ScheduleManager.getInstance().init();
 
         // Start service as soon as app starts
-        //GarDService.startChecking(); FIXME
+        GarDService.start();
 
         // Initialize Universal Image Loader
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
@@ -63,6 +68,20 @@ public class GarD extends Application {
     @Subscribe
     public void on(CommandSent event) {
         toast(event.message);
+    }
+
+    @Subscribe
+    public void on(BoardConnected event) {
+        sBoardConnected = true;
+    }
+
+    @Subscribe
+    public void on(BoardDisconnected event) {
+        sBoardConnected = false;
+    }
+
+    public static boolean isBoardConnected() {
+        return sBoardConnected;
     }
 
     public void toast(String message) {

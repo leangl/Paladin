@@ -66,7 +66,6 @@ public class CreateScheduleFragment extends BaseFragment {
     private TextView mTimeEndTextView;
     private TextView mDateStartTextView;
     private ControlSchedule mControlSchedule;
-    private View mHourContainer;
 
     public static CreateScheduleFragment newInstance(Schedule schedule) {
         CreateScheduleFragment instance = new CreateScheduleFragment();
@@ -102,12 +101,8 @@ public class CreateScheduleFragment extends BaseFragment {
         if (mSchedule.isCloseTimeSet())
             mClose.setText(Utils.getHour(mSchedule.getCloseHour(), mSchedule.getCloseMinute()));
 
-        mOpen.setOnClickListener(v -> {
-            showTimerPicker(v.getId(), mSchedule.getOpenTime());
-        });
-        mClose.setOnClickListener(v -> {
-            showTimerPicker(v.getId(), mSchedule.getCloseTime());
-        });
+        mOpen.setOnClickListener(v -> showTimerPicker(v.getId(), mSchedule.getOpenTime()));
+        mClose.setOnClickListener(v -> showTimerPicker(v.getId(), mSchedule.getCloseTime()));
 
         initScheduleView();
     }
@@ -116,7 +111,7 @@ public class CreateScheduleFragment extends BaseFragment {
         View scheduleContainer = getView().findViewById(R.id.schedule_container);
         LinearLayout daysContainer = (LinearLayout) scheduleContainer.findViewById(R.id.days_container);
 
-        this.mHourContainer = scheduleContainer.findViewById(R.id.hour_container);
+        View mHourContainer = scheduleContainer.findViewById(R.id.hour_container);
         this.mTimeStartTextView = (TextView) scheduleContainer.findViewById(R.id.textview_start_time);
         this.mTimeEndTextView = (TextView) scheduleContainer.findViewById(R.id.textview_end_time);
         this.mDateStartTextView = (TextView) scheduleContainer.findViewById(R.id.textview_start_day);
@@ -126,13 +121,11 @@ public class CreateScheduleFragment extends BaseFragment {
         CheckBox repeatCheckBox = (CheckBox) scheduleContainer.findViewById(R.id.checkbox_repeat);
         Spinner limitSpinner = (Spinner) scheduleContainer.findViewById(R.id.spinner_date_event);
 
-        this.mHourContainer.setVisibility(View.GONE);
+        mHourContainer.setVisibility(View.GONE);
 
         this.mRepeatEventWeeksEditText.setEnabled(false);
 
-        repeatEveryDayCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            mControlSchedule.setRepeatEveryOtherWeek(isChecked);
-        });
+        repeatEveryDayCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> mControlSchedule.setRepeatEveryOtherWeek(isChecked));
 
         repeatCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             mControlSchedule.setRepeatWeeks(isChecked);
@@ -157,9 +150,7 @@ public class CreateScheduleFragment extends BaseFragment {
                     mDateEventEditText.setVisibility(View.VISIBLE);
                     mDateEventEditText.setFocusable(false);
                     mDateEventEditText.setFocusableInTouchMode(false);
-                    mDateEventEditText.setOnClickListener(v -> {
-                        showDatePicker(v.getId(), mControlSchedule.getEndDate());
-                    });
+                    mDateEventEditText.setOnClickListener(v -> showDatePicker(v.getId(), mControlSchedule.getEndDate()));
                     if (mControlSchedule != null && mControlSchedule.isEndDateSet()) {
                         mDateEventEditText.setText(getDay(mControlSchedule.getLimitDay(), mControlSchedule.getLimitMonth(), mControlSchedule.getLimitYear()));
                     } else {
@@ -193,15 +184,9 @@ public class CreateScheduleFragment extends BaseFragment {
             }
         });
         initDays(daysContainer);
-        this.mTimeStartTextView.setOnClickListener(v -> {
-            showTimerPicker(R.id.textview_start_time, mControlSchedule.getStartTime());
-        });
-        this.mTimeEndTextView.setOnClickListener(v -> {
-            showTimerPicker(R.id.textview_end_time, mControlSchedule.getEndTime());
-        });
-        this.mDateStartTextView.setOnClickListener(v -> {
-            showDatePicker(R.id.textview_start_day, mControlSchedule.getStartDate());
-        });
+        this.mTimeStartTextView.setOnClickListener(v -> showTimerPicker(R.id.textview_start_time, mControlSchedule.getStartTime()));
+        this.mTimeEndTextView.setOnClickListener(v -> showTimerPicker(R.id.textview_end_time, mControlSchedule.getEndTime()));
+        this.mDateStartTextView.setOnClickListener(v -> showDatePicker(R.id.textview_start_day, mControlSchedule.getStartDate()));
         Calendar today = Calendar.getInstance();
         mDateStartTextView.setText(getDay(today.get(Calendar.DAY_OF_MONTH), today.get(Calendar.MONTH), today.get(Calendar.YEAR)));
 
@@ -261,7 +246,7 @@ public class CreateScheduleFragment extends BaseFragment {
     }
 
     public String getDay(int day, int month, int year) {
-        return month + "/" + day + "/" + year;
+        return (month + 1) + "/" + day + "/" + year;
     }
 
     private void loadData(CheckBox repeatEveryDayCheckBox, CheckBox repeatCheckBox, Spinner limitSpinner) {
@@ -317,7 +302,7 @@ public class CreateScheduleFragment extends BaseFragment {
     }
 
     public boolean validateDate(Calendar startTime, Calendar endTime) {
-        if (startTime == null || endTime == null ? true : startTime.before(endTime)) {
+        if (startTime == null || endTime == null || startTime.before(endTime)) {
             return true;
         } else {
             toast(R.string.error_date_msg);

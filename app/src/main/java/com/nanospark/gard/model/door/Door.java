@@ -155,9 +155,9 @@ public abstract class Door {
             Tattu.post(new CommandProcessed(this, mState, mPendingCommand));
             mPendingCommand = null;
         }
-        /*if (isOpen()) {
+        if (isOpen()) {
             startAutoClose();
-        }*/
+        }
     }
 
     private void startAutoClose() {
@@ -244,7 +244,7 @@ public abstract class Door {
     }
 
     public boolean isReady() {
-        return !State.UNKNOWN.equals(mState);
+        return !State.UNKNOWN.equals(getState());
     }
 
     public int getId() {
