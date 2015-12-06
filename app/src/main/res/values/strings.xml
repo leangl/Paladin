@@ -71,5 +71,6 @@
     <string name="limit.date">Date</string>
     <string name="limit.events">Number of events</string>
     <string name="caution_sms"><![CDATA[ <b>Caution!!!</b> Changing the phone number can disrupt your Text Message control and alerts. <br>Please only proceed if you\'re sure you know what you\'re doing ]]></string>
+    <string name="version">version %1$s (%2$s)</string>
 
 </resources>

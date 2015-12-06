@@ -2,7 +2,6 @@ package com.nanospark.gard.model.user;
 
 import com.nanospark.gard.Utils;
 import com.nanospark.gard.model.Day;
-import com.nanospark.gard.model.door.Door;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,7 +10,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import mobi.tattu.utils.annotations.Nullable;
 import roboguice.util.Ln;
 
 /**
@@ -226,10 +224,6 @@ public class ControlSchedule implements Serializable {
     }
 
     public boolean isAllowed() {
-        return isAllowed(null);
-    }
-
-    public boolean isAllowed(@Nullable Door door) { // TODO door is of no use for now
         Calendar today = Calendar.getInstance();
         if (isStartTimeSet()) {
             int minute = today.get(Calendar.MINUTE);

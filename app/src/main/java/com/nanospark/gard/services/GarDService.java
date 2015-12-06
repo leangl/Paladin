@@ -5,11 +5,12 @@ import android.content.Intent;
 import android.support.v7.app.NotificationCompat;
 
 import com.google.inject.Inject;
+import com.nanospark.gard.BuildConfig;
 import com.nanospark.gard.GarD;
 import com.nanospark.gard.R;
+import com.nanospark.gard.Utils;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
-import com.nanospark.gard.voice.VoiceRecognizer;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.sms.SmsManager;
 import com.squareup.otto.Produce;
@@ -29,9 +30,7 @@ import roboguice.util.Ln;
  */
 public class GarDService extends BaseService implements IOIOLooperProvider {
 
-    public static final String KEY_THRESHOLD = "threshold";
-    public static final String START_VOICE_RECOGNITION = "START_VOICE_RECOGNITION";
-    public static final String STOP_VOICE_RECOGNITION = "STOP_VOICE_RECOGNITION";
+    public static final String RESTART_IOIO = "restart_ioio";
 
     // service started flag
     private boolean started;
@@ -42,8 +41,6 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
     private Door.Two mDoorTwo;
     @Inject
     private SmsManager mClient;
-    @Inject
-    private VoiceRecognizer mVoiceRecognizer;
 
     private IOIOAndroidApplicationHelper ioioHelper;
 
@@ -60,7 +57,6 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
     public void onDestroy() {
         super.onDestroy();
         stopIOIO();
-        mVoiceRecognizer.stop();
         mClient.stopChecking();
     }
 
@@ -77,20 +73,12 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
             startForeground(123, mNotification);
 
             mClient.startChecking();
+
+            startIOIO();
         }
 
-        startIOIO();
-
-        if (intent != null && intent.getAction() != null) {
-            switch (intent.getAction()) {
-                case START_VOICE_RECOGNITION:
-                    // Get setup parameters (recognition threshold and open/close phrases)
-                    mVoiceRecognizer.start(mDoorOne);
-                    break;
-                case STOP_VOICE_RECOGNITION:
-                    mVoiceRecognizer.stop();
-                    break;
-            }
+        if (intent != null && intent.getAction() != null && RESTART_IOIO.equals(intent.getAction())) {
+            startIOIO();
         }
 
         return START_STICKY;
@@ -123,9 +111,12 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
     private void startIOIO() {
         stopIOIO();
         Tattu.runOnUiThread(() -> {
-            ioioHelper = new IOIOAndroidApplicationHelper(this, this);
-            ioioHelper.create();
-            ioioHelper.start();
+            // Disable IOIO on emulator since it starves all resources
+            if (!BuildConfig.DEBUG || !Utils.isVM()) {
+                ioioHelper = new IOIOAndroidApplicationHelper(this, this);
+                ioioHelper.create();
+                ioioHelper.start();
+            }
         }, 3000);
     }
 
@@ -168,21 +159,14 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
         }
     }
 
-    public static void startVoiceRecognition(float threshold) {
-        Intent i = new Intent(GarD.instance, GarDService.class);
-        i.setAction(START_VOICE_RECOGNITION);
-        i.putExtra(KEY_THRESHOLD, threshold);
-        GarD.instance.startService(i);
-    }
-
-    public static void stopVoiceRecognition() {
-        Intent i = new Intent(GarD.instance, GarDService.class);
-        i.setAction(STOP_VOICE_RECOGNITION);
-        GarD.instance.startService(i);
-    }
-
     public static void start() {
         Intent i = new Intent(GarD.instance, GarDService.class);
+        GarD.instance.startService(i);
+    }
+
+    public static void restart() {
+        Intent i = new Intent(GarD.instance, GarDService.class);
+        i.setAction(RESTART_IOIO);
         GarD.instance.startService(i);
     }
 

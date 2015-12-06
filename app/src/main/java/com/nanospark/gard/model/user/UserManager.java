@@ -12,6 +12,7 @@ import java.util.List;
 
 import mobi.tattu.utils.F;
 import mobi.tattu.utils.Tattu;
+import mobi.tattu.utils.ToastManager;
 import mobi.tattu.utils.persistance.datastore.DataStore;
 import roboguice.RoboGuice;
 
@@ -39,7 +40,7 @@ public class UserManager {
     }
 
     public void add(User user) {
-        mDataStore.putObject(user);
+        mDataStore.put(user);
     }
 
     public void update(User user) {
@@ -63,7 +64,7 @@ public class UserManager {
     }
 
     public User getUser(String id) {
-        return mDataStore.getObject(id, User.class).get();
+        return mDataStore.get(id, User.class).get();
     }
 
     public User findByName(String username) {
@@ -83,6 +84,7 @@ public class UserManager {
     public void on(CommandProcessed event) {
         if (event.command != null && event.command.user != null && event.command.user.getSchedule() != null
                 && Limit.EVENTS.equals(event.command.user.getSchedule())) {
+            ToastManager.show("Command processed");
             event.command.user.getSchedule().incrementEvents();
             update(event.command.user);
         }

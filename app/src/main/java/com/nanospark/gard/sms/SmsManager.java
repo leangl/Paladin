@@ -10,8 +10,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.nanospark.gard.BuildConfig;
 import com.nanospark.gard.GarD;
-import com.nanospark.gard.events.CommandProcessed;
+import com.nanospark.gard.events.DoorStateChanged;
 import com.nanospark.gard.events.SmsSuspended;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.user.User;
@@ -48,6 +49,8 @@ import static com.nanospark.gard.sms.twilio.TwilioApi.DATE_FORMAT;
 @Singleton
 public class SmsManager {
 
+    private static final int RATE_LIMIT_1_MINUTE = 8; // Max allowed SMSs within 1 minute
+    private static final int RATE_LIMITE_10_MINUTE = 24; // Max allowed SMSs within 10 minutes
     private static long MESSAGES_CHECK_TIME = TimeUnit.SECONDS.toMillis(1);
     private static long MESSAGES_RETRY_TIME = TimeUnit.SECONDS.toMillis(30);
 
@@ -56,7 +59,7 @@ public class SmsManager {
     private Handler smsHandler;
     private List<Long> mLastSentTimestamps;
 
-    public static String fakeSms;
+    private String fakeSms;
 
     @Inject
     private UserManager mUserManager;
@@ -74,7 +77,7 @@ public class SmsManager {
 
         mApi = restAdapter.create(TwilioApi.class);
         smsHandler = new Handler();
-        mLastSentTimestamps = new ArrayList<>(20);
+        mLastSentTimestamps = new ArrayList<>(RATE_LIMITE_10_MINUTE);
 
         Tattu.register(this);
 
@@ -82,6 +85,11 @@ public class SmsManager {
         if (mConfig == null) {
             mConfig = new SmsConfig();
         }
+    }
+
+    public void fakeSms(String sms) {
+        fakeSms = sms;
+        startChecking();
     }
 
     public static final SmsManager getInstance() {
@@ -149,14 +157,17 @@ public class SmsManager {
     }
 
     public Observable<Void> sendMessage(String message, String to) {
+        if (!isSmsEnabled()) {
+            return Observable.empty();
+        }
+
         if (exceededLimit()) {
             suspendSms();
             return Observable.empty();
         }
 
-        if (!isSmsEnabled()) {
-            return Observable.empty();
-        }
+        if (BuildConfig.DEBUG) return Observable.empty();
+
         TwilioAccount account = getAccount();
         if (account != null && account.isValid()) {
             return mApi.sendMessage(account.getSid(), message, account.getPhone(), to).map(result -> {
@@ -172,13 +183,13 @@ public class SmsManager {
 
     private boolean exceededLimit() {
         long currentTime = System.currentTimeMillis();
-        if (mLastSentTimestamps.size() >= 4) {
-            long delta = currentTime - mLastSentTimestamps.get(mLastSentTimestamps.size() - 4);
+        if (mLastSentTimestamps.size() >= RATE_LIMIT_1_MINUTE) {
+            long delta = currentTime - mLastSentTimestamps.get(mLastSentTimestamps.size() - RATE_LIMIT_1_MINUTE);
             if (delta < TimeUnit.MINUTES.toMillis(1)) return true;
         }
 
-        if (mLastSentTimestamps.size() >= 20) {
-            long delta = currentTime - mLastSentTimestamps.get(mLastSentTimestamps.size() - 20);
+        if (mLastSentTimestamps.size() >= RATE_LIMITE_10_MINUTE) {
+            long delta = currentTime - mLastSentTimestamps.get(mLastSentTimestamps.size() - RATE_LIMITE_10_MINUTE);
             if (delta < TimeUnit.MINUTES.toMillis(10)) return true;
         }
 
@@ -200,10 +211,12 @@ public class SmsManager {
         if (fakeSms != null) {
             JsonObject sms = new JsonObject();
             sms.addProperty("body", fakeSms);
-            sms.addProperty("from", "+19");
+            sms.addProperty("from", "19");
             fakeSms = null;
             return Observable.just(sms);
         }
+        if (BuildConfig.DEBUG) return Observable.error(new Exception());
+
         TwilioAccount account = getAccount();
         if (isSmsEnabled() && account != null && account.isValid()) {
             return mApi.getMessages(account.getSid(), account.getPhone()).map(response -> {
@@ -269,8 +282,8 @@ public class SmsManager {
                     String from = message.get("from").getAsString().trim();
                     String replyMessage = null;
 
+                    User fromUser = mUserManager.findByPhone(from);
                     try {
-                        User fromUser = mUserManager.findByPhone(from);
                         if (SmsCommand.isSmsCommand(body)) {
                             replyMessage = handle(SmsCommand.fromBody(fromUser, from, body));
                         } else {
@@ -278,16 +291,21 @@ public class SmsManager {
                         }
                     } catch (Exception e) {
                         Ln.e("Invalid command: " + body, e);
-                        replyMessage = "Invalid command. Format has to be: {door} {command}";
+                        replyMessage = "Invalid command. Format has to be: {command} {door name}";
+                        if (fromUser != null && fromUser.isPasswordRequired()) {
+                            replyMessage = replyMessage + " {pass code}";
+                        }
                     }
 
                     Ln.i(replyMessage);
 
-                    sendMessage(replyMessage, from).subscribe(success -> {
-                        Ln.i("Reply sent successfully");
-                    }, error -> {
-                        Ln.e("Error sending reply.", error);
-                    });
+                    if (StringUtils.isNotBlank(replyMessage)) { // do not send empty messages
+                        sendMessage(replyMessage, from).subscribe(success -> {
+                            Ln.i("Reply sent successfully");
+                        }, error -> {
+                            Ln.e("Error sending reply.", error);
+                        });
+                    }
                 }
                 // Reschedule message log check
                 if (smsHandler != null) {
@@ -309,24 +327,35 @@ public class SmsManager {
         if (smsCommand.user.isPasswordRequired() && !smsCommand.user.isPasswordCorrect(smsCommand.password)) {
             return "Pass code is invalid";
         }
-        if (!smsCommand.user.isAllowed(smsCommand.door)) {
+        if (!smsCommand.user.isAllowed()) {
             return "You are not authorized to control the door during this time frame";
         }
         if (smsCommand.is(SmsCommand.STATUS)) {
-            return smsCommand.door.getId() + " is " + smsCommand.door.getState().toString().toLowerCase();
+            StringBuilder response = new StringBuilder();
+            for (Door door : smsCommand.doors) {
+                if (door.isEnabled()) {
+                    if (response.length() > 0) response.append(" and ");
+                    response.append(door.getName() + " is " + door.getState().toString().toLowerCase());
+                }
+            }
+            return response.toString();
         } else {
-            if (smsCommand.is(SmsCommand.OPEN)) {
-                if (smsCommand.door.isOpen()) {
-                    return "The door is already open.";
+            for (Door door : smsCommand.doors) { // TODO right now multiple door command works only for STATUS
+                if (door.isEnabled()) {
+                    if (smsCommand.is(SmsCommand.OPEN)) {
+                        if (door.isOpen()) {
+                            return "The door is already open.";
+                        }
+                        door.send(new Door.Open("Message received, door is in motion", false, smsCommand.user));
+                        return "Open door command received.";
+                    } else if (smsCommand.is(SmsCommand.CLOSE)) {
+                        if (door.isClosed()) {
+                            return "The door is already closed.";
+                        }
+                        door.send(new Door.Close("Message received, door is in motion", false, smsCommand.user));
+                        return "Close door command received.";
+                    }
                 }
-                smsCommand.door.send(new Door.Open("Message received, door is in motion", false, smsCommand.user));
-                return "Open door command received.";
-            } else if (smsCommand.is(SmsCommand.CLOSE)) {
-                if (smsCommand.door.isClosed()) {
-                    return "The door is already closed.";
-                }
-                smsCommand.door.send(new Door.Close("Message received, door is in motion", false, smsCommand.user));
-                return "Close door command received.";
             }
         }
         throw new Exception("Invalid command " + smsCommand.command);
@@ -367,20 +396,24 @@ public class SmsManager {
     }
 
     @Subscribe
-    public void on(CommandProcessed event) {
-        if (event.command != null) {
-            sendDoorAlert(event.door.getId() + " is " + event.command.toString(), event.command);
-        }
+    public void on(DoorStateChanged event) {
+        sendDoorAlert(event.door + " is " + event.state.toString().toLowerCase(), event.state);
     }
 
     /**
      * Send SMS message to users configured to receive door status alerts
+     * <p>
+     * If state is NULL then SMS is sent to every user subscribed to at least one state
+     *
+     * @param alert SMS
+     * @param state only to users subscribed to this state or everyone if null
      */
-    public void sendDoorAlert(String alert, Door.Command command) {
+    public void sendDoorAlert(String alert, Door.State state) {
         int count = 0;
         for (User user : mUserManager.getAll()) {
             if (StringUtils.isNotBlank(user.getPhone())
-                    && user.getNotify().notify(command)) {
+                    && ((state == null && !user.getNotify().equals(User.Notify.NONE))
+                    || user.getNotify().notify(state))) {
                 count++;
                 sendMessage(alert, user.getPhone()).subscribe(success -> {
                     Ln.d("SMS success");
@@ -401,7 +434,7 @@ public class SmsManager {
     }
 
     public static class SmsConfig {
-        public TwilioAccount account = new TwilioAccount("+17152204298", "ACb000804b50f276502aeab919ee16b4a0", "307f30b80e7a21e5c526cdc968ba75f6");
+        public TwilioAccount account = new TwilioAccount("", "AC83aacf8a55784375290210a9eb924ad4", "3f5dab33644d33cacb4bf300194299eb");
         public boolean enabled = true;
         public boolean suspended = false;
     }

@@ -118,7 +118,7 @@ public class DoorCardFragment extends BaseFragment {
     }
 
     public void refreshState(Door door) {
-        if (mDoor.getId() == door.getId()) {
+        if (door.equals(mDoor)) {
             refreshState();
         }
     }
@@ -165,10 +165,6 @@ public class DoorCardFragment extends BaseFragment {
         mEditTextClose.setText(mDoor.getClosePhrase());
     }
 
-    public Door getDoor() {
-        return mDoor;
-    }
-
     @Override
     public boolean showHomeIcon() {
         return false;
@@ -213,7 +209,7 @@ public class DoorCardFragment extends BaseFragment {
 
     @Subscribe
     public void on(CommandFailed doorActivationFailed) {
-        if (mDoor.getId() == mDoor.getId()) {
+        if (mDoor.equals(doorActivationFailed.door)) {
             refreshState();
         }
     }

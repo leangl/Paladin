@@ -8,7 +8,7 @@
     <android.support.v4.widget.Space
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.25"
+        android:layout_weight="0.15"
         android:background="@android:color/transparent"/>
 
     <ScrollView
@@ -25,7 +25,7 @@
             android:padding="10dp"
             android:paddingTop="20dp">
 
-            <EditText
+            u<EditText
                 android:id="@+id/name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -129,6 +129,6 @@
     <android.support.v4.widget.Space
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.25"
+        android:layout_weight="0.15"
         android:background="@android:color/transparent"/>
 </LinearLayout>

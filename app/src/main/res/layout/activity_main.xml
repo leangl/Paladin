@@ -22,13 +22,12 @@
         android:src="@drawable/bg1"/>
 
     <ImageView
-        android:layout_width="130dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/include"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"
         android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
         android:src="@drawable/logo_text"/>
 
     <FrameLayout

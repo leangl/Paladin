@@ -26,6 +26,7 @@ public class WeatherManager {
 
     private static final String API_KEY = "3096911bf9d52bd438829370a9abedcb";
     private static final String UNIT_METRIC = "metric";
+    private static final String UNIT_IMPERIAL = "imperial";
 
     private OpenWeatherMapApi mApi;
 
@@ -59,7 +60,7 @@ public class WeatherManager {
         if (mForecast != null && TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - mForecast.getDate().getTime()) < 3) {
             return Observable.just(mForecast);
         }
-        return mApi.getForecast(mConfig.city.getName() + ",US", API_KEY, UNIT_METRIC)
+        return mApi.getForecast(mConfig.city.getName() + ",US", API_KEY, UNIT_IMPERIAL)
                 .map(result -> {
                     JsonObject object = result.getAsJsonObject();
                     JsonArray list = object.get("list").getAsJsonArray();

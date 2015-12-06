@@ -1,1 +1,1 @@
-include ':app', ':utils', ':iOIOLibAndroid', ':iOIOLibAccessory', ':iOIOLibBT', ':iOIOLibAndroidDevice'
+include ':app', ':utils'

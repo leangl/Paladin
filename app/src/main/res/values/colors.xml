@@ -19,4 +19,6 @@
     <color name="user_divider">#b1b1b1</color>
     <color name="text_color_pass">#f44336</color>
 
+    <color name="dark_blue">#34495e</color>
+
 </resources>

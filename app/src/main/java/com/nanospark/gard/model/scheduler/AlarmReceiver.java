@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import ioio.lib.spi.Log;
+import roboguice.util.Ln;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -19,11 +19,9 @@ public class AlarmReceiver extends BroadcastReceiver {
         String key = intent.getStringExtra(EXTRA_ID);
         Schedule schedule = ScheduleManager.getInstance().getSchedule(key);
         if (schedule != null) {
-            if (schedule.trigger()) {
-                Log.i("Scheduler", "Schedule triggered: " + schedule);
-            } else {
-                Log.e("Scheduler", "Schedule not triggered: " + schedule);
-            }
+            schedule.trigger();
+        } else {
+            Ln.i("Schedule not found");
         }
     }
 

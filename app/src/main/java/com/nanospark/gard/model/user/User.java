@@ -98,11 +98,11 @@ public class User implements Serializable {
         return notify != null && !notify.equals(Notify.NONE);
     }
 
-    public boolean isAllowed(Door door) {
+    public boolean isAllowed() {
         if (schedule == null) {
             return true;
         } else {
-            return schedule.isAllowed(door);
+            return schedule.isAllowed();
         }
     }
 
@@ -117,11 +117,15 @@ public class User implements Serializable {
             this.close = close;
         }
 
-        public boolean notify(Door.Command command) {
-            if (command instanceof Door.Open) {
-                return open;
-            } else {
-                return close;
+        public boolean notify(Door.State state) {
+            switch (state) {
+                case OPEN:
+                    return open;
+                case CLOSED:
+                    return close;
+                case UNKNOWN:
+                default:
+                    return false;
             }
         }
 

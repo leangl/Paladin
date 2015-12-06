@@ -8,6 +8,11 @@
         app:showAsAction="never"/>
 
     <item
+        android:id="@+id/about"
+        android:title="About"
+        app:showAsAction="never"/>
+
+    <item
         android:id="@+id/action_log"
         android:icon="@drawable/ic_logs"
         android:title="Log"

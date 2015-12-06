@@ -102,7 +102,12 @@ public class WeatherCardFragment extends BaseFragment {
     private void renderWeather(Forecast forecast) {
         Weather current = forecast.getCurrent();
         mTitle.setText(printTemp(current.getTemp()) + " " + mManager.getCity().getName());
-        mLastUpdate.setText(forecast.getAge() + " hours ago");
+        if (forecast.getAge() == 0) {
+            mLastUpdate.setText("Just now");
+        } else {
+            mLastUpdate.setText(forecast.getAge() + " hours ago");
+
+        }
         mWeatherIcon.setImageResource(getWeatherIcon(current));
 
         mForecastContainer.removeAllViews();
@@ -124,7 +129,7 @@ public class WeatherCardFragment extends BaseFragment {
 
     private String printTemp(Double temp) {
         if (temp == null) return "";
-        return new DecimalFormat("#.#").format(Math.abs(temp)) + "°";
+        return new DecimalFormat("#.#").format(Math.abs(temp)) + "°F";
     }
 
     private int getWeatherIcon(Weather weather) {

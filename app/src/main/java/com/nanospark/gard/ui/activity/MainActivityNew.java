@@ -1,5 +1,6 @@
 package com.nanospark.gard.ui.activity;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,8 +16,10 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.inject.Inject;
+import com.nanospark.gard.BuildConfig;
 import com.nanospark.gard.R;
 import com.nanospark.gard.Utils;
 import com.nanospark.gard.events.BoardConnected;
@@ -50,24 +53,27 @@ public class MainActivityNew extends BaseActivity implements TabLayout.OnTabSele
     private ImageView mLogoText;
     @Inject
     private LogManager mLogManager;
+    @Inject
+    private SmsManager mSmsManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        registerReceiver(mUsbReceiver, new IntentFilter(UsbManager.ACTION_USB_ACCESSORY_DETACHED));
+        registerReceiver(mUsbDetachReceiver, new IntentFilter(UsbManager.ACTION_USB_ACCESSORY_DETACHED));
         getSupportActionBar().setIcon(R.drawable.logo_white);
         initTabs();
 
         mLogoText.setOnClickListener(v -> {
-            //fakeSms();
+            if (BuildConfig.DEBUG) fakeSms();
             Utils.saveLogcat();
         });
-    }
 
+        GarDService.start(); // start ioio
+    }
 
     private void fakeSms() {
         DialogUtils.ask(this, "Fake SMS", fakeSmsText -> {
-            SmsManager.fakeSms = fakeSmsText;
+            mSmsManager.fakeSms(fakeSmsText);
             return true;
         });
     }
@@ -107,7 +113,7 @@ public class MainActivityNew extends BaseActivity implements TabLayout.OnTabSele
         }
     }
 
-    BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
+    BroadcastReceiver mUsbDetachReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Tattu.post(new BoardDisconnected());
@@ -120,6 +126,7 @@ public class MainActivityNew extends BaseActivity implements TabLayout.OnTabSele
         super.onNewIntent(intent);
         setIntent(intent);
         checkBoardConnected(intent);
+        GarDService.restart(); // restart ioio
     }
 
     @Override
@@ -129,17 +136,9 @@ public class MainActivityNew extends BaseActivity implements TabLayout.OnTabSele
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        //if (!GarD.isBoardConnected()) {
-        GarDService.start(); // restart ioio
-        //}
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mUsbReceiver);
+        unregisterReceiver(mUsbDetachReceiver);
     }
 
     private void initTabs() {
@@ -219,6 +218,9 @@ public class MainActivityNew extends BaseActivity implements TabLayout.OnTabSele
             case R.id.settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
+            case R.id.about:
+                showAbout();
+                break;
             case R.id.action_log:
                 if (mLogManager.getLogs().isEmpty()) {
                     ToastManager.show(R.string.no_record_msg);
@@ -230,6 +232,18 @@ public class MainActivityNew extends BaseActivity implements TabLayout.OnTabSele
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    private void showAbout() {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(getLayoutInflater().inflate(R.layout.about, null))
+                .setPositiveButton(R.string.ok, (dialog1, which) -> {
+                    dialog1.dismiss();
+                })
+                .show();
+
+        TextView versionText = (TextView) dialog.findViewById(R.id.version);
+        versionText.setText(getString(R.string.version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE));
     }
 
 }

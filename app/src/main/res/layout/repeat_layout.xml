@@ -139,112 +139,126 @@
         android:visibility="invisible"
         tools:visibility="visible"/>
 
-    <LinearLayout
-        android:id="@+id/days_container"
+    <TextView
+        android:id="@+id/limit_current"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/edittext_date_event"
+        android:layout_toLeftOf="@id/edittext_date_event"
+        tools:text="1"/>
+
+    <HorizontalScrollView
+        android:id="@+id/days_scroll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/date_container"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
-        android:orientation="horizontal">
+        android:layout_marginTop="40dp">
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fb_day_sun"
+        <LinearLayout
+            android:id="@+id/days_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="3dp"
-            android:layout_weight="1"
-            android:scaleType="center"
-            android:src="@drawable/ic_sun"
-            app:backgroundTint="@color/white"
-            app:borderWidth="0dp"
-            app:elevation="3dp"
-            app:rippleColor="@color/white"/>
+            android:orientation="horizontal">
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fb_day_mon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="3dp"
-            android:layout_weight="1"
-            android:scaleType="center"
-            android:src="@drawable/ic_mon"
-            app:backgroundTint="@color/white"
-            app:borderWidth="0dp"
-            app:elevation="3dp"
-            app:rippleColor="@color/white"/>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fb_day_sun"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:src="@drawable/ic_sun"
+                app:backgroundTint="@color/white"
+                app:borderWidth="0dp"
+                app:elevation="3dp"
+                app:rippleColor="@color/white"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fb_day_tue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="3dp"
-            android:layout_weight="1"
-            android:scaleType="center"
-            android:src="@drawable/ic_tue"
-            app:backgroundTint="@color/white"
-            app:borderWidth="0dp"
-            app:elevation="3dp"
-            app:rippleColor="@color/white"/>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fb_day_mon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:src="@drawable/ic_mon"
+                app:backgroundTint="@color/white"
+                app:borderWidth="0dp"
+                app:elevation="3dp"
+                app:rippleColor="@color/white"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fb_day_wed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="3dp"
-            android:layout_weight="1"
-            android:scaleType="center"
-            android:src="@drawable/ic_wed"
-            app:backgroundTint="@color/white"
-            app:borderWidth="0dp"
-            app:elevation="3dp"
-            app:rippleColor="@color/white"/>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fb_day_tue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:src="@drawable/ic_tue"
+                app:backgroundTint="@color/white"
+                app:borderWidth="0dp"
+                app:elevation="3dp"
+                app:rippleColor="@color/white"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fb_day_thr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="3dp"
-            android:layout_weight="1"
-            android:scaleType="center"
-            android:src="@drawable/ic_thr"
-            app:backgroundTint="@color/white"
-            app:borderWidth="0dp"
-            app:elevation="3dp"
-            app:rippleColor="@color/white"/>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fb_day_wed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:src="@drawable/ic_wed"
+                app:backgroundTint="@color/white"
+                app:borderWidth="0dp"
+                app:elevation="3dp"
+                app:rippleColor="@color/white"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fb_day_fri"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="3dp"
-            android:layout_weight="1"
-            android:scaleType="center"
-            android:src="@drawable/ic_fri"
-            app:backgroundTint="@color/white"
-            app:borderWidth="0dp"
-            app:elevation="3dp"
-            app:rippleColor="@color/white"/>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fb_day_thr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:src="@drawable/ic_thr"
+                app:backgroundTint="@color/white"
+                app:borderWidth="0dp"
+                app:elevation="3dp"
+                app:rippleColor="@color/white"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fb_day_sat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="3dp"
-            android:layout_weight="1"
-            android:scaleType="center"
-            android:src="@drawable/ic_sat"
-            app:backgroundTint="@android:color/white"
-            app:borderWidth="0dp"
-            app:elevation="3dp"
-            app:rippleColor="@color/white"/>
-    </LinearLayout>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fb_day_fri"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:src="@drawable/ic_fri"
+                app:backgroundTint="@color/white"
+                app:borderWidth="0dp"
+                app:elevation="3dp"
+                app:rippleColor="@color/white"/>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fb_day_sat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:src="@drawable/ic_sat"
+                app:backgroundTint="@android:color/white"
+                app:borderWidth="0dp"
+                app:elevation="3dp"
+                app:rippleColor="@color/white"/>
+        </LinearLayout>
+    </HorizontalScrollView>
 
     <CheckBox
         android:id="@+id/checkbox_repeat_every_day"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/days_container"
+        android:layout_below="@+id/days_scroll"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
         android:checked="false"
@@ -282,19 +296,25 @@
         android:singleLine="true"
         android:spinnerMode="dropdown"/>
 
-
-    <TextView
-        android:id="@+id/textView10"
+    <!-- http://stackoverflow.com/questions/21444425/androidgravity-fails-on-api-18/22812527#22812527 -->
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/edittext_repeat_weeks"
-        android:layout_alignTop="@+id/edittext_repeat_weeks"
+        android:layout_alignBottom="@+id/checkbox_repeat"
+        android:layout_alignTop="@+id/checkbox_repeat"
         android:layout_toEndOf="@+id/edittext_repeat_weeks"
         android:layout_toRightOf="@+id/edittext_repeat_weeks"
-        android:gravity="center"
-        android:text="@string/weeks_label"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/text_color_bold"
-        android:textStyle="bold"/>
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/textView10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/weeks_label"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/text_color_bold"
+            android:textStyle="bold"/>
+    </LinearLayout>
 
 </RelativeLayout>

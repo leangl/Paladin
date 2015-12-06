@@ -54,6 +54,7 @@ public class CreateUserFragment extends BaseFragment {
     private CheckBox mRequirePassCheckBox;
     private CheckBox mNotifyCheckBox;
     private CheckBox mTimelimitsCheckBox;
+    private TextView mLimitCount;
 
     @Inject
     private UserManager mUserManager;
@@ -144,6 +145,7 @@ public class CreateUserFragment extends BaseFragment {
         this.mTimeEndTextView = (TextView) scheduleContainer.findViewById(R.id.textview_end_time);
         this.mDateStartTextView = (TextView) scheduleContainer.findViewById(R.id.textview_start_day);
         this.mRepeatEventWeeksEditText = (EditText) scheduleContainer.findViewById(R.id.edittext_repeat_weeks);
+        this.mLimitCount = (TextView) scheduleContainer.findViewById(R.id.limit_current);
         this.mDateEventEditText = (TextView) scheduleContainer.findViewById(R.id.edittext_date_event);
         CheckBox repeatEveryDayCheckBox = (CheckBox) scheduleContainer.findViewById(R.id.checkbox_repeat_every_day);
         CheckBox repeatCheckBox = (CheckBox) scheduleContainer.findViewById(R.id.checkbox_repeat);
@@ -173,6 +175,7 @@ public class CreateUserFragment extends BaseFragment {
                     if (parent.getTag() == null) {
                         showDatePicker(view.getId(), mControlSchedule.getEndDate());
                     }
+                    mLimitCount.setVisibility(View.GONE);
                     mDateEventEditText.setVisibility(View.VISIBLE);
                     mDateEventEditText.setFocusable(false);
                     mDateEventEditText.setFocusableInTouchMode(false);
@@ -183,6 +186,8 @@ public class CreateUserFragment extends BaseFragment {
                         mDateEventEditText.setText(null);
                     }
                 } else if (limit.equals(Limit.EVENTS)) {
+                    mLimitCount.setVisibility(View.VISIBLE);
+                    mLimitCount.setText(mControlSchedule.getTriggeredEvents().toString());
                     mDateEventEditText.setVisibility(View.VISIBLE);
                     mDateEventEditText.setFocusable(true);
                     mDateEventEditText.setFocusableInTouchMode(true);
@@ -194,6 +199,7 @@ public class CreateUserFragment extends BaseFragment {
                         mDateEventEditText.setText(null);
                     }
                 } else {
+                    mLimitCount.setVisibility(View.GONE);
                     mDateEventEditText.setText(null);
                     mDateEventEditText.setVisibility(View.GONE);
                     mDateEventEditText.setOnClickListener(null);

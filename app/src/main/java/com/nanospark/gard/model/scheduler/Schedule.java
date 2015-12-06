@@ -10,7 +10,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
-import mobi.tattu.utils.ResourceUtils;
+import ioio.lib.spi.Log;
 
 /**
  * Created by Leandro on 29/10/2015.
@@ -96,58 +96,35 @@ public class Schedule implements Serializable, Comparable<Schedule> {
         return closeMinute != null && closeHour != null;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Schedule schedule = (Schedule) o;
-
-        return id.equals(schedule.id);
-
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
-
-    @Override
-    public int compareTo(Schedule another) {
-        return this.createDate.compareTo(another.createDate);
-    }
-
-    public enum Repeat {
-        DAILY, WEEKLY;
-
-        @Override
-        public String toString() {
-            return ResourceUtils.toString(this);
-        }
-    }
-
     public boolean isNow(Integer scheduleHour, Integer scheduleMinute) {
         if (scheduleHour == null || scheduleMinute == null) return false;
 
         Calendar calendar = Calendar.getInstance();
-        int day = calendar.get(Calendar.DAY_OF_WEEK);
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
 
-        return getControlSchedule().isAllowed();
+        return hour == scheduleHour && minute == scheduleMinute && getControlSchedule().isAllowed();
     }
 
-    public boolean trigger() {
+    public void trigger() {
+        Door.Command command = null;
         if (isNow(openHour, openMinute)) {
-            for (Integer doorId : doors) {
-                return Door.getInstance(doorId).send(new Door.Open("Scheduled action taken, door is in motion", false));
-            }
+            command = new Door.Open("Scheduled action taken, door is in motion", false);
         } else if (isNow(closeHour, closeMinute)) {
-            for (Integer doorId : doors) {
-                return Door.getInstance(doorId).send(new Door.Close("Scheduled action taken, door is in motion", false));
-            }
+            command = new Door.Close("Scheduled action taken, door is in motion", false);
         }
-        return false;
+        if (command != null) {
+            for (Integer doorId : doors) {
+                Door door = Door.getInstance(doorId);
+                if (door.send(command)) {
+                    Log.i("Scheduler", "Schedule " + this + " triggered on " + door);
+                } else {
+                    Log.i("Scheduler", "Schedule " + this + " NOT triggered on " + door);
+                }
+            }
+        } else {
+            Log.i("Scheduler", "Schedule " + this + " NOT triggered (not allowed?)");
+        }
     }
 
     public Calendar getOpenTime() {
@@ -157,4 +134,30 @@ public class Schedule implements Serializable, Comparable<Schedule> {
     public Calendar getCloseTime() {
         return isCloseTimeSet() ? Utils.createCalendarTime(closeHour, closeMinute) : null;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Schedule schedule = (Schedule) o;
+
+        return id.equals(schedule.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    @Override
+    public int compareTo(Schedule another) {
+        return this.createDate.compareTo(another.createDate);
+    }
+
 }

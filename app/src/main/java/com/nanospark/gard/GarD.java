@@ -10,7 +10,6 @@ import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.log.LogManager;
 import com.nanospark.gard.model.scheduler.ScheduleManager;
 import com.nanospark.gard.model.user.UserManager;
-import com.nanospark.gard.services.GarDService;
 import com.nanospark.gard.sms.SmsManager;
 import com.nanospark.gard.ui.activity.MainActivityNew;
 import com.nanospark.gard.voice.VoiceRecognizer;
@@ -57,7 +56,7 @@ public class GarD extends Application {
         ScheduleManager.getInstance().init();
 
         // Start service as soon as app starts
-        GarDService.start();
+        //GarDService.start();
 
         // Initialize Universal Image Loader
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
