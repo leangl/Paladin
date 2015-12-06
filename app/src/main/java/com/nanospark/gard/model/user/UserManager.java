@@ -83,7 +83,7 @@ public class UserManager {
     @Subscribe
     public void on(CommandProcessed event) {
         if (event.command != null && event.command.user != null && event.command.user.getSchedule() != null
-                && Limit.EVENTS.equals(event.command.user.getSchedule())) {
+                && Limit.EVENTS.equals(event.command.user.getSchedule().getLimit())) {
             ToastManager.show("Command processed");
             event.command.user.getSchedule().incrementEvents();
             update(event.command.user);
