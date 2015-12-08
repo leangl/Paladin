@@ -14,8 +14,6 @@ import com.nanospark.gard.weather.Forecast;
 import com.nanospark.gard.weather.Weather;
 import com.nanospark.gard.weather.WeatherManager;
 
-import java.text.DecimalFormat;
-
 import mobi.tattu.utils.fragments.BaseFragment;
 import roboguice.inject.InjectView;
 import rx.android.schedulers.AndroidSchedulers;
@@ -129,7 +127,7 @@ public class WeatherCardFragment extends BaseFragment {
 
     private String printTemp(Double temp) {
         if (temp == null) return "";
-        return new DecimalFormat("#.#").format(Math.abs(temp)) + "°F";
+        return mManager.getUnit().print(temp);
     }
 
     private int getWeatherIcon(Weather weather) {

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import com.google.inject.Inject;
 import com.nanospark.gard.R;
 import com.nanospark.gard.Utils;
+import com.nanospark.gard.model.Day;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.scheduler.Schedule;
 import com.nanospark.gard.model.scheduler.ScheduleManager;
@@ -119,21 +121,25 @@ public class CreateScheduleFragment extends BaseFragment {
         this.mRepeatEventWeeksEditText = (EditText) scheduleContainer.findViewById(R.id.edittext_repeat_weeks);
         this.mLimitCount = (TextView) scheduleContainer.findViewById(R.id.limit_current);
         this.mDateEventEditText = (TextView) scheduleContainer.findViewById(R.id.edittext_date_event);
-        CheckBox repeatEveryDayCheckBox = (CheckBox) scheduleContainer.findViewById(R.id.checkbox_repeat_every_day);
-        CheckBox repeatCheckBox = (CheckBox) scheduleContainer.findViewById(R.id.checkbox_repeat);
+        CompoundButton repeatEveryOtherWeek = (CompoundButton) scheduleContainer.findViewById(R.id.checkbox_repeat_every_week);
+        CompoundButton repeatEveryWeek = (CompoundButton) scheduleContainer.findViewById(R.id.checkbox_repeat);
         Spinner limitSpinner = (Spinner) scheduleContainer.findViewById(R.id.spinner_date_event);
 
         mHourContainer.setVisibility(View.GONE);
 
         this.mRepeatEventWeeksEditText.setEnabled(false);
 
-        repeatEveryDayCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> mControlSchedule.setRepeatEveryOtherWeek(isChecked));
+        repeatEveryOtherWeek.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            mControlSchedule.setRepeatEveryOtherWeek(isChecked);
+            if (isChecked) repeatEveryWeek.setChecked(false);
+        });
 
-        repeatCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        repeatEveryWeek.setOnCheckedChangeListener((buttonView, isChecked) -> {
             mControlSchedule.setRepeatWeeks(isChecked);
             mRepeatEventWeeksEditText.setEnabled(isChecked);
-
+            if (isChecked) repeatEveryOtherWeek.setChecked(false);
         });
+
         ArrayAdapter<Limit> adapter = new ArrayAdapter<>(getBaseActivity(),
                 android.R.layout.simple_dropdown_item_1line,
                 Limit.values());
@@ -149,7 +155,6 @@ public class CreateScheduleFragment extends BaseFragment {
                     if (parent.getTag() == null) {
                         showDatePicker(view.getId(), mControlSchedule.getEndDate());
                     }
-                    mLimitCount.setVisibility(View.GONE);
                     mDateEventEditText.setVisibility(View.VISIBLE);
                     mDateEventEditText.setFocusable(false);
                     mDateEventEditText.setFocusableInTouchMode(false);
@@ -160,7 +165,6 @@ public class CreateScheduleFragment extends BaseFragment {
                         mDateEventEditText.setText(null);
                     }
                 } else if (limit.equals(Limit.EVENTS)) {
-                    mLimitCount.setVisibility(View.VISIBLE);
                     mLimitCount.setText(mControlSchedule.getTriggeredEvents().toString());
                     mDateEventEditText.setVisibility(View.VISIBLE);
                     mDateEventEditText.setFocusable(true);
@@ -173,7 +177,6 @@ public class CreateScheduleFragment extends BaseFragment {
                         mDateEventEditText.setText(null);
                     }
                 } else {
-                    mLimitCount.setVisibility(View.GONE);
                     mDateEventEditText.setText(null);
                     mDateEventEditText.setVisibility(View.GONE);
                     mDateEventEditText.setOnClickListener(null);
@@ -196,7 +199,7 @@ public class CreateScheduleFragment extends BaseFragment {
         Calendar today = Calendar.getInstance();
         mDateStartTextView.setText(getDay(today.get(Calendar.DAY_OF_MONTH), today.get(Calendar.MONTH), today.get(Calendar.YEAR)));
 
-        loadData(repeatEveryDayCheckBox, repeatCheckBox, limitSpinner);
+        loadData(repeatEveryOtherWeek, repeatEveryWeek, limitSpinner);
     }
 
     private void showDatePicker(int id, Calendar defaultDate) {
@@ -210,16 +213,16 @@ public class CreateScheduleFragment extends BaseFragment {
     }
 
     private void initDays(LinearLayout daysContainer) {
-        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_sun), Calendar.SUNDAY, R.drawable.ic_sun, R.drawable.ic_sun_selected);
-        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_mon), Calendar.MONDAY, R.drawable.ic_mon, R.drawable.ic_mon_selected);
-        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_tue), Calendar.TUESDAY, R.drawable.ic_tue, R.drawable.ic_tue_selected);
-        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_wed), Calendar.WEDNESDAY, R.drawable.ic_wed, R.drawable.ic_wed_selected);
-        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_thr), Calendar.THURSDAY, R.drawable.ic_thr, R.drawable.ic_thr_selected);
-        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_fri), Calendar.FRIDAY, R.drawable.ic_fri, R.drawable.ic_fri_selected);
-        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_sat), Calendar.SATURDAY, R.drawable.ic_sat, R.drawable.ic_sat_selected);
+        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_sun), Day.SUNDAY, R.drawable.ic_sun, R.drawable.ic_sun_selected);
+        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_mon), Day.MONDAY, R.drawable.ic_mon, R.drawable.ic_mon_selected);
+        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_tue), Day.TUESDAY, R.drawable.ic_tue, R.drawable.ic_tue_selected);
+        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_wed), Day.WEDNESDAY, R.drawable.ic_wed, R.drawable.ic_wed_selected);
+        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_thr), Day.THURSDAY, R.drawable.ic_thr, R.drawable.ic_thr_selected);
+        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_fri), Day.FRIDAY, R.drawable.ic_fri, R.drawable.ic_fri_selected);
+        handleDaySelected((FloatingActionButton) daysContainer.findViewById(R.id.fb_day_sat), Day.SATURDAY, R.drawable.ic_sat, R.drawable.ic_sat_selected);
     }
 
-    private void handleDaySelected(FloatingActionButton floatingActionButton, int day, int drawable, int drawableSelected) {
+    private void handleDaySelected(FloatingActionButton floatingActionButton, Day day, int drawable, int drawableSelected) {
         floatingActionButton.setTag(R.string.key_state, Boolean.FALSE);
         floatingActionButton.setTag(R.string.key_day, day);
         floatingActionButton.setOnClickListener(v -> {
@@ -236,7 +239,7 @@ public class CreateScheduleFragment extends BaseFragment {
                 color = R.color.red;
                 drawableAux = drawableSelected;
                 state = true;
-                mControlSchedule.getDays().add((Integer) fb.getTag(R.string.key_day));
+                mControlSchedule.getDays().add((Day) fb.getTag(R.string.key_day));
             }
             fb.setBackgroundTintList(ColorStateList.valueOf(getColorFromResource(color)));
             fb.setImageResource(drawableAux);
@@ -244,7 +247,7 @@ public class CreateScheduleFragment extends BaseFragment {
             fb.setTag(R.string.key_state, state);
 
         });
-        if (mControlSchedule.getDays().indexOf(day) != -1) {
+        if (mControlSchedule.getDays().contains(day)) {
             floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(getColorFromResource(R.color.red)));
             floatingActionButton.setImageResource(drawableSelected);
             floatingActionButton.setTag(R.string.key_state, true);
@@ -255,7 +258,7 @@ public class CreateScheduleFragment extends BaseFragment {
         return (month + 1) + "/" + day + "/" + year;
     }
 
-    private void loadData(CheckBox repeatEveryDayCheckBox, CheckBox repeatCheckBox, Spinner limitSpinner) {
+    private void loadData(CompoundButton repeatEveryOtherWeek, CompoundButton repeatEveryWeek, Spinner limitSpinner) {
         ControlSchedule controlSchedule = mControlSchedule;
         if (controlSchedule.isStartTimeSet()) {
             mTimeStartTextView.setText(Utils.getHour(controlSchedule.getStartHour(), controlSchedule.getStartMinute()));
@@ -268,8 +271,8 @@ public class CreateScheduleFragment extends BaseFragment {
             mDateStartTextView.setText(getDay(controlSchedule.getStartDay(), controlSchedule.getStartMonth(), controlSchedule.getStartYear()));
         }
 
-        repeatEveryDayCheckBox.setChecked(controlSchedule.isRepeatEveryOtherWeek());
-        repeatCheckBox.setChecked(controlSchedule.isRepeatWeeks());
+        repeatEveryOtherWeek.setChecked(controlSchedule.isRepeatEveryOtherWeek());
+        repeatEveryWeek.setChecked(controlSchedule.isRepeatWeeks());
         if (controlSchedule.getRepeatWeeksNumber() != null) {
             mRepeatEventWeeksEditText.setText(controlSchedule.getRepeatWeeksNumber() + "");
         }

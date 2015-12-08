@@ -82,7 +82,7 @@ class SmsCommand {
     }
 
     public static boolean isSmsCommand(String body) {
-        return getCommand(body) != null;
+        return getCommand(body.toLowerCase()) != null;
     }
 
     public boolean is(String command) {

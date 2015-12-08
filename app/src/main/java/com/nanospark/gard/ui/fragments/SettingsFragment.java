@@ -56,6 +56,8 @@ public class SettingsFragment extends BaseFragment {
     private EditText mZipcode;
     @InjectView(R.id.city)
     private TextView mCity;
+    @InjectView(R.id.display_celcius)
+    private CheckBox mDisplayCelcius;
 
     @Inject
     private SmsManager mSmsManager;
@@ -114,6 +116,7 @@ public class SettingsFragment extends BaseFragment {
         mWeather.setChecked(mWeatherManager.isEnabled());
         mZipcode.setText(mWeatherManager.getCity().getZipCode());
         mCity.setText(mWeatherManager.getCity().toString());
+        mDisplayCelcius.setChecked(WeatherManager.Unit.METRIC.equals(mWeatherManager.getUnit()));
     }
 
     @Override
@@ -143,6 +146,8 @@ public class SettingsFragment extends BaseFragment {
         door2.setEnabled(mDoor2.isChecked());
         door2.setOpenSwitchEnabled(mOpen2.isChecked());
         door2.setCloseSwitchEnabled(mClose2.isChecked());
+
+        mWeatherManager.setUnit(mDisplayCelcius.isChecked() ? WeatherManager.Unit.METRIC : WeatherManager.Unit.IMPERIAL);
 
         mWeatherManager.setEnabled(mWeather.isChecked());
         String zipCode = mZipcode.getText().toString();

@@ -8,9 +8,11 @@ import com.google.gson.JsonObject;
 import com.google.inject.Singleton;
 import com.nanospark.gard.GarD;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import mobi.tattu.utils.ResourceUtils;
 import mobi.tattu.utils.persistance.datastore.DataStore;
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
@@ -60,7 +62,7 @@ public class WeatherManager {
         if (mForecast != null && TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - mForecast.getDate().getTime()) < 3) {
             return Observable.just(mForecast);
         }
-        return mApi.getForecast(mConfig.city.getName() + ",US", API_KEY, UNIT_IMPERIAL)
+        return mApi.getForecast(mConfig.city.getName() + ",US", API_KEY, mConfig.unit.name().toLowerCase())
                 .map(result -> {
                     JsonObject object = result.getAsJsonObject();
                     JsonArray list = object.get("list").getAsJsonArray();
@@ -118,6 +120,16 @@ public class WeatherManager {
         DataStore.getInstance().putObject(Config.class.getSimpleName(), mConfig);
     }
 
+    public void setUnit(Unit unit) {
+        mConfig.unit = unit;
+        persit();
+        mForecast = null;
+    }
+
+    public Unit getUnit() {
+        return mConfig.unit;
+    }
+
     public void setEnabled(boolean enabled) {
         mConfig.enabled = enabled;
         persit();
@@ -129,11 +141,31 @@ public class WeatherManager {
 
     public static class Config {
         public City city;
+        public Unit unit = Unit.IMPERIAL;
         public boolean enabled = true;
     }
 
     public City getCity() {
         return mConfig.city;
+    }
+
+    public enum Unit {
+        METRIC, IMPERIAL;
+
+        @Override
+        public String toString() {
+            return ResourceUtils.toString(this);
+        }
+
+        public String print(Double temp) {
+            switch (this) {
+                case METRIC:
+                    return new DecimalFormat("#.#").format(Math.abs(temp)) + this;
+                case IMPERIAL:
+                    return ((int) Math.abs(temp)) + "" + this;
+            }
+            return null;
+        }
     }
 
 }

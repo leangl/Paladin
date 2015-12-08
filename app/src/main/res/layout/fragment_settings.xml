@@ -244,7 +244,6 @@
                         android:id="@+id/zipcode"
                         android:layout_width="200dp"
                         android:layout_height="wrap_content"
-                        android:layout_toRightOf="@id/door1"
                         android:digits="0123456789abcdefghijklmnñopqrstuvwxyz"
                         android:enabled="true"
                         android:focusable="true"
@@ -255,6 +254,16 @@
                         android:maxLines="1"
                         android:singleLine="true"
                         android:textSize="18sp"/>
+
+                    <CheckBox
+                        android:id="@+id/display_celcius"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="50dp"
+                        android:layout_marginRight="5dp"
+                        android:text="Display temp in C°"
+                        android:textSize="20sp"/>
+
                 </LinearLayout>
 
                 <TextView

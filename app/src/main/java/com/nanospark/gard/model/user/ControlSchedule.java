@@ -5,6 +5,7 @@ import com.nanospark.gard.model.Day;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -29,7 +30,7 @@ public class ControlSchedule implements Serializable {
     private Integer limitMonth;
     private Integer limitYear;
     private Integer limitEvents;
-    private List<Integer> days = new ArrayList<>();
+    private List<Day> days = new ArrayList<>(Arrays.asList(Day.values()));
     private boolean repeatEveryOtherWeek;
     private boolean repeatWeeks;
     private Integer repeatWeeksNumber;
@@ -40,10 +41,10 @@ public class ControlSchedule implements Serializable {
         this.createTimestamp = System.currentTimeMillis();
     }
 
-    public List<Integer> getDays() {
+    public List<Day> getDays() {
         return days;
     }
-    public void setDays(List<Integer> days) {
+    public void setDays(List<Day> days) {
         this.days = days;
     }
     public Integer getEndHour() {
@@ -213,12 +214,12 @@ public class ControlSchedule implements Serializable {
         }
         boolean first = true;
         Collections.sort(days);
-        for (int day : days) {
+        for (Day day : days) {
             if (!first) {
                 sb.append(", ");
             }
             first = false;
-            sb.append(Day.fromCalendar(day).abbr());
+            sb.append(day.abbr());
         }
         return sb.toString();
     }
@@ -295,8 +296,8 @@ public class ControlSchedule implements Serializable {
             }
         }
 
-        if (days != null && !days.isEmpty() && !days.contains(today.get(Calendar.DAY_OF_WEEK))) {
-            Ln.i("Day not allowed: " + today.get(Calendar.DAY_OF_WEEK));
+        if (days != null && !days.isEmpty() && !days.contains(Day.today())) {
+            Ln.i("Day not allowed: " + Day.today().name());
             return false;
         }
 
