@@ -328,7 +328,7 @@ public class SmsManager {
             return "Pass code is invalid";
         }
         if (!smsCommand.user.isAllowed()) {
-            return "You are not authorized to control the door during this time frame";
+            return "You don't have permission to operate the door(s) at this time.";
         }
         if (smsCommand.is(SmsCommand.STATUS)) {
             StringBuilder response = new StringBuilder();
@@ -346,13 +346,13 @@ public class SmsManager {
                         if (door.isOpen()) {
                             return "The door is already open.";
                         }
-                        door.send(new Door.Open("Message received, door is in motion", false, smsCommand.user));
+                        door.send(new Door.Open(smsCommand.user, "Message received, door is in motion", false, smsCommand.user));
                         return "Open door command received.";
                     } else if (smsCommand.is(SmsCommand.CLOSE)) {
                         if (door.isClosed()) {
                             return "The door is already closed.";
                         }
-                        door.send(new Door.Close("Message received, door is in motion", false, smsCommand.user));
+                        door.send(new Door.Close(smsCommand.user, "Message received, door is in motion", false, smsCommand.user));
                         return "Close door command received.";
                     }
                 }
@@ -367,7 +367,8 @@ public class SmsManager {
         }
         SmsCommand command = pendingCommands.get(from);
         if (TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - command.timestamp) >= 5) {
-            throw new Exception("Authentication challenge expired for " + from);
+            Ln.w("Authentication challenge expired for " + from);
+            return "Your permission to operate the door(s) has expired.";
         }
         if (StringUtils.isEmpty(body)) {
             throw new Exception("Invalid authentication format");
@@ -386,6 +387,8 @@ public class SmsManager {
                 command.password = bodyParts[1].trim();
                 if (command.user.isPasswordCorrect(command.password)) {
                     pendingCommands.remove(from);
+                } else {
+                    return "Pass code is invalid (or was left blank and is required).";
                 }
             }
         } else {
@@ -397,7 +400,15 @@ public class SmsManager {
 
     @Subscribe
     public void on(DoorStateChanged event) {
-        sendDoorAlert(event.door + " is " + event.state.toString().toLowerCase(), event.state);
+        if (event.door.isEnabled()) {
+            String message;
+            if (event.source != null) {
+                message = event.door + " has been " + event.state.toString().toLowerCase() + " by " + event.source.getSourceDescription();
+            } else {
+                message = event.door + " is " + event.state.toString().toLowerCase() + ", not by a command through your PALADIN system.";
+            }
+            sendDoorAlert(message, event.state);
+        }
     }
 
     /**
@@ -434,7 +445,10 @@ public class SmsManager {
     }
 
     public static class SmsConfig {
-        public TwilioAccount account = new TwilioAccount("", "AC83aacf8a55784375290210a9eb924ad4", "3f5dab33644d33cacb4bf300194299eb");
+        private static final String DEFAULT_SID = BuildConfig.DEBUG ? "AC83aacf8a55784375290210a9eb924ad4" : "";
+        private static final String DEFAULT_TOKEN = BuildConfig.DEBUG ? "3f5dab33644d33cacb4bf300194299eb" : "";
+
+        public TwilioAccount account = new TwilioAccount("", DEFAULT_SID, DEFAULT_TOKEN);
         public boolean enabled = true;
         public boolean suspended = false;
     }

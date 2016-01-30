@@ -52,7 +52,7 @@ public class ScheduleManager {
     }
 
     public void add(Schedule schedule) {
-        mDataStore.putObject(schedule);
+        mDataStore.put(schedule);
         initializeSchedule(schedule);
     }
 
@@ -70,11 +70,11 @@ public class ScheduleManager {
     }
 
     public Schedule getSchedule(String id) {
-        return mDataStore.getObject(id, Schedule.class).get();
+        return mDataStore.get(id, Schedule.class).get();
     }
 
     public void delete(Schedule schedule) {
-        mDataStore.delete(Schedule.class, schedule);
+        mDataStore.delete(schedule, Schedule.class);
     }
 
     private void initializeSchedule(Schedule schedule) {

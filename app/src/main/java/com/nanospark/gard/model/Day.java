@@ -6,6 +6,7 @@ import java.util.Calendar;
  * Created by Leandro on 31/10/2015.
  */
 public enum Day {
+
     SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY;
 
     public static Day fromCalendar(int day) {

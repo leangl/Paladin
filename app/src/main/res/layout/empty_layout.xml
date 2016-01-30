@@ -50,7 +50,7 @@
                         android:layout_weight="0.2"
                         android:gravity="center"
                         android:text="Luke Jhon Obama Keneddy Smith"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="18dp"
                         android:textColor="@color/text_color_bold"
                         android:textStyle="bold"/>
 

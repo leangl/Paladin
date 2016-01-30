@@ -19,7 +19,11 @@ public class ResourceUtils {
         try {
             return getString(name);
         } catch (Resources.NotFoundException e) {
-            return getString(defValue);
+            try {
+                return getString(defValue);
+            } catch (Resources.NotFoundException e2) {
+                return defValue;
+            }
         }
     }
 

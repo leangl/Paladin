@@ -7,6 +7,7 @@ import com.nanospark.gard.events.DoorStateChanged;
 import com.nanospark.gard.events.PhraseRecognized;
 import com.nanospark.gard.events.VoiceRecognitionDisabled;
 import com.nanospark.gard.events.VoiceRecognitionEnabled;
+import com.nanospark.gard.model.CommandSource;
 import com.nanospark.gard.model.door.Door;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
@@ -134,7 +135,7 @@ public class VoiceRecognizer implements RecognitionListener {
 
     @Subscribe
     public void on(PhraseRecognized event) {
-        event.door.send(new Door.Toggle("Command heard, door is in motion", true));
+        event.door.send(new Door.Toggle(CommandSource.VOICE, "Command heard, door is in motion", true));
     }
 
     /**

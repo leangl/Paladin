@@ -34,7 +34,7 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:text="Error updating weather.\nTouch to retry."
-            android:textSize="18sp"
+            android:textSize="18dp"
             android:visibility="invisible"
             tools:visibility="visible"/>
 
@@ -53,7 +53,7 @@
                     android:id="@+id/title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="28sp"
+                    android:textSize="28dp"
                     android:textStyle="bold"
                     android:maxLines="1"
                     android:maxWidth="270dp"
@@ -66,7 +66,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/title"
                     android:text="Last update: "
-                    android:textSize="16sp"/>
+                    android:textSize="16dp"/>
 
                 <TextView
                     android:id="@+id/last_update"
@@ -75,7 +75,7 @@
                     android:layout_below="@id/title"
                     android:layout_toRightOf="@id/last_update_title"
                     android:text="4 hours ago"
-                    android:textSize="16sp"
+                    android:textSize="16dp"
                     android:textStyle="bold"/>
 
                 <ImageView

@@ -227,18 +227,14 @@ public class ControlSchedule implements Serializable {
     public boolean isAllowed() {
         Calendar today = Calendar.getInstance();
         if (isStartTimeSet()) {
-            int minute = today.get(Calendar.MINUTE);
-            int hour = today.get(Calendar.HOUR_OF_DAY);
-            if (hour < startHour || (hour == startHour && minute < startMinute)) {
-                Ln.i("Today is before end hour: HH:mm", hour, minute);
+            if (today.before(getStartTime())) {
+                Ln.i("Today is before start time " + getStartTime());
                 return false;
             }
         }
         if (isEndTimeSet()) {
-            int minute = today.get(Calendar.MINUTE);
-            int hour = today.get(Calendar.HOUR_OF_DAY);
-            if (hour > endHour || (hour == endHour && minute > endMinute)) {
-                Ln.i("Today is after end hour: HH:mm", hour, minute);
+            if (today.after(getEndTime())) {
+                Ln.i("Today is after end time " + getEndTime());
                 return false;
             }
         }
@@ -250,7 +246,7 @@ public class ControlSchedule implements Serializable {
             if (year < startYear ||
                     (year == startYear &&
                             (month < startMonth || (month == startMonth && day < startDay)))) {
-                Ln.i("Today is before startChecking date: yyyy/MM/dd", year, month, day);
+                Ln.i("Today is before start date " + startYear + "/" + startMonth + "/" + startDay);
                 return false;
             }
         }
@@ -262,7 +258,7 @@ public class ControlSchedule implements Serializable {
             if (year > limitYear ||
                     (year == limitYear &&
                             (month > limitMonth || (month == limitMonth && day > limitDay)))) {
-                Ln.i("Today is after end date: yyyy/MM/dd", year, month, day);
+                Ln.i("Today is after end date " + limitYear + "/" + limitMonth + "/" + limitDay);
                 return false;
             }
         }
@@ -301,7 +297,7 @@ public class ControlSchedule implements Serializable {
             return false;
         }
 
-        Ln.i("Allowed time.");
+        Ln.i("Allowed timeframe");
         return true;
     }
 
@@ -330,11 +326,39 @@ public class ControlSchedule implements Serializable {
     }
 
     public Calendar getStartTime() {
-        return isStartTimeSet() ? Utils.createCalendarTime(startHour, startMinute) : null;
+        if (!isStartTimeSet()) return null;
+
+        Calendar startTime = Utils.createCalendarTime(startHour, startMinute);
+
+        if (isEndTimeSet()) {
+            Calendar endTime = Utils.createCalendarTime(endHour, endMinute);
+            if (endTime.before(startTime)) {
+                Calendar today = Calendar.getInstance();
+                if (today.before(endTime)) {
+                    startTime.add(Calendar.DAY_OF_MONTH, -1);
+                }
+            }
+        }
+
+        return startTime;
     }
 
     public Calendar getEndTime() {
-        return isEndTimeSet() ? Utils.createCalendarTime(endHour, endMinute) : null;
+        if (!isEndTimeSet()) return null;
+
+        Calendar endTime = Utils.createCalendarTime(endHour, endMinute);
+
+        if (isStartTimeSet()) {
+            Calendar startTime = Utils.createCalendarTime(startHour, startMinute);
+            if (endTime.before(startTime)) {
+                Calendar today = Calendar.getInstance();
+                if (today.after(endTime)) {
+                    endTime.add(Calendar.DAY_OF_MONTH, 1);
+                }
+            }
+        }
+
+        return endTime;
     }
 
 }

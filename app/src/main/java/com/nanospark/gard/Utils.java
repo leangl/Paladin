@@ -25,7 +25,10 @@ public class Utils {
     }
 
     public static String getHour(Calendar calendar) {
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int hour = calendar.get(Calendar.HOUR);
+        if (hour == 0 && calendar.get(Calendar.AM_PM) == Calendar.PM) {
+            hour = 12;
+        }
         int minute = calendar.get(Calendar.MINUTE);
         StringBuilder builder = new StringBuilder();
         builder.append(hour > 9 ? hour : "0" + hour);
@@ -76,7 +79,7 @@ public class Utils {
         deviceInfo.append("Build.DEVICE " + Build.DEVICE + "\n");
         String info = deviceInfo.toString();
 
-        Ln.i(info);
+        Ln.d(info);
 
         Boolean isvm = false;
         if (
@@ -96,6 +99,8 @@ public class Utils {
         if (Build.BRAND.contains("generic") && Build.DEVICE.contains("generic")) {
             isvm = true;
         }
+
+        Ln.d("Is VM: " + isvm);
 
         return isvm;
     }

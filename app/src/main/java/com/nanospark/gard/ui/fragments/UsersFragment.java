@@ -22,6 +22,8 @@ import com.nanospark.gard.ui.custom.BaseFragment;
 
 import java.util.List;
 
+import mobi.tattu.utils.DialogUtils;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -88,8 +90,13 @@ public class UsersFragment extends BaseFragment {
                 if (user.isNotificationEnabled()) {
                     receiveAlerts.setImageResource(R.drawable.ic_alert_enabled);
                 }
-                timeLimits1.setText(user.getHourRangeString());
-                timeLimits2.setText(user.getDayLimitString());
+                if (user.hasSchedules()) {
+                    timeLimits1.setText(user.getHourRangeString());
+                    timeLimits2.setText(user.getDayLimitString());
+                } else {
+                    ((ImageView)userView.findViewById(R.id.imageView3)).setImageResource(R.drawable.ic_no_time_limits);
+                    userView.findViewById(R.id.textView6).setVisibility(View.GONE);
+                }
                 populateUserView(user, name, phone);
 
                 addViewToGrid(this.mGridLayout, userView);
@@ -107,8 +114,17 @@ public class UsersFragment extends BaseFragment {
     private void handlePopMenu(MenuItem item, User user) {
         switch (item.getItemId()) {
             case R.id.action_delete:
-                mUserManager.delete(user);
-                loadUsers();
+                DialogUtils.alert(getActivity(),
+                        "Do you want to delete this user?",
+                        null,
+                        "Delete",
+                        "Cancel",
+                        (confirmed) -> {
+                            if (confirmed) {
+                                mUserManager.delete(user);
+                                loadUsers();
+                            }
+                        });
                 break;
             case R.id.action_edit:
                 Intent intent = new Intent(getBaseActivity(), CreateUserActivity.class);
@@ -124,7 +140,11 @@ public class UsersFragment extends BaseFragment {
 
     private void populateUserView(User user, TextView name, TextView phone) {
         name.setText(user.getName());
-        phone.setText(user.getPhone());
+        String phoneNumber = user.getPhone();
+        if (phoneNumber.length() == 10) {
+            phoneNumber = "(" + phoneNumber.substring(0, 3) + ") " + phoneNumber.substring(3, 6) + "-" + phoneNumber.substring(6, 10);
+        }
+        phone.setText(phoneNumber);
     }
 
     private void addViewToGrid(GridLayout gridLayout, View view) {

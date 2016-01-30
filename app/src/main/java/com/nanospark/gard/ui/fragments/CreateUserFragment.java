@@ -419,6 +419,10 @@ public class CreateUserFragment extends BaseFragment {
         }
 
         if (validateField(phone, getString(R.string.phone_label))) {
+            if (phone.toString().trim().length() < 10) {
+                toast("Phone number is less than 10 digits, please include your area code.");
+                return false;
+            }
             this.mUser.setPhone(phone);
         } else {
             return false;

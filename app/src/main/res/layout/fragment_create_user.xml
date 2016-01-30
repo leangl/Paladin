@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal">
 
     <android.support.v4.widget.Space
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.15"
-        android:background="@android:color/transparent"/>
+        android:background="@android:color/transparent" />
 
     <ScrollView
         android:layout_width="0dp"
@@ -43,8 +43,10 @@
                         android:focusable="true"
                         android:focusableInTouchMode="true"
                         android:hint="@string/name_label"
+                        android:textColor="@color/text_color_bold"
                         android:maxLines="1"
-                        android:singleLine="true"/>
+                        android:singleLine="true"
+                        tools:text="Luke"/>
 
                     <CheckBox
                         android:id="@+id/checkbox_password"
@@ -57,8 +59,8 @@
                         android:checked="false"
                         android:text="@string/require_password_label"
                         android:textColor="@color/text_color_bold"
-                        android:textSize="16sp"
-                        android:textStyle="bold"/>
+                        android:textSize="16dp"
+                        android:textStyle="bold" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -71,14 +73,14 @@
                             android:gravity="bottom"
                             android:paddingBottom="5dp"
                             android:text="Passcode:"
-                            android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:textColor="@color/text_color_pass"/>
+                            android:textColor="@color/text_color_pass"
+                            android:textSize="14dp" />
 
                         <EditText
                             android:id="@+id/edittext_password"
                             android:layout_width="80dp"
                             android:layout_height="wrap_content"
-                            android:maxLength="4"/>
+                            android:maxLength="4" />
 
                     </LinearLayout>
 
@@ -93,8 +95,8 @@
                         android:checked="false"
                         android:text="@string/time_limits_label"
                         android:textColor="@color/text_color_bold"
-                        android:textSize="16sp"
-                        android:textStyle="bold"/>
+                        android:textSize="16dp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 
@@ -108,10 +110,11 @@
                         android:id="@+id/edittext_phone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/phone_label"
+                        android:hint="Enter 10 digit phone number"
                         android:inputType="number"
+                        android:maxLength="10"
                         android:maxLines="1"
-                        android:singleLine="true"/>
+                        android:singleLine="true" />
 
                     <CheckBox
                         android:id="@+id/checkbox_notify"
@@ -120,8 +123,8 @@
                         android:checked="true"
                         android:text="@string/notify_door_activity_label"
                         android:textColor="@color/text_color_bold"
-                        android:textSize="16sp"
-                        android:textStyle="bold"/>
+                        android:textSize="16dp"
+                        android:textStyle="bold" />
 
                     <Spinner
                         android:id="@+id/spinner_door_event"
@@ -129,11 +132,11 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="40dp"
                         android:minWidth="100dp"
-                        android:spinnerMode="dropdown"/>
+                        android:spinnerMode="dropdown" />
                 </LinearLayout>
             </LinearLayout>
 
-            <include layout="@layout/repeat_layout"/>
+            <include layout="@layout/repeat_layout" />
         </LinearLayout>
     </ScrollView>
 
@@ -141,5 +144,5 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.15"
-        android:background="@android:color/transparent"/>
+        android:background="@android:color/transparent" />
 </LinearLayout>

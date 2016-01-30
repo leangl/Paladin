@@ -32,7 +32,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="5dp"
         android:layout_toRightOf="@+id/imageview_lock"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="18dp"
         tools:text=" Mon 13, 14:26"/>
 
     <TextView
@@ -45,7 +45,7 @@
         android:layout_toEndOf="@+id/imageview_lock"
         android:layout_toRightOf="@+id/imageview_lock"
         android:paddingLeft="7dp"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="14dp"
         android:visibility="invisible"
         tools:text="opened for 23 sec"
         tools:visibility="visible"/>

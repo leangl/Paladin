@@ -2,6 +2,8 @@ package com.nanospark.gard.ui.fragments;
 
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,7 @@ import com.nanospark.gard.events.CommandFailed;
 import com.nanospark.gard.events.CommandProcessed;
 import com.nanospark.gard.events.CommandSent;
 import com.nanospark.gard.events.DoorStateChanged;
+import com.nanospark.gard.model.CommandSource;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.log.Log;
 import com.nanospark.gard.model.log.LogManager;
@@ -24,6 +27,10 @@ import com.nanospark.gard.ui.custom.BaseFragment;
 import com.nanospark.gard.voice.VoiceRecognizer;
 import com.squareup.otto.Subscribe;
 
+import java.util.Calendar;
+import java.util.Locale;
+
+import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.annotations.SaveState;
 import roboguice.inject.InjectView;
 
@@ -60,6 +67,8 @@ public class DoorCardFragment extends BaseFragment {
     private Integer mDoorId;
 
     private Door mDoor;
+    private long animationStarted;
+    private Handler mAnimationStopHandler = Tattu.createUiHandler();
 
     public static DoorCardFragment newInstance(Integer doorId) {
         DoorCardFragment instance = new DoorCardFragment();
@@ -87,7 +96,7 @@ public class DoorCardFragment extends BaseFragment {
             }
         });
         mImageViewDoor.setOnClickListener(v -> {
-            mDoor.send(new Door.Toggle("Door is in motion", true));
+            mDoor.send(new Door.Toggle(CommandSource.TOUCH, "Door is in motion", true));
         });
         refresh();
     }
@@ -127,29 +136,71 @@ public class DoorCardFragment extends BaseFragment {
         mTextviewOpen.setText(mDoor.getState().toString());
         mTextviewOpen.setTextColor(getResources().getColor(!mDoor.isReady() ? R.color.door_unknown : mDoor.isOpen() ? R.color.door_open : R.color.door_closed));
         if (mDoor.isReady()) {
-            mImageViewDoor.setBackgroundResource(mDoor.isOpen() ? R.drawable.door_0 : R.drawable.door_4);
+            refreshDoorImage();
         }
         mContainerCenter.setBackgroundColor(getResources().getColor(!mDoor.isReady() ? R.color.door_unknown : mDoor.isOpen() ? R.color.door_open : R.color.door_closed));
 
         refreshLastOpened();
     }
 
+    private void refreshDoorImage() {
+        long now = System.currentTimeMillis();
+        if (now - animationStarted > 5000) {
+            setDoorBackground();
+        } else {
+            stopDoorAnimationIn(now - animationStarted);
+        }
+    }
+
+    private void setDoorBackground() {
+        mImageViewDoor.setBackgroundResource(mDoor.isOpen() ? R.drawable.door_0 : R.drawable.door_4);
+    }
+
     private void startAnimation(int drawableResId) {
+        animationStarted = System.currentTimeMillis();
         mImageViewDoor.setBackgroundResource(drawableResId);
         AnimationDrawable animation = (AnimationDrawable) mImageViewDoor.getBackground();
         animation.start();
+
+        stopDoorAnimationIn(30);
+    }
+
+    private void stopDoorAnimationIn(long millis) {
+        mAnimationStopHandler.removeCallbacks(null);
+        mAnimationStopHandler.postDelayed(() -> setDoorBackground(), millis);
     }
 
     private void refreshLastOpened() {
-        Log mLastLog = mLogManager.getLastLog(mDoor);
-        if (mLastLog != null) {
+        Log lastLog = mLogManager.getLastLog(mDoor);
+        if (lastLog != null) {
             mTextViewLastOpened.setVisibility(View.VISIBLE);
             mLastOpenedlabel.setVisibility(View.VISIBLE);
-            mTextViewLastOpened.setText(mLastLog.getDateString(true));
+            mTextViewLastOpened.setText(getLogString(lastLog));
         } else {
             mTextViewLastOpened.setVisibility(View.INVISIBLE);
             mLastOpenedlabel.setVisibility(View.INVISIBLE);
         }
+    }
+
+    public String getLogString(Log log) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(log.getDate());
+        String dayOfWeek = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US);
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(log.getEvent().equals(Door.State.OPEN) ? "Opened" : "Closed");
+        builder.append(", ");
+        builder.append(dayOfWeek);
+        builder.append(" ");
+        builder.append(dayOfMonth);
+        builder.append("/");
+        builder.append(month);
+        builder.append(" at ");
+        builder.append(com.nanospark.gard.Utils.getHour(calendar));
+
+        return Html.fromHtml(builder.toString()).toString();
     }
 
     public void refreshVoiceState() {

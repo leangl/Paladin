@@ -27,6 +27,7 @@ import com.nanospark.gard.ui.custom.BaseFragment;
 
 import java.util.concurrent.TimeUnit;
 
+import mobi.tattu.utils.DialogUtils;
 import mobi.tattu.utils.EnumWrapper;
 import mobi.tattu.utils.ResourceUtils;
 import mobi.tattu.utils.StringUtils;
@@ -133,8 +134,17 @@ public class SchedulesFragment extends BaseFragment {
     private void handlePopMenu(MenuItem item, Schedule schedule) {
         switch (item.getItemId()) {
             case R.id.action_delete:
-                mManager.delete(schedule);
-                loadSchedules();
+                DialogUtils.alert(getActivity(),
+                        "Do you want to delete this schedule?",
+                        null,
+                        "Delete",
+                        "Cancel",
+                        (confirmed) -> {
+                            if (confirmed) {
+                                mManager.delete(schedule);
+                                loadSchedules();
+                            }
+                        });
                 break;
             case R.id.action_edit:
                 CreateScheduleActivity.start(getActivity(), schedule);

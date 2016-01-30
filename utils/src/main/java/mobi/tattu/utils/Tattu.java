@@ -40,7 +40,11 @@ public class Tattu {
         //ToastManager.get().init(R.layout.toast, R.id.toast_text);
         Config.get().setDefaultPreferences(false, null);
 
-        //checkVersion();
+        try {
+            checkVersion();
+        } catch (Exception e) {
+            Ln.e(e);
+        }
     }
 
     private static void checkVersion() throws Exception {
@@ -59,7 +63,7 @@ public class Tattu {
                 Ln.i("App updated: " + previousVersionCode + " > " + currentVersionCode);
             } else if (previousVersionCode > currentVersionCode) {
                 // App downgraded
-                Ln.e("App downgraded: " + previousVersionCode + " > " + currentVersionCode);
+                Ln.w("App downgraded: " + previousVersionCode + " > " + currentVersionCode);
             } else {
                 Ln.d("Version not changed");
             }

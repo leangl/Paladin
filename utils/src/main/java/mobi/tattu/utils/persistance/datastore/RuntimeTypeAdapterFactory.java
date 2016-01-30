@@ -21,6 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.internal.Streams;
@@ -211,7 +212,11 @@ public final class RuntimeTypeAdapterFactory<T> implements TypeAdapterFactory {
                     throw new JsonParseException("cannot deserialize " + baseType + " subtype named "
                             + label + "; did you forget to register a subtype?");
                 }
-                return delegate.fromJsonTree(jsonElement);
+                try {
+                    return delegate.fromJsonTree(jsonElement);
+                } catch (JsonSyntaxException e) {
+                    return null;
+                }
             }
 
             @Override public void write(JsonWriter out, R value) throws IOException {

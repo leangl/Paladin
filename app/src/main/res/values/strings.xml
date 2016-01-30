@@ -14,7 +14,7 @@
     <string name="title_main">Main</string>
     <string name="door_one_label">Door 1</string>
     <string name="door_two_label">Door 2</string>
-    <string name="last_opened_label">Last opened: </string>
+    <string name="recent">Recent: </string>
     <string name="open_label">Open:</string>
     <string name="close_label">Close:</string>
     <string name="subtile_toolbar">by NANOSPARK</string>
@@ -39,7 +39,7 @@
     <string name="no_record_msg">No records to display</string>
     <string name="door_label">Door</string>
     <string name="receive_alerts_label">Receive Alerts</string>
-    <string name="time_limits_label">Time limits: </string>
+    <string name="time_limits_label">Time limits </string>
     <string name="start_label">Start: </string>
     <string name="end_label">End: </string>
     <string name="repeat_only_every_week_label">Repeat every other week</string>

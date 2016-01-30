@@ -9,8 +9,8 @@
     <color name="toolbar_background">@color/background_material_dark</color>
     <!--<color name="activity_main_background">#eeeeee</color>-->
 
-    <color name="door_open">#a6e04b</color>
-    <color name="door_closed">#ee9c26</color>
+    <color name="door_open">#ee9c26</color>
+    <color name="door_closed">#a6e04b</color>
     <color name="door_unknown">#c2c2c2</color>
 
     <color name="text_color_bold">#6e6e6e</color>

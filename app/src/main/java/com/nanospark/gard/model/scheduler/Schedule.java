@@ -1,6 +1,7 @@
 package com.nanospark.gard.model.scheduler;
 
 import com.nanospark.gard.Utils;
+import com.nanospark.gard.model.CommandSource;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.user.ControlSchedule;
 
@@ -109,9 +110,9 @@ public class Schedule implements Serializable, Comparable<Schedule> {
     public void trigger() {
         Door.Command command = null;
         if (isNow(openHour, openMinute)) {
-            command = new Door.Open("Scheduled action taken, door is in motion", false);
+            command = new Door.Open(CommandSource.SCHEDULED_ACTION, "Scheduled action taken, door is in motion", false);
         } else if (isNow(closeHour, closeMinute)) {
-            command = new Door.Close("Scheduled action taken, door is in motion", false);
+            command = new Door.Close(CommandSource.SCHEDULED_ACTION, "Scheduled action taken, door is in motion", false);
         }
         if (command != null) {
             for (Integer doorId : doors) {

@@ -8,8 +8,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.TypeAdapterFactory;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -19,24 +17,18 @@ import java.util.Set;
 
 import mobi.tattu.utils.F;
 import mobi.tattu.utils.Tattu;
-import roboguice.RoboGuice;
 
-@Singleton
 public class DataStore {
 
     private static final String DATA = "data";
     private static final String TIMESTAMP = "timestamp";
+    private static DataStore sInstance = new DataStore();
 
-    private final Context mCtx;
     private Gson mGson;
-
-    @Inject
-    private DataStore() {
-        mCtx = Tattu.context;
-    }
+    private List<TypeAdapterFactory> mAdapters = new ArrayList<>();
 
     public static final DataStore getInstance() {
-        return RoboGuice.getInjector(Tattu.context).getInstance(DataStore.class);
+        return sInstance;
     }
 
     public <T> Set<T> getAll(Class<T> type) {
@@ -60,12 +52,8 @@ public class DataStore {
         }
     }
 
-    /**
-     * @deprecated Use get(Object, Class)
-     */
-    @Deprecated
-    public <T> F.Option<T> getObject(Object key, Class<T> type) {
-        return get(key, type);
+    public <T> F.Option<T> getSingleton(Class<T> type) {
+        return get(type.getSimpleName(), type);
     }
 
     public boolean contains(Object object) {
@@ -111,15 +99,13 @@ public class DataStore {
      * TODO should include Class parameter to avoid persisting subtypes into different stores
      *
      * @param object
-     * @deprecated use put(Object) instead
      */
-    @Deprecated
-    public void putObject(Object object) {
-        put(object);
-    }
-
     public void put(Object object) {
         put(object, object);
+    }
+
+    public void putSingleton(Object object) {
+        put(object.getClass().getSimpleName(), object);
     }
 
     /**
@@ -151,13 +137,7 @@ public class DataStore {
      * TODO should include Class parameter to avoid persisting subtypes into different stores
      *
      * @param object
-     * @deprecated use put(Object, Object) instead
      */
-    @Deprecated
-    public void putObject(Object key, Object object) {
-        put(key, object);
-    }
-
     public void put(Object key, Object object) {
         SharedPreferences prefs = getSharedPreferences(object.getClass());
 
@@ -174,15 +154,17 @@ public class DataStore {
         getSharedPreferences(type).edit().clear().commit();
     }
 
-    public <T> void delete(Class<T> type, Object key) {
+    public <T> void delete(Object key, Class<T> type) {
         getSharedPreferences(type).edit().remove(resolveKey(key)).commit();
+    }
+
+    public <T> void deleteSingleton(Class<T> type) {
+        delete(type.getSimpleName(), type);
     }
 
     private SharedPreferences getSharedPreferences(Class<?> type) {
         return Tattu.context.getSharedPreferences(type.getCanonicalName(), Context.MODE_PRIVATE);
     }
-
-    private List<TypeAdapterFactory> mAdapters = new ArrayList<>();
 
     public <T> void registerTypeWithSubtypes(Class<T> type, Class<? extends T>... subtypes) {
         RuntimeTypeAdapterFactory<T> adapter = RuntimeTypeAdapterFactory.of(type, "_type_");

@@ -53,6 +53,8 @@ public class WeatherCardFragment extends BaseFragment {
     @Inject
     private WeatherManager mManager;
 
+    private Forecast mForecast;
+
     public static WeatherCardFragment newInstance() {
         return new WeatherCardFragment();
     }
@@ -66,6 +68,9 @@ public class WeatherCardFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mContainer.setOnClickListener(v -> {
+            if (mForecast == null) refresh();
+        });
     }
 
     @Override
@@ -88,8 +93,10 @@ public class WeatherCardFragment extends BaseFragment {
                         mProgress.setVisibility(View.GONE);
                         mError.setVisibility(View.GONE);
 
+                        mForecast = forecast;
                         renderWeather(forecast);
                     }, error -> {
+                        mForecast = null;
                         mCardContent.setVisibility(View.INVISIBLE);
                         mProgress.setVisibility(View.GONE);
                         mError.setVisibility(View.VISIBLE);

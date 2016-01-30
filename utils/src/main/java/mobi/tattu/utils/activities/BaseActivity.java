@@ -32,10 +32,6 @@ import roboguice.activity.RoboActionBarActivity;
 
 public class BaseActivity extends RoboActionBarActivity implements NaviComponent {
 
-    static {
-        RoboGuice.setUseAnnotationDatabases(false);
-    }
-
     private OnBackListener mOnBackListener;
     private ProgressDialog progressDialog;
     private final BaseNaviComponent base = BaseNaviComponent.createActivityComponent();
@@ -184,7 +180,11 @@ public class BaseActivity extends RoboActionBarActivity implements NaviComponent
     }*/
 
     public void start(Fragment fragment, boolean addToBackStack) {
-        FragmentTransaction tx = getSupportFragmentManager().beginTransaction().replace(R.id.main_content, fragment);
+        start(fragment, addToBackStack, R.id.main_content);
+    }
+
+    public void start(Fragment fragment, boolean addToBackStack, int containerViewId) {
+        FragmentTransaction tx = getSupportFragmentManager().beginTransaction().replace(containerViewId, fragment);
         if (addToBackStack) {
             tx.addToBackStack(fragment.getClass().getSimpleName());
         }
@@ -227,6 +227,10 @@ public class BaseActivity extends RoboActionBarActivity implements NaviComponent
         } else {
             Log.d("baseActivity", "Already showing progress dialog.");
         }
+    }
+
+    public ProgressDialog getProgressDialog() {
+        return progressDialog;
     }
 
     public void setOnBackListener(OnBackListener listener) {

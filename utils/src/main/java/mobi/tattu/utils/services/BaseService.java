@@ -12,10 +12,6 @@ import roboguice.service.RoboService;
  */
 public class BaseService extends RoboService {
 
-    static {
-        RoboGuice.setUseAnnotationDatabases(false);
-    }
-
     @Override
     public void onCreate() {
         super.onCreate();

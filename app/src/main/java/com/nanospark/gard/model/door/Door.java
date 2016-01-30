@@ -15,6 +15,7 @@ import com.nanospark.gard.events.CommandSent;
 import com.nanospark.gard.events.DoorStateChanged;
 import com.nanospark.gard.events.VoiceRecognitionDisabled;
 import com.nanospark.gard.events.VoiceRecognitionEnabled;
+import com.nanospark.gard.model.CommandSource;
 import com.nanospark.gard.model.user.User;
 import com.nanospark.gard.sms.SmsManager;
 import com.nanospark.gard.voice.VoiceRecognizer;
@@ -158,7 +159,11 @@ public abstract class Door {
     private void confirm(State state) {
         Log.i(toString(), "Confirmed door: " + this + " - state: " + state);
         mState = state;
-        Tattu.post(new DoorStateChanged(this, mState));
+        CommandSource source = null;
+        if (mPendingCommand != null) {
+            source = mPendingCommand.source;
+        }
+        Tattu.post(new DoorStateChanged(this, mState, source));
         if (mState != State.UNKNOWN) {
             mActivationTimeoutHandler.removeCallbacksAndMessages(null);
             Tattu.post(new CommandProcessed(this, mState, mPendingCommand));
@@ -178,14 +183,14 @@ public abstract class Door {
             @Override
             public void run() {
                 if (isOpen()) {
-                    send(new Close("Auto closing", false));
+                    send(new Close(CommandSource.SCHEDULED_ACTION, "Auto closing", false));
                 } else {
                     long currentTime = System.currentTimeMillis();
                     if (currentTime - startTime < 20000) {
                         mAutoCloseHandler.removeCallbacksAndMessages(null);
                         mAutoCloseHandler.postDelayed(this, 20000);
                     } else {
-                        send(new Close("Auto closing", false));
+                        send(new Close(null, "Auto closing", false));
                     }
                 }
             }
@@ -199,24 +204,31 @@ public abstract class Door {
         mActivatePin = true;
         mPendingCommand = event.command;
         mActivationTimeoutHandler.removeCallbacksAndMessages(null);
-        mActivationTimeoutHandler.postDelayed(new Runnable() {
+        // For touch and voice issued commands since the user should be aware of any failure to
+        // open/close the app should only process the command, not make attempts to close if the
+        // door has not succeeded
+        if (mPendingCommand.source != CommandSource.VOICE && mPendingCommand.source != CommandSource.TOUCH) {
+            mActivationTimeoutHandler.postDelayed(new Runnable() {
 
-            private int increment = 0;
+                private int increment = 0;
 
-            @Override
-            public void run() {
-                increment++;
-                if (increment < 3) {
-                    Log.d(Door.this.toString(), "Retrying command: " + event.command.toString());
-                    mActivatePin = true;
-                    mActivationTimeoutHandler.postDelayed(this, 20000);
-                } else {
-                    Log.d(Door.this.toString(), "Retry failed: " + event.command.toString());
-                    Tattu.post(new CommandFailed(event.door, event.command));
-                    mSmsManager.sendDoorAlert("Paladin was unable to " + event.command.toString() + " your door.", null);
+                @Override
+                public void run() {
+                    increment++;
+                    if (increment < 3) {
+                        Log.d(Door.this.toString(), "Retrying command: " + event.command.toString());
+                        mActivatePin = true;
+                        mActivationTimeoutHandler.postDelayed(this, 20000);
+                    } else {
+                        Log.d(Door.this.toString(), "Retry failed: " + event.command.toString());
+                        Tattu.post(new CommandFailed(event.door, event.command));
+                        if (event.door.isEnabled()) {
+                            mSmsManager.sendDoorAlert("PALADIN was unable to " + event.command.toString() + " your door.", null);
+                        }
+                    }
                 }
-            }
-        }, 20000);
+            }, 20000);
+        }
     }
 
     private void on(BoardDisconnected event) {
@@ -471,15 +483,17 @@ public abstract class Door {
     }
 
     public static abstract class Command {
+        public final CommandSource source;
         public final String message;
         public final boolean forced;
         public final User user;
 
-        public Command(String message, boolean forced) {
-            this(message, forced, null);
+        public Command(CommandSource source, String message, boolean forced) {
+            this(source, message, forced, null);
         }
 
-        public Command(String message, boolean forced, User user) {
+        public Command(CommandSource source, String message, boolean forced, User user) {
+            this.source = source;
             this.forced = forced;
             this.message = message;
             this.user = user;
@@ -493,12 +507,12 @@ public abstract class Door {
 
     public static class Open extends Command {
 
-        public Open(String message, boolean forced) {
-            super(message, forced);
+        public Open(CommandSource source, String message, boolean forced) {
+            super(source, message, forced);
         }
 
-        public Open(String message, boolean forced, User user) {
-            super(message, forced, user);
+        public Open(CommandSource source, String message, boolean forced, User user) {
+            super(source, message, forced, user);
         }
 
         @Override
@@ -534,12 +548,12 @@ public abstract class Door {
 
     public static class Close extends Command {
 
-        public Close(String message, boolean forced) {
-            super(message, forced);
+        public Close(CommandSource source, String message, boolean forced) {
+            super(source, message, forced);
         }
 
-        public Close(String message, boolean forced, User user) {
-            super(message, forced, user);
+        public Close(CommandSource source, String message, boolean forced, User user) {
+            super(source, message, forced, user);
         }
 
         @Override
@@ -569,21 +583,21 @@ public abstract class Door {
 
     public static class Toggle extends Command {
 
-        public Toggle(String message, boolean forced) {
-            super(message, forced);
+        public Toggle(CommandSource source, String message, boolean forced) {
+            super(source, message, forced);
         }
 
-        public Toggle(String message, boolean forced, User user) {
-            super(message, forced, user);
+        public Toggle(CommandSource source, String message, boolean forced, User user) {
+            super(source, message, forced, user);
         }
 
         @Override
         protected boolean apply(Door door) {
             Log.i(toString(), "Toggle door: " + door);
             if (door.isOpen()) {
-                return door.send(new Close(message, forced));
+                return door.send(new Close(source, message, forced));
             } else if (door.isClosed()) {
-                return door.send(new Open(message, forced));
+                return door.send(new Open(source, message, forced));
             }
             return false;
         }

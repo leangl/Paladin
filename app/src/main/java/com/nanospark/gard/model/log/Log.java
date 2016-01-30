@@ -88,4 +88,6 @@ public class Log implements Serializable {
 
         return Html.fromHtml(builder.toString()).toString();
     }
+
+
 }

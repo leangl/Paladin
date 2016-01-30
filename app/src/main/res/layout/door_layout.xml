@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
-    android:id="@+id/door_container"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/door_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
     android:orientation="vertical">
 
     <android.support.v7.widget.CardView
-        android:id="@+id/cardview_door"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/cardview_door"
         android:layout_width="240dp"
         android:layout_height="wrap_content"
         card_view:cardBackgroundColor="@color/cardview_background"
@@ -41,11 +41,10 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="10dp"
-                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@color/text_color_bold"
-                android:textSize="19sp"
+                android:textSize="18dp"
                 android:textStyle="bold"
-                tools:text="@string/door_one_label"/>
+                tools:text="@string/door_one_label" />
 
             <TextView
                 android:id="@+id/textView9"
@@ -55,21 +54,25 @@
                 android:layout_alignStart="@+id/textview_title_door"
                 android:layout_below="@+id/textview_title_door"
                 android:layout_marginBottom="10dp"
-                android:text="@string/last_opened_label"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textSize="14sp"/>
+                android:text="@string/recent"
+                android:textSize="14dp" />
 
             <TextView
                 android:id="@+id/textview_last_opened"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/textView9"
                 android:layout_alignTop="@+id/textView9"
                 android:layout_marginLeft="5dp"
                 android:layout_toEndOf="@+id/textView9"
                 android:layout_toRightOf="@+id/textView9"
-                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true"
                 android:textColor="@color/text_color_bold"
-                android:textStyle="bold"/>
+                android:textSize="12dp"
+                android:textStyle="bold"
+                tools:text="Opened, Mon 1/2 at 08:48AM" />
 
             <FrameLayout
                 android:id="@+id/container_center"
@@ -89,7 +92,7 @@
                     android:layout_gravity="center"
                     android:layout_weight="0.3"
                     android:scaleType="fitCenter"
-                    tools:src="@drawable/door_3"/>
+                    tools:src="@drawable/door_3" />
 
             </FrameLayout>
 
@@ -101,22 +104,19 @@
                 android:layout_alignLeft="@+id/textView9"
                 android:layout_alignStart="@+id/textView9"
                 android:layout_below="@+id/container_center"
-                android:src="@drawable/ic_no_sound_"/>
-
+                android:src="@drawable/ic_no_sound_" />
 
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
                 android:layout_above="@+id/textView2"
-                android:layout_alignEnd="@+id/textView9"
-                android:layout_alignRight="@+id/textView9"
                 android:layout_alignTop="@+id/edittext_open_voice"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@+id/imageview_icon_sound"
                 android:gravity="center_vertical"
                 android:text="@string/open_label"
-                android:textAppearance="?android:attr/textAppearanceMedium"/>
+                android:textSize="18dp" />
 
             <EditText
                 android:id="@+id/edittext_open_voice"
@@ -129,7 +129,7 @@
                 android:hint="@string/default_open"
                 android:inputType="text"
                 android:maxLines="1"
-                android:text="@string/default_open"/>
+                android:text="@string/default_open" />
 
             <TextView
                 android:id="@+id/textView2"
@@ -141,7 +141,7 @@
                 android:layout_below="@+id/edittext_open_voice"
                 android:gravity="center_vertical"
                 android:text="@string/close_label"
-                android:textAppearance="?android:attr/textAppearanceMedium"/>
+                android:textSize="18dp" />
 
             <EditText
                 android:id="@+id/edittext_close_voice"
@@ -154,8 +154,7 @@
                 android:hint="@string/default_close"
                 android:inputType="text"
                 android:maxLines="1"
-
-                android:text="@string/default_close"/>
+                android:text="@string/default_close" />
 
             <View
                 android:id="@+id/space"
@@ -163,7 +162,7 @@
                 android:layout_height="10dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:layout_below="@+id/edittext_close_voice"/>
+                android:layout_below="@+id/edittext_close_voice" />
 
             <TextView
                 android:id="@+id/textview_open"
@@ -177,10 +176,10 @@
                 android:gravity="center_vertical|right"
                 android:paddingRight="10dp"
                 android:paddingTop="4dp"
-                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/door_open"
+                android:textSize="14dp"
                 android:textStyle="bold"
-                tools:text="@string/closed_label"/>
+                tools:text="@string/closed_label" />
 
         </RelativeLayout>
     </android.support.v7.widget.CardView>

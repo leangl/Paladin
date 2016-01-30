@@ -44,7 +44,7 @@
                         android:layout_weight="0.2"
                         android:ellipsize="end"
                         android:maxLines="2"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="18dp"
                         android:textColor="@color/text_color_bold"
                         android:textStyle="bold"
                         tools:text="Just one door"/>
@@ -63,7 +63,7 @@
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:paddingBottom="10dp"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textSize="14dp"
                     android:textColor="@color/red"
                     tools:text="Door 1, Door 2"/>
 
@@ -101,7 +101,7 @@
                         android:layout_marginLeft="10dp"
                         android:gravity="center"
                         android:text="Open"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="14dp"
                         android:textStyle="bold"/>
 
                     <TextView
@@ -111,7 +111,7 @@
                         android:layout_marginLeft="10dp"
                         android:gravity="center"
                         android:text="@string/not_available"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="14dp"
                         tools:text="at 2:45 PM"/>
                 </LinearLayout>
 
@@ -134,7 +134,7 @@
                         android:layout_marginLeft="10dp"
                         android:gravity="center"
                         android:text="Close"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="14dp"
                         android:textStyle="bold"/>
 
                     <TextView
@@ -144,7 +144,7 @@
                         android:layout_marginLeft="10dp"
                         android:gravity="center"
                         android:text="@string/not_available"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="14dp"
                         tools:text="at 2:46 PM"/>
 
                 </LinearLayout>
@@ -168,7 +168,7 @@
                         android:layout_marginLeft="10dp"
                         android:gravity="center"
                         android:text="Repeat"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="14dp"
                         android:textStyle="bold"/>
 
                     <TextView
@@ -179,7 +179,7 @@
                         android:ellipsize="end"
                         android:gravity="center"
                         android:singleLine="true"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="14dp"
                         tools:text="Daily"/>
 
                 </LinearLayout>

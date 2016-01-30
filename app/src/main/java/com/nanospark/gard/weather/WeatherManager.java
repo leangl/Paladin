@@ -117,7 +117,7 @@ public class WeatherManager {
     }
 
     public void persit() {
-        DataStore.getInstance().putObject(Config.class.getSimpleName(), mConfig);
+        DataStore.getInstance().putSingleton(mConfig);
     }
 
     public void setUnit(Unit unit) {

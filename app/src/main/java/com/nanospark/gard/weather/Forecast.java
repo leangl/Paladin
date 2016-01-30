@@ -18,12 +18,15 @@ public class Forecast implements Serializable {
     public Date getDate() {
         return date;
     }
+
     public void setDate(Date date) {
         this.date = date;
     }
+
     public List<Weather> getList() {
         return list;
     }
+
     public void setList(List<Weather> list) {
         this.list = list;
     }
@@ -57,33 +60,35 @@ public class Forecast implements Serializable {
         double tempMax = Double.MIN_VALUE;
         double tempMin = Double.MAX_VALUE;
         Weather midDay = null;
+        boolean first = true;
         for (Weather weather : list) {
-            if (normalize(weather.getDate()).after(normalize(getCurrent().getDate()))) { // skip current day
-                if (previousDate == null)
-                    previousDate = normalize(weather.getDate()); // init previous
-                if (normalize(weather.getDate()).after(previousDate)) { // if day changed
-                    Weather w = new Weather();
-                    w.setTempMax(tempMax);
-                    w.setTempMin(tempMin);
-                    w.setTemp(tempMax + tempMin / 2);
-                    w.setDate(normalize(weather.getDate()));
-                    w.setName(midDay.getName());
-                    forecast.add(w);
-                    previousDate = normalize(weather.getDate());
-                    tempMax = Double.MIN_VALUE;
-                    tempMin = Double.MAX_VALUE;
-                    midDay = null;
-                } else { // if same day
-                    if (midDay == null || Math.abs(12 - getHour(weather.getDate())) <= 2) { // get the weather conditions closest to 12AM
-                        midDay = weather;
-                    }
-                    // recheck max/min temperatures
-                    if (weather.getTempMax() > tempMax) tempMax = weather.getTempMax();
-                    if (weather.getTempMin() < tempMin) tempMin = weather.getTempMin();
+            if (first) {
+                previousDate = normalize(weather.getDate()); // init previous
+                first = false;
+            }
+            if (normalize(weather.getDate()).after(previousDate)) { // if day changed
+                Weather w = new Weather();
+                w.setTempMax(tempMax);
+                w.setTempMin(tempMin);
+                w.setTemp(tempMax + tempMin / 2);
+                w.setDate(previousDate);
+                w.setName(midDay.getName());
+                forecast.add(w);
+
+                previousDate = normalize(weather.getDate());
+                tempMax = Double.MIN_VALUE;
+                tempMin = Double.MAX_VALUE;
+                midDay = null;
+            } else { // if same day
+                if (midDay == null || Math.abs(12 - getHour(weather.getDate())) <= 2) { // get the weather conditions closest to 12AM
+                    midDay = weather;
                 }
-                if (forecast.size() == daysAhead) {
-                    break;
-                }
+                // recheck max/min temperatures
+                if (weather.getTempMax() > tempMax) tempMax = weather.getTempMax();
+                if (weather.getTempMin() < tempMin) tempMin = weather.getTempMin();
+            }
+            if (forecast.size() == daysAhead) {
+                break;
             }
         }
         return forecast;

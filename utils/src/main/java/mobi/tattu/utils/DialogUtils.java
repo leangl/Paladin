@@ -3,12 +3,20 @@ package mobi.tattu.utils;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import mobi.tattu.utils.activities.BaseActivity;
+import mobi.tattu.utils.views.HintAdapter;
+import rx.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by Leandro on 7/8/2015.
@@ -173,25 +181,94 @@ public class DialogUtils {
         }
     }
 
+    public static void alert(Context ctx, String title, String okButton, F.Callback<Boolean> listener) {
+        alert(ctx, title, null, okButton, null, listener);
+    }
+
+    public static void alert(Context ctx, String title, String text, String okButton, F.Callback<Boolean> listener) {
+        alert(ctx, title, text, okButton, null, listener);
+    }
+
+    public static void alert(Context ctx, String title, String text, String okBUttom, String cancelButton, F.Callback<Boolean> listener) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
+        alert.setTitle(title);
+
+        if (StringUtils.isNotBlank(text)) {
+            alert.setMessage(text);
+        }
+
+        alert.setPositiveButton(okBUttom, (dialog, whichButton) -> {
+            listener.invoke(true);
+            dialog.dismiss();
+        });
+
+        if (StringUtils.isNotBlank(cancelButton)) {
+            alert.setNegativeButton(cancelButton, (dialog, whichButton) -> {
+                listener.invoke(false);
+                dialog.dismiss();
+            });
+        }
+
+        alert.show();
+    }
+
     public static void ask(Context ctx, String title, F.Function<String, Boolean> listener) {
+        ask(ctx, title, ctx.getString(R.string.ok), ctx.getString(R.string.cancel), listener);
+    }
+
+    public static void ask(Context ctx, String title, String okBUttom, String cancelButton, F.Function<String, Boolean> listener) {
         AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
         alert.setTitle(title);
 
         final EditText edittext = new EditText(ctx);
         alert.setView(edittext);
 
-        alert.setPositiveButton(R.string.ok, (dialog, whichButton) -> {
+        alert.setPositiveButton(okBUttom, (dialog, whichButton) -> {
             String text = edittext.getText().toString();
             if (listener.apply(text)) {
                 dialog.dismiss();
             }
         });
 
-        alert.setNegativeButton(R.string.cancel, (dialog, whichButton) -> {
+        alert.setNegativeButton(cancelButton, (dialog, whichButton) -> {
             // what ever you want to do with No option.
         });
 
         alert.show();
+    }
+
+    public static AlertDialog custom(BaseActivity ctx,
+                                     String title,
+                                     View content,
+                                     String positive,
+                                     String negative,
+                                     F.Function2<DialogInterface, Boolean, Boolean> callback) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+        builder.setTitle(title);
+        builder.setView(content);
+        if (StringUtils.isNotBlank(positive)) {
+            builder.setPositiveButton(positive, (dialog, whichButton) -> {
+            });
+        }
+        if (StringUtils.isNotBlank(negative)) {
+            builder.setNegativeButton(negative, (dialog, whichButton) -> {
+            });
+        }
+
+        AlertDialog dialog = builder.show();
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
+           if (callback.apply(dialog, true)) {
+               dialog.dismiss();
+           }
+        });
+        dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(v -> {
+            if (callback.apply(dialog, false)) {
+                dialog.dismiss();
+            }
+        });
+
+        return dialog;
     }
 
 }

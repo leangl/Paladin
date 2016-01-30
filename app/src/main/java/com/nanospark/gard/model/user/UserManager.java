@@ -77,7 +77,11 @@ public class UserManager {
     }
 
     public void delete(User user) {
-        mDataStore.delete(User.class, user);
+        mDataStore.delete(user, User.class);
+    }
+
+    public boolean isEmpty() {
+        return getAll().isEmpty();
     }
 
     @Subscribe

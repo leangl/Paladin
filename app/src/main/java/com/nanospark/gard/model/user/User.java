@@ -2,6 +2,7 @@ package com.nanospark.gard.model.user;
 
 import com.nanospark.gard.GarD;
 import com.nanospark.gard.R;
+import com.nanospark.gard.model.CommandSource;
 import com.nanospark.gard.model.door.Door;
 
 import java.io.Serializable;
@@ -14,7 +15,7 @@ import mobi.tattu.utils.StringUtils;
 /**
  * Created by Leandro on 1/10/2015.
  */
-public class User implements Serializable {
+public class User implements Serializable, CommandSource {
 
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s");
 
@@ -106,6 +107,11 @@ public class User implements Serializable {
         }
     }
 
+    @Override
+    public String getSourceDescription() {
+        return name;
+    }
+
     public enum Notify {
         OPEN(true, false), CLOSE(false, true), ALL(true, true), NONE(false, false);
 
@@ -139,12 +145,13 @@ public class User implements Serializable {
         if (StringUtils.isBlank(username)) {
             return false;
         }
-        if (username.length() > 20) {
+        /*if (username.length() > 20) {
             return false;
         }
         if (WHITESPACE_PATTERN.matcher(username).find()) {
             return false;
-        }
+        }*/
+        // I don't remember the reason of this check...
         if (Character.isDigit(username.charAt(0))) {
             return false;
         }
@@ -166,12 +173,12 @@ public class User implements Serializable {
     }
 
     public String getHourRangeString() {
-        if (getSchedule() == null) return GarD.instance.getString(R.string.not_available);
+        if (!hasSchedules()) return GarD.instance.getString(R.string.not_available);
         return getSchedule().getHourRangeString();
     }
 
     public String getDayLimitString() {
-        if (getSchedule() == null) return "";
+        if (!hasSchedules()) return "";
         return getSchedule().getDayLimitString();
     }
 }
