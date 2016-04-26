@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    package="com.nanospark.gard"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.nanospark.gard">
 
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
-    <uses-permission android:name="android.permission.READ_LOGS"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
 
     <uses-feature
         android:name="com.android.future.usb.accessory"
-        android:required="false"/>
+        android:required="false" />
 
     <application
         android:name=".GarD"
@@ -22,68 +23,84 @@
         android:theme="@style/AppTheme">
         <uses-library
             android:name="com.android.future.usb.accessory"
-            android:required="false"/>
+            android:required="false" />
 
         <activity
             android:name=".ui.activity.MainActivityNew"
             android:launchMode="singleTask"
-            android:screenOrientation="landscape"
+            android:screenOrientation="nosensor"
+            android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
             <intent-filter>
-                <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"/>
+                <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"/>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
             </intent-filter>
 
             <meta-data
                 android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"
-                android:resource="@xml/accessory_filter"/>
+                android:resource="@xml/accessory_filter" />
             <meta-data
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
-                android:resource="@xml/device_filter"/>
+                android:resource="@xml/device_filter" />
         </activity>
         <activity
             android:name=".ui.activity.CreateUserActivity"
-            android:screenOrientation="landscape"
-            android:windowSoftInputMode="adjustPan"/>
+            android:screenOrientation="nosensor"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.activity.CreateScheduleActivity"
-            android:screenOrientation="landscape"
-            android:windowSoftInputMode="adjustPan"/>
+            android:screenOrientation="nosensor"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.activity.SettingsActivity"
-            android:screenOrientation="landscape"
-            android:windowSoftInputMode="adjustPan"/>
+            android:screenOrientation="nosensor"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.activity.LogActivity"
-            android:screenOrientation="landscape"
-            android:windowSoftInputMode="adjustPan"/>
+            android:screenOrientation="nosensor"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="adjustPan" />
 
-        <service android:name=".services.GarDService"/>
+        <service android:name=".services.GarDService" />
 
         <receiver
             android:name=".model.scheduler.BootReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
         <receiver
             android:name=".model.scheduler.AlarmReceiver"
             android:enabled="true"
+            android:exported="true" />
+
+        <receiver
+            android:name=".sms.SmsReceiver"
+            android:enabled="true"
             android:exported="true">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
         </receiver>
 
+        <meta-data
+            android:name="com.crashlytics.ApiKey"
+            android:value="c10fa93825a5d8dc2a9fe6d425a5e8d1c55b37f5" />
     </application>
 
 </manifest>

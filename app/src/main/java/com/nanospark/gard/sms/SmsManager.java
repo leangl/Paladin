@@ -13,6 +13,7 @@ import com.google.inject.Singleton;
 import com.nanospark.gard.BuildConfig;
 import com.nanospark.gard.GarD;
 import com.nanospark.gard.events.DoorStateChanged;
+import com.nanospark.gard.events.SmsMessage;
 import com.nanospark.gard.events.SmsSuspended;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.model.user.User;
@@ -85,6 +86,7 @@ public class SmsManager {
         if (mConfig == null) {
             mConfig = new SmsConfig();
         }
+
     }
 
     public void fakeSms(String sms) {
@@ -156,6 +158,15 @@ public class SmsManager {
         return mConfig.suspended;
     }
 
+    public boolean isUsingInternet() {
+        return mConfig.useInternet;
+    }
+
+    public void setUseInternet(boolean use) {
+        mConfig.useInternet = use;
+        saveConfig();
+    }
+
     public Observable<Void> sendMessage(String message, String to) {
         if (!isSmsEnabled()) {
             return Observable.empty();
@@ -168,16 +179,26 @@ public class SmsManager {
 
         if (BuildConfig.DEBUG) return Observable.empty();
 
-        TwilioAccount account = getAccount();
-        if (account != null && account.isValid()) {
-            return mApi.sendMessage(account.getSid(), message, account.getPhone(), to).map(result -> {
-                Ln.i("Messages sent: " + message + " to " + to);
-                mLastSentTimestamps.add(System.currentTimeMillis());
-                return null;
-            });
+        if (isUsingInternet()) {
+            TwilioAccount account = getAccount();
+            if (account != null && account.isValid()) {
+                return mApi.sendMessage(account.getSid(), message, account.getPhone(), to).map(result -> {
+                    Ln.i("Messages sent: " + message + " to " + to);
+                    mLastSentTimestamps.add(System.currentTimeMillis());
+                    return null;
+                });
+            } else {
+                Ln.e("SMS enabled but account not set!");
+                return Observable.error(new Exception());
+            }
         } else {
-            Ln.e("SMS enabled but account not set!");
-            return Observable.error(new Exception());
+            try {
+                android.telephony.SmsManager manager = android.telephony.SmsManager.getDefault();
+                manager.sendTextMessage(to, null, message, null, null);
+                return Observable.empty();
+            } catch (Exception e) {
+                return Observable.error(e);
+            }
         }
     }
 
@@ -274,38 +295,18 @@ public class SmsManager {
                 Ln.d("SMS is suspended");
                 return;
             }
+            if (!isUsingInternet()) {
+                Ln.d("Twilio disabled");
+                return;
+            }
             getNewMessage().subscribe(message -> {
                 // if new message is received
                 if (message != null) {
                     // check if the body matches the current door status
                     String body = message.get("body").getAsString().trim();
                     String from = message.get("from").getAsString().trim();
-                    String replyMessage = null;
 
-                    User fromUser = mUserManager.findByPhone(from);
-                    try {
-                        if (SmsCommand.isSmsCommand(body)) {
-                            replyMessage = handle(SmsCommand.fromBody(fromUser, from, body));
-                        } else {
-                            replyMessage = handleAuthentication(from, body);
-                        }
-                    } catch (Exception e) {
-                        Ln.e("Invalid command: " + body, e);
-                        replyMessage = "Invalid command. Format has to be: {command} {door name}";
-                        if (fromUser != null && fromUser.isPasswordRequired()) {
-                            replyMessage = replyMessage + " {pass code}";
-                        }
-                    }
-
-                    Ln.i(replyMessage);
-
-                    if (StringUtils.isNotBlank(replyMessage)) { // do not send empty messages
-                        sendMessage(replyMessage, from).subscribe(success -> {
-                            Ln.i("Reply sent successfully");
-                        }, error -> {
-                            Ln.e("Error sending reply.", error);
-                        });
-                    }
+                    receive(new SmsMessage(body, from));
                 }
                 // Reschedule message log check
                 if (smsHandler != null) {
@@ -318,6 +319,35 @@ public class SmsManager {
             });
         }
     };
+
+    private void receive(SmsMessage sms) {
+        String replyMessage = null;
+
+        User fromUser = mUserManager.findByPhone(sms.from);
+        try {
+            if (SmsCommand.isSmsCommand(sms.body)) {
+                replyMessage = handle(SmsCommand.fromBody(fromUser, sms.from, sms.body));
+            } else {
+                replyMessage = handleAuthentication(sms.from, sms.body);
+            }
+        } catch (Exception e) {
+            Ln.e("Invalid command: " + sms.body, e);
+            replyMessage = "Invalid command. Format has to be: {command} {door name}";
+            if (fromUser != null && fromUser.isPasswordRequired()) {
+                replyMessage = replyMessage + " {pass code}";
+            }
+        }
+
+        Ln.i(replyMessage);
+
+        if (StringUtils.isNotBlank(replyMessage)) { // do not send empty messages
+            sendMessage(replyMessage, sms.from).subscribe(success -> {
+                Ln.i("Reply sent successfully");
+            }, error -> {
+                Ln.e("Error sending reply.", error);
+            });
+        }
+    }
 
     private String handle(SmsCommand smsCommand) throws Exception {
         if (smsCommand.user == null) {
@@ -411,6 +441,11 @@ public class SmsManager {
         }
     }
 
+    @Subscribe
+    public void on(SmsMessage sms) {
+        receive(sms);
+    }
+
     /**
      * Send SMS message to users configured to receive door status alerts
      * <p>
@@ -451,6 +486,7 @@ public class SmsManager {
         public TwilioAccount account = new TwilioAccount("", DEFAULT_SID, DEFAULT_TOKEN);
         public boolean enabled = true;
         public boolean suspended = false;
+        public boolean useInternet = true;
     }
 
 }

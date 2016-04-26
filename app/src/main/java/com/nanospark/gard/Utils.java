@@ -1,5 +1,6 @@
 package com.nanospark.gard;
 
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
 
@@ -105,5 +106,9 @@ public class Utils {
         return isvm;
     }
 
+    public static boolean hasTelephony() {
+        PackageManager pm = GarD.instance.getPackageManager();
+        return pm.hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
+    }
 
 }
