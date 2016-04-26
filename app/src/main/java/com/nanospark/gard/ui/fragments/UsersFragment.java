@@ -46,6 +46,7 @@ public class UsersFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_users, container, false);
+
         this.mGridLayout = (GridLayout) view.findViewById(R.id.gridlayout);
         this.mGridLayout.setUseDefaultMargins(true);
         if (!mobi.tattu.utils.Utils.isTablet(getActivity())) {

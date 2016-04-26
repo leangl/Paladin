@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -59,8 +60,10 @@ public class MainActivityNew extends BaseActivity implements TabLayout.OnTabSele
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         registerReceiver(mUsbDetachReceiver, new IntentFilter(UsbManager.ACTION_USB_ACCESSORY_DETACHED));
         getSupportActionBar().setIcon(R.drawable.logo_white);
+        getSupportActionBar().setTitle(" " + getString(R.string.app_name));
         initTabs();
 
         mLogoText.setOnClickListener(v -> {

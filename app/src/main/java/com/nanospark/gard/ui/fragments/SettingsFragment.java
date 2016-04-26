@@ -11,10 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.google.inject.Inject;
 import com.nanospark.gard.R;
+import com.nanospark.gard.Utils;
 import com.nanospark.gard.model.door.Door;
 import com.nanospark.gard.sms.SmsManager;
 import com.nanospark.gard.sms.twilio.TwilioAccount;
@@ -30,6 +32,10 @@ import rx.Observable;
  */
 public class SettingsFragment extends BaseFragment {
 
+    @InjectView(R.id.disabled)
+    private TextView mSmsledDisabled;
+    @InjectView(R.id.routing)
+    private TextView mRouting;
     @InjectView(R.id.phone)
     private TextView mPhone;
     @InjectView(R.id.imageview_menu)
@@ -77,6 +83,8 @@ public class SettingsFragment extends BaseFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        changeTitleActionBar(getString(R.string.settings));
+
         mSmsMenu.setOnClickListener(v -> {
             PopupMenu popupMenu = new PopupMenu(getBaseActivity(), v);
             popupMenu.inflate(R.menu.autoclose);
@@ -87,9 +95,11 @@ public class SettingsFragment extends BaseFragment {
                         break;
                     case R.id.action_enable:
                         mSmsManager.enableSms();
+                        loadSmsSettings();
                         break;
                     case R.id.action_disable:
                         mSmsManager.disableSms();
+                        loadSmsSettings();
                         break;
                 }
                 return true;
@@ -99,7 +109,7 @@ public class SettingsFragment extends BaseFragment {
             popupMenu.show();
         });
 
-        loadPhoneNumber();
+        loadSmsSettings();
 
         Door door1 = Door.getInstance(1);
         mName1.setText(door1.getName());
@@ -167,11 +177,23 @@ public class SettingsFragment extends BaseFragment {
         }
     }
 
-    private void loadPhoneNumber() {
-        mPhone.setText(mSmsManager.getAccount().getPhone());
+    private void loadSmsSettings() {
+        if (mSmsManager.isUsingInternet()) {
+            mPhone.setText(mSmsManager.getAccount().getPhone());
+            mPhone.setVisibility(StringUtils.isNotBlank(mSmsManager.getAccount().getPhone()) ? View.VISIBLE : View.GONE);
+            mRouting.setText("Internet");
+        } else {
+            mPhone.setVisibility(View.GONE);
+            mRouting.setText("Phone");
+        }
+        if (!Utils.hasTelephony()) {
+            mRouting.setVisibility(View.GONE);
+        }
+        mSmsledDisabled.setVisibility(mSmsManager.isSmsEnabled() ? View.INVISIBLE : View.VISIBLE);
     }
 
     private int touchCount;
+
     public void editSms() {
         touchCount = 0;
 
@@ -179,6 +201,20 @@ public class SettingsFragment extends BaseFragment {
 
         TextView cautionSms = (TextView) content.findViewById(R.id.caution_sms);
         cautionSms.setText(Html.fromHtml(getString(R.string.caution_sms)));
+
+        if (!Utils.hasTelephony()) { // hide Phone/Internet radios if the device is is not a phone
+            content.findViewById(R.id.sms_route_container).setVisibility(View.GONE);
+        }
+
+        RadioGroup radioGroup = (RadioGroup) content.findViewById(R.id.radio_group);
+        radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.telephony) { // hide/show twilio data if phone is checked
+                content.findViewById(R.id.phone_container).setVisibility(View.GONE);
+            } else { // internet
+                content.findViewById(R.id.phone_container).setVisibility(View.VISIBLE);
+            }
+        });
+        radioGroup.check(mSmsManager.isUsingInternet() ? R.id.internet : R.id.telephony);
 
         EditText phoneView = (EditText) content.findViewById(R.id.phone);
         EditText sidView = (EditText) content.findViewById(R.id.twilio_sid);
@@ -198,25 +234,29 @@ public class SettingsFragment extends BaseFragment {
 
         AlertDialog dialog = builder.show();
         dialog.findViewById(android.support.v7.appcompat.R.id.alertTitle).setOnClickListener(v -> {
-            touchCount++;
-            if (touchCount == 4) {
-                touchCount = 0;
-                content.findViewById(R.id.advanced).setVisibility(View.VISIBLE);
+            if (radioGroup.getCheckedRadioButtonId() == R.id.internet) { // do not open advanced settings if phone is checked
+                touchCount++;
+                if (touchCount == 4) {
+                    touchCount = 0;
+                    content.findViewById(R.id.advanced).setVisibility(View.VISIBLE);
+                }
             }
         });
 
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
-            if (StringUtils.isBlank(phoneView.getText())) {
-                toast("Please enter a valid phone number");
-                return;
-            }
-            if (StringUtils.isBlank(sidView.getText())) {
-                toast("Please enter a valid Twilio SID");
-                return;
-            }
-            if (StringUtils.isBlank(tokenView.getText())) {
-                toast("Please enter a valid Twilio Token");
-                return;
+            if (radioGroup.getCheckedRadioButtonId() == R.id.internet) {
+                if (StringUtils.isBlank(phoneView.getText())) {
+                    toast("Please enter a valid phone number");
+                    return;
+                }
+                if (StringUtils.isBlank(sidView.getText())) {
+                    toast("Please enter a valid Twilio SID");
+                    return;
+                }
+                if (StringUtils.isBlank(tokenView.getText())) {
+                    toast("Please enter a valid Twilio Token");
+                    return;
+                }
             }
 
             account.setPhone(phoneView.getText().toString());
@@ -224,8 +264,9 @@ public class SettingsFragment extends BaseFragment {
             account.setToken(tokenView.getText().toString());
 
             mSmsManager.setTwilioAccount(account);
+            mSmsManager.setUseInternet(radioGroup.getCheckedRadioButtonId() == R.id.internet);
 
-            loadPhoneNumber();
+            loadSmsSettings();
 
             dialog.dismiss();
         });

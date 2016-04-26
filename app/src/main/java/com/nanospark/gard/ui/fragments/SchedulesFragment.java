@@ -58,6 +58,10 @@ public class SchedulesFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mGridLayout.setUseDefaultMargins(true);
+        if (!mobi.tattu.utils.Utils.isTablet(getActivity())) {
+            mGridLayout.setColumnCount(1);
+        }
         mAddSchedule.setOnClickListener(v -> CreateScheduleActivity.start(getActivity()));
         loadSchedules();
     }

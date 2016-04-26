@@ -10,6 +10,14 @@
         <item name="android:textColorPrimary">@color/text_color_bold</item>
         <item name="android:textColorSecondary">@color/red_900</item>
         <item name="windowActionModeOverlay">true</item>
+        <item name="actionBarTheme">@style/ActionBarTheme</item>
+        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="android:spinnerStyle">@style/Base.Widget.AppCompat.Spinner.Underlined</item>
+        <item name="spinnerStyle">@style/Base.Widget.AppCompat.Spinner.Underlined</item>
+        <item name="android:colorPressedHighlight">@color/grey_500</item>
+        <item name="android:colorLongPressedHighlight">@color/grey_500</item>
+        <item name="android:listViewStyle">@style/ListViewAppTheme</item>
+        <item name="android:listViewWhiteStyle">@style/ListViewAppTheme</item>
     </style>
 
     <style name="ActionBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -17,6 +25,19 @@
         <item name="android:textColorSecondary">@color/white</item>
         <item name="colorAccent">@color/white</item>
         <item name="colorControlHighlight">@color/white</item>
+        <item name="selectableItemBackground">?android:selectableItemBackground</item>
+        <item name="selectableItemBackgroundBorderless">?android:selectableItemBackground</item>
+    </style>
+
+    <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="spinBars">true</item>
+        <item name="color">@android:color/white</item>
+    </style>
+
+    <style name="ListViewAppTheme" parent="Base.Widget.AppCompat.ListView">
+        <item name="android:listSelector">@drawable/list_selector</item>
+        <item name="android:divider">@null</item>
+        <item name="android:dividerHeight">0px</item>
     </style>
 
 </resources>

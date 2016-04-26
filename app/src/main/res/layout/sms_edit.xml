@@ -1,81 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="300dp"
-              android:layout_height="wrap_content"
-              android:orientation="vertical"
-              android:paddingBottom="10dp"
-              android:paddingLeft="20dp"
-              android:paddingRight="20dp"
-              android:paddingTop="10dp">
-
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/phone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Phone Number"
-            android:inputType="phone"
-            android:maxLength="15"
-            android:maxLines="1"
-            android:singleLine="true"
-            tools:text="999"/>
-
-    </android.support.design.widget.TextInputLayout>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
     <LinearLayout
-        android:id="@+id/advanced"
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone"
-        tools:visibility="visible">
+        android:paddingBottom="10dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="10dp">
 
-        <android.support.design.widget.TextInputLayout
+        <LinearLayout
+            android:id="@+id/sms_route_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/twilio_token"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Please select how do you want to send and receive SMS"
+                android:textColor="@color/black" />
+
+            <RadioGroup
+                android:id="@+id/radio_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/internet"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Internet" />
+
+                <RadioButton
+                    android:id="@+id/telephony"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:text="Phone" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/phone_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Phone Number"
+                    android:inputType="phone"
+                    android:maxLength="15"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    tools:text="999" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+                android:id="@+id/advanced"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Auth Token"
-                android:inputType="textVisiblePassword"
-                android:maxLength="40"
-                android:maxLines="1"
-                android:singleLine="true"
-                tools:text="209ujdsakj21ju321jdlsa"/>
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
 
-        </android.support.design.widget.TextInputLayout>
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-        <android.support.design.widget.TextInputLayout
+                    <EditText
+                        android:id="@+id/twilio_token"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Auth Token"
+                        android:inputType="textVisiblePassword"
+                        android:maxLength="40"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        tools:text="209ujdsakj21ju321jdlsa" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/twilio_sid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Auth SID"
+                        android:inputType="textVisiblePassword"
+                        android:maxLength="40"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        tools:text="lkdspa2031dkjlksa813" />
+
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/caution_sms"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/twilio_sid"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Auth SID"
-                android:inputType="textVisiblePassword"
-                android:maxLength="40"
-                android:maxLines="1"
-                android:singleLine="true"
-                tools:text="lkdspa2031dkjlksa813"/>
-
-        </android.support.design.widget.TextInputLayout>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textColor="@color/red_800"
+            tools:text="@string/caution_sms" />
 
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/caution_sms"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:textColor="@color/red_800"
-        tools:text="@string/caution_sms"/>
-
-</LinearLayout>
+</ScrollView>

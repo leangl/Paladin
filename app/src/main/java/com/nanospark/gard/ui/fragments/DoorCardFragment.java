@@ -162,7 +162,7 @@ public class DoorCardFragment extends BaseFragment {
         AnimationDrawable animation = (AnimationDrawable) mImageViewDoor.getBackground();
         animation.start();
 
-        stopDoorAnimationIn(30);
+        stopDoorAnimationIn(30000);
     }
 
     private void stopDoorAnimationIn(long millis) {

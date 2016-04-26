@@ -61,13 +61,14 @@ public class CreateScheduleFragment extends BaseFragment {
 
     @SaveState
     private Schedule mSchedule;
+    private ControlSchedule mControlSchedule;
 
     private EditText mRepeatEventWeeksEditText;
     private TextView mDateEventEditText;
     private TextView mTimeStartTextView;
     private TextView mTimeEndTextView;
     private TextView mDateStartTextView;
-    private ControlSchedule mControlSchedule;
+
     private TextView mLimitCount;
 
     public static CreateScheduleFragment newInstance(Schedule schedule) {
@@ -77,7 +78,6 @@ public class CreateScheduleFragment extends BaseFragment {
         } else {
             instance.mSchedule = new Schedule();
         }
-        instance.mControlSchedule = instance.mSchedule.getControlSchedule();
         return instance;
     }
 
@@ -90,6 +90,10 @@ public class CreateScheduleFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mControlSchedule = mSchedule.getControlSchedule();
+
+        changeTitleActionBar(getString(R.string.create_schedule));
 
         mName.setText(mSchedule.getName());
 

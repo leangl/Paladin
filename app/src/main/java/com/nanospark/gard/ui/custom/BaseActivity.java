@@ -1,5 +1,6 @@
 package com.nanospark.gard.ui.custom;
 
+import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -21,6 +22,12 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (mobi.tattu.utils.Utils.isTablet(this)) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
 
         this.mToolbar = (Toolbar) findViewById(R.id.toolbar);
         if (this.mToolbar != null) {

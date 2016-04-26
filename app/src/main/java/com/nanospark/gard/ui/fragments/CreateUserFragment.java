@@ -72,6 +72,7 @@ public class CreateUserFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         String id = getArguments().getString(ARG_ID_USER);
         if (id == null) {
             mUser = new User();
@@ -140,6 +141,14 @@ public class CreateUserFragment extends BaseFragment {
         });
         initScheduleView(scheduleContainer, daysContainer);
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        changeTitleActionBar(getString(R.string.create_user));
+
     }
 
     private void initScheduleView(View scheduleContainer, LinearLayout daysContainer) {

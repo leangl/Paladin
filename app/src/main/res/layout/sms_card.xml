@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="250dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    card_view:cardBackgroundColor="@color/cardview_background"
+    card_view:cardCornerRadius="4dp"
+    card_view:cardPreventCornerOverlap="false"
+    card_view:cardUseCompatPadding="false"
+    card_view:contentPadding="0dp"
+    tools:showIn="@layout/settings">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp">
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="SMS Account"
+                android:textColor="@color/text_color_bold"
+                android:textSize="18dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/disabled"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:text="disabled"
+                android:textColor="@color/black"
+                android:visibility="invisible" />
+
+            <ImageView
+                android:id="@+id/imageview_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_menu_owerflow" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/routing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/linearLayout"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/black"
+            android:textSize="14dp"
+            tools:text="Internet" />
+
+        <TextView
+            android:id="@+id/phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/routing"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/red"
+            android:textSize="14dp"
+            tools:text="(715) 831-6353" />
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

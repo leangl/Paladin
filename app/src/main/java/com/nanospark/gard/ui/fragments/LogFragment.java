@@ -54,6 +54,9 @@ public class LogFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_log, container, false);
+
+        changeTitleActionBar(getString(R.string.logs));
+
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         view.findViewById(R.id.fab_save).setOnClickListener(v -> {
             saveLogCsv();

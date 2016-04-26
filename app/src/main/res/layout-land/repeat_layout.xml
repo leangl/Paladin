@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    android:id="@+id/schedule_container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/schedule_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginBottom="20dp"
@@ -14,63 +15,59 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:orientation="vertical"
-        android:paddingLeft="30dp">
+        android:gravity="center_vertical"
+        android:paddingLeft="30dp"
+        android:paddingRight="80dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginRight="5dp"
+            android:src="@drawable/ic_time_limits"/>
 
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginRight="5dp"
-                android:src="@drawable/ic_time_limits" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/start_label"
+            android:textSize="18dp"
+            android:textColor="@color/text_color_bold"
+            android:textStyle="bold"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/start_label"
-                android:textColor="@color/text_color_bold"
-                android:textSize="18dp"
-                android:textStyle="bold" />
+        <EditText
+            android:id="@+id/textview_start_time"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:gravity="center"
+            android:maxLines="1"
+            android:singleLine="true"/>
 
-            <EditText
-                android:id="@+id/textview_start_time"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:focusable="false"
-                android:layout_marginLeft="5dp"
-                android:focusableInTouchMode="false"
-                android:gravity="center_horizontal"
-                android:maxLines="1"
-                android:singleLine="true" />
-        </LinearLayout>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/end_label"
+            android:textSize="18dp"
+            android:textColor="@color/text_color_bold"
+            android:textStyle="bold"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="45dp"
-                android:text="@string/end_label"
-                android:textColor="@color/text_color_bold"
-                android:textSize="18dp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/textview_end_time"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="14dp"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:gravity="center_horizontal"
-                android:maxLines="1"
-                android:singleLine="true" />
-        </LinearLayout>
+        <EditText
+            android:id="@+id/textview_end_time"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:gravity="center"
+            android:maxLines="1"
+            android:singleLine="true"/>
     </LinearLayout>
 
     <LinearLayout
@@ -78,82 +75,69 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/hour_container"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:gravity="center_vertical"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:paddingLeft="30dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginRight="5dp"
+            android:src="@drawable/ic_calendar"/>
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/hour_container"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:text="@string/start_label"
+            android:textSize="18dp"
+            android:textColor="@color/text_color_bold"
+            android:textStyle="bold"/>
 
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginRight="5dp"
-                android:src="@drawable/ic_calendar" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/start_label"
-                android:textColor="@color/text_color_bold"
-                android:textSize="18dp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/textview_start_day"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:gravity="center_horizontal"
-                android:maxLines="1"
-                android:singleLine="true" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <EditText
+            android:id="@+id/textview_start_day"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/hour_container"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_marginLeft="5dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:gravity="center"
+            android:maxLines="1"
+            android:singleLine="true"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="45dp"
-                android:text="@string/end_label"
-                android:textColor="@color/text_color_bold"
-                android:textSize="18dp"
-                android:textStyle="bold" />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
-            <Spinner
-                android:id="@+id/spinner_date_event"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="14dp"
-                android:layout_marginRight="10dp"
-                android:minWidth="150dp"
-                android:spinnerMode="dropdown" />
-        </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/end_label"
+            android:textSize="18dp"
+            android:textColor="@color/text_color_bold"
+            android:textStyle="bold"/>
+
+        <Spinner
+            android:id="@+id/spinner_date_event"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:spinnerMode="dropdown"/>
     </LinearLayout>
 
     <EditText
         android:id="@+id/edittext_date_event"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
         android:layout_below="@+id/date_container"
-        android:layout_marginLeft="124dp"
+        android:layout_marginRight="85dp"
         android:focusable="false"
         android:focusableInTouchMode="false"
         android:visibility="invisible"
-        tools:visibility="visible" />
+        tools:visibility="visible"/>
 
     <TextView
         android:id="@+id/limit_current"
@@ -162,15 +146,15 @@
         android:layout_alignBottom="@id/edittext_date_event"
         android:layout_toLeftOf="@id/edittext_date_event"
         android:visibility="gone"
-        tools:text="1" />
+        tools:text="1"/>
 
     <HorizontalScrollView
         android:id="@+id/days_scroll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/edittext_date_event"
+        android:layout_below="@+id/date_container"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="40dp">
 
         <LinearLayout
             android:id="@+id/days_container"
@@ -189,7 +173,7 @@
                 app:backgroundTint="@color/white"
                 app:borderWidth="0dp"
                 app:elevation="3dp"
-                app:rippleColor="@color/white" />
+                app:rippleColor="@color/white"/>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fb_day_mon"
@@ -202,7 +186,7 @@
                 app:backgroundTint="@color/white"
                 app:borderWidth="0dp"
                 app:elevation="3dp"
-                app:rippleColor="@color/white" />
+                app:rippleColor="@color/white"/>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fb_day_tue"
@@ -215,7 +199,7 @@
                 app:backgroundTint="@color/white"
                 app:borderWidth="0dp"
                 app:elevation="3dp"
-                app:rippleColor="@color/white" />
+                app:rippleColor="@color/white"/>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fb_day_wed"
@@ -228,7 +212,7 @@
                 app:backgroundTint="@color/white"
                 app:borderWidth="0dp"
                 app:elevation="3dp"
-                app:rippleColor="@color/white" />
+                app:rippleColor="@color/white"/>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fb_day_thr"
@@ -241,7 +225,7 @@
                 app:backgroundTint="@color/white"
                 app:borderWidth="0dp"
                 app:elevation="3dp"
-                app:rippleColor="@color/white" />
+                app:rippleColor="@color/white"/>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fb_day_fri"
@@ -254,7 +238,7 @@
                 app:backgroundTint="@color/white"
                 app:borderWidth="0dp"
                 app:elevation="3dp"
-                app:rippleColor="@color/white" />
+                app:rippleColor="@color/white"/>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fb_day_sat"
@@ -267,7 +251,7 @@
                 app:backgroundTint="@android:color/white"
                 app:borderWidth="0dp"
                 app:elevation="3dp"
-                app:rippleColor="@color/white" />
+                app:rippleColor="@color/white"/>
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -276,18 +260,18 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/days_scroll"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
         android:orientation="vertical">
 
         <CheckBox
             android:id="@+id/checkbox_repeat_every_week"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
             android:checked="false"
             android:text="@string/repeat_only_every_week_label"
             android:textColor="@color/text_color_bold"
             android:textSize="16dp"
-            android:textStyle="bold" />
+            android:textStyle="bold"/>
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -297,12 +281,12 @@
                 android:id="@+id/checkbox_repeat"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="26dp"
                 android:checked="false"
                 android:text="@string/repeat_label"
                 android:textColor="@color/text_color_bold"
                 android:textSize="16dp"
-                android:textStyle="bold" />
+                android:textStyle="bold"/>
 
             <EditText
                 android:id="@+id/edittext_repeat_weeks"
@@ -317,7 +301,7 @@
                 android:maxLength="2"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:spinnerMode="dropdown" />
+                android:spinnerMode="dropdown"/>
 
             <!-- http://stackoverflow.com/questions/21444425/androidgravity-fails-on-api-18/22812527#22812527 -->
             <LinearLayout
@@ -334,9 +318,9 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/weeks_label"
-                    android:textColor="@color/text_color_bold"
                     android:textSize="16dp"
-                    android:textStyle="bold" />
+                    android:textColor="@color/text_color_bold"
+                    android:textStyle="bold"/>
             </LinearLayout>
         </RelativeLayout>
     </LinearLayout>

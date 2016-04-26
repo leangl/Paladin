@@ -21,10 +21,10 @@ public class CreateUserActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         if (getIntent() != null) {
             mId = getIntent().getStringExtra(CreateUserFragment.ARG_ID_USER);
         }
-        super.onCreate(savedInstanceState);
         getToolbar().setTitle(R.string.new_user_label);
         TextView textView = (TextView) getViewInToolbar(R.id.textview_menu_overflow);
         textView.setVisibility(View.VISIBLE);
