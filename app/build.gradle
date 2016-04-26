@@ -1,7 +1,23 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
+
 plugins {
     id "me.tatarka.retrolambda" version "3.2.4"
 }
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+repositories {
+    jcenter()
+    maven { url 'https://maven.fabric.io/public' }
+}
 
 android {
     compileSdkVersion 23
@@ -11,8 +27,8 @@ android {
         applicationId "com.nanospark.gard"
         minSdkVersion 16
         targetSdkVersion 18 // for alarm repeating at exact times
-        versionCode 1
-        versionName "1.0"
+        versionCode 6
+        versionName "1.0.6.3"
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -33,18 +49,17 @@ clean.dependsOn(clean_assets)
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':utils')
-    compile 'com.github.ytai.ioio:IOIOLibAndroid:5.05'
-    compile 'com.github.ytai.ioio:IOIOLibAndroidBluetooth:5.05'
-    compile 'com.github.ytai.ioio:IOIOLibAndroidAccessory:5.05'
-    compile 'com.github.ytai.ioio:IOIOLibAndroidDevice:5.05'
+    compile 'com.github.ytai.ioio:IOIOLibAndroid:5.+'
+    compile 'com.github.ytai.ioio:IOIOLibAndroidBluetooth:5.+'
+    compile 'com.github.ytai.ioio:IOIOLibAndroidAccessory:5.+'
+    compile 'com.github.ytai.ioio:IOIOLibAndroidDevice:5.+'
     compile 'com.android.support:design:23.0.1'
     compile 'com.android.support:support-v4:23.0.1'
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.android.support:cardview-v7:23.0.1'
     compile 'com.android.support:recyclerview-v7:23.0.1'
-    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.4'
     compile 'com.android.support:gridlayout-v7:23.1.0'
-    compile 'com.survivingwithandroid:weatherlib:1.6.0'
-    compile 'com.survivingwithandroid:weatherlib_okhttpclient:1.6.0'
-    compile 'com.squareup.okhttp:okhttp:2.0.+'
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.0@aar') {
+        transitive = true;
+    }
 }

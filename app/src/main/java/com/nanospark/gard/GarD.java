@@ -3,6 +3,8 @@ package com.nanospark.gard;
 import android.app.Application;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.core.CrashlyticsCore;
 import com.nanospark.gard.events.BoardConnected;
 import com.nanospark.gard.events.BoardDisconnected;
 import com.nanospark.gard.events.CommandSent;
@@ -13,10 +15,9 @@ import com.nanospark.gard.model.user.UserManager;
 import com.nanospark.gard.sms.SmsManager;
 import com.nanospark.gard.ui.activity.MainActivityNew;
 import com.nanospark.gard.voice.VoiceRecognizer;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.squareup.otto.Subscribe;
 
+import io.fabric.sdk.android.Fabric;
 import mobi.tattu.utils.StringUtils;
 import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.ToastManager;
@@ -44,6 +45,12 @@ public class GarD extends Application {
         Tattu.init(this, MainActivityNew.class);
         Tattu.register(this);
 
+        Fabric.with(this, new Crashlytics.Builder()
+                .core(new CrashlyticsCore.Builder()
+                        .disabled(BuildConfig.DEBUG)
+                        .build())
+                .build());
+
         instance = this;
 
         // force initialization of singletons TODO find a cleaner way
@@ -57,10 +64,6 @@ public class GarD extends Application {
 
         // Start service as soon as app starts
         //GarDService.start();
-
-        // Initialize Universal Image Loader
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this).build();
-        ImageLoader.getInstance().init(config);
 
     }
 
