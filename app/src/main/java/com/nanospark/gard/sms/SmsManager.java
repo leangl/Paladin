@@ -1,6 +1,7 @@
 package com.nanospark.gard.sms;
 
 import android.os.Handler;
+import android.os.Message;
 import android.util.Base64;
 
 import com.google.gson.Gson;
@@ -20,6 +21,7 @@ import com.nanospark.gard.model.user.User;
 import com.nanospark.gard.model.user.UserManager;
 import com.nanospark.gard.sms.twilio.TwilioAccount;
 import com.nanospark.gard.sms.twilio.TwilioApi;
+import com.squareup.okhttp.OkHttpClient;
 import com.squareup.otto.Produce;
 import com.squareup.otto.Subscribe;
 
@@ -32,11 +34,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import mobi.tattu.utils.F;
 import mobi.tattu.utils.StringUtils;
 import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.persistance.datastore.DataStore;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
+import retrofit.client.OkClient;
 import retrofit.converter.GsonConverter;
 import roboguice.RoboGuice;
 import roboguice.util.Ln;
@@ -51,13 +55,14 @@ import static com.nanospark.gard.sms.twilio.TwilioApi.DATE_FORMAT;
 public class SmsManager {
 
     private static final int RATE_LIMIT_1_MINUTE = 8; // Max allowed SMSs within 1 minute
-    private static final int RATE_LIMITE_10_MINUTE = 24; // Max allowed SMSs within 10 minutes
+    private static final int RATE_LIMIT_10_MINUTE = 24; // Max allowed SMSs within 10 minutes
     private static long MESSAGES_CHECK_TIME = TimeUnit.SECONDS.toMillis(1);
     private static long MESSAGES_RETRY_TIME = TimeUnit.SECONDS.toMillis(30);
 
     private SmsConfig mConfig;
     private TwilioApi mApi;
-    private Handler smsHandler;
+    private Handler receiveSmsHandler;
+    private SendSmsHandler sendSmsHandler;
     private List<Long> mLastSentTimestamps;
 
     private String fakeSms;
@@ -69,16 +74,22 @@ public class SmsManager {
         Gson gson = new GsonBuilder()
                 .create();
 
+        // Disable retries to prevent duplicate SMS
+        OkHttpClient client = new OkHttpClient();
+        client.setRetryOnConnectionFailure(false);
+
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint("https://api.twilio.com")
+                .setClient(new OkClient(client))
                 .setConverter(new GsonConverter(gson))
                 .setRequestInterceptor(mBasicAuthInterceptor)
                 .setLogLevel(RestAdapter.LogLevel.FULL).setLog(Ln::d)
                 .build();
 
         mApi = restAdapter.create(TwilioApi.class);
-        smsHandler = new Handler();
-        mLastSentTimestamps = new ArrayList<>(RATE_LIMITE_10_MINUTE);
+        receiveSmsHandler = new Handler();
+        sendSmsHandler = new SendSmsHandler();
+        mLastSentTimestamps = new ArrayList<>(RATE_LIMIT_10_MINUTE);
 
         Tattu.register(this);
 
@@ -100,14 +111,12 @@ public class SmsManager {
 
     public void startChecking() {
         // Start checking for incoming SMS messages
-        smsHandler.removeCallbacksAndMessages(null);
-        smsHandler.post(checkMessages);
+        receiveSmsHandler.removeCallbacksAndMessages(null);
+        receiveSmsHandler.post(checkMessages);
     }
 
     public void stopChecking() {
-        if (smsHandler != null) {
-            smsHandler.removeCallbacksAndMessages(null);
-        }
+        receiveSmsHandler.removeCallbacksAndMessages(null);
     }
 
     private RequestInterceptor mBasicAuthInterceptor = request -> {
@@ -209,8 +218,8 @@ public class SmsManager {
             if (delta < TimeUnit.MINUTES.toMillis(1)) return true;
         }
 
-        if (mLastSentTimestamps.size() >= RATE_LIMITE_10_MINUTE) {
-            long delta = currentTime - mLastSentTimestamps.get(mLastSentTimestamps.size() - RATE_LIMITE_10_MINUTE);
+        if (mLastSentTimestamps.size() >= RATE_LIMIT_10_MINUTE) {
+            long delta = currentTime - mLastSentTimestamps.get(mLastSentTimestamps.size() - RATE_LIMIT_10_MINUTE);
             if (delta < TimeUnit.MINUTES.toMillis(10)) return true;
         }
 
@@ -309,13 +318,11 @@ public class SmsManager {
                     receive(new SmsMessage(body, from));
                 }
                 // Reschedule message log check
-                if (smsHandler != null) {
-                    smsHandler.removeCallbacksAndMessages(null);
-                    smsHandler.postDelayed(checkMessages, MESSAGES_CHECK_TIME);
-                }
+                receiveSmsHandler.removeCallbacksAndMessages(null);
+                receiveSmsHandler.postDelayed(checkMessages, MESSAGES_CHECK_TIME);
             }, error -> {
-                smsHandler.removeCallbacksAndMessages(null);
-                smsHandler.postDelayed(checkMessages, MESSAGES_RETRY_TIME);
+                receiveSmsHandler.removeCallbacksAndMessages(null);
+                receiveSmsHandler.postDelayed(checkMessages, MESSAGES_RETRY_TIME);
             });
         }
     };
@@ -455,20 +462,7 @@ public class SmsManager {
      * @param state only to users subscribed to this state or everyone if null
      */
     public void sendDoorAlert(String alert, Door.State state) {
-        int count = 0;
-        for (User user : mUserManager.getAll()) {
-            if (StringUtils.isNotBlank(user.getPhone())
-                    && ((state == null && !user.getNotify().equals(User.Notify.NONE))
-                    || user.getNotify().notify(state))) {
-                count++;
-                sendMessage(alert, user.getPhone()).subscribe(success -> {
-                    Ln.d("SMS success");
-                }, error -> {
-                    Ln.e("SMS error", error);
-                });
-            }
-        }
-        Ln.d("Sending alert to #" + count);
+        sendSmsHandler.sendSms(alert, state);
     }
 
     @Produce
@@ -480,13 +474,60 @@ public class SmsManager {
     }
 
     public static class SmsConfig {
-        private static final String DEFAULT_SID = BuildConfig.DEBUG ? "AC83aacf8a55784375290210a9eb924ad4" : "";
-        private static final String DEFAULT_TOKEN = BuildConfig.DEBUG ? "3f5dab33644d33cacb4bf300194299eb" : "";
+        private static final String DEFAULT_SID = "QUM4M2FhY2Y4YTU1Nzg0Mzc1MjkwMjEwYTllYjkyNGFkNA==";
+        private static final String DEFAULT_TOKEN = "M2Y1ZGFiMzM2NDRkMzNjYWNiNGJmMzAwMTk0Mjk5ZWI=";
 
         public TwilioAccount account = new TwilioAccount("", DEFAULT_SID, DEFAULT_TOKEN);
         public boolean enabled = true;
         public boolean suspended = false;
         public boolean useInternet = true;
+    }
+
+    /**
+     * Prevents rapid fire text alerts.
+     * Puts a 1 second delay before firing a message, that is the door has to
+     * remain in a given state for at least 1 second before sending the notification.
+     * <p>
+     * - Receive door state change
+     * - Count 1000ms
+     * - Check, is the door is still in changed state
+     * - If YES, send message, If NO, cancel message
+     */
+    private class SendSmsHandler extends Handler {
+
+        public static final int SEND = 1;
+
+        public void sendSms(String alert, Door.State state) {
+            Message m = obtainMessage(SEND);
+            m.obj = new F.Tuple<>(alert, state);
+            if (hasMessages(SEND)) {
+                this.removeMessages(SEND);
+            } else {
+                this.sendMessageDelayed(m, 1000);
+            }
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            F.Tuple<String, Door.State> obj = (F.Tuple<String, Door.State>) msg.obj;
+            String alert = obj._1;
+            Door.State state = obj._2;
+            int count = 0;
+            for (User user : mUserManager.getAll()) {
+                if (StringUtils.isNotBlank(user.getPhone())
+                        && ((state == null && !user.getNotify().equals(User.Notify.NONE))
+                        || user.getNotify().notify(state))) {
+                    count++;
+                    SmsManager.this.sendMessage(alert, user.getPhone()).subscribe(success -> {
+                        Ln.d("SMS success");
+                    }, error -> {
+                        Ln.e("SMS error", error);
+                    });
+                }
+            }
+            Ln.d("Sending alert to #" + count);
+        }
+
     }
 
 }

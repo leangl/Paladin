@@ -125,6 +125,9 @@ public class SchedulesFragment extends BaseFragment {
             cardView.findViewById(R.id.imageview_menu).setOnClickListener(v -> {
                 PopupMenu popupMenu = new PopupMenu(getBaseActivity(), v);
                 popupMenu.inflate(R.menu.actions);
+                if (!schedule.isLatchingActive()) {
+                    popupMenu.getMenu().findItem(R.id.action_override).setVisible(false);
+                }
                 popupMenu.setOnMenuItemClickListener(item -> {
                     handlePopMenu(item, schedule);
                     return true;
@@ -152,6 +155,9 @@ public class SchedulesFragment extends BaseFragment {
                 break;
             case R.id.action_edit:
                 CreateScheduleActivity.start(getActivity(), schedule);
+                break;
+            case R.id.action_override:
+                schedule.override();
                 break;
         }
     }

@@ -8,6 +8,7 @@ import com.nanospark.gard.model.user.ControlSchedule;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +28,8 @@ public class Schedule implements Serializable, Comparable<Schedule> {
     private Integer closeHour;
     private Integer closeMinute;
     private ControlSchedule controlSchedule;
+    private boolean latching;
+    private boolean overriden = false;
 
     public Schedule() {
         this.id = UUID.randomUUID().toString();
@@ -89,6 +92,21 @@ public class Schedule implements Serializable, Comparable<Schedule> {
         this.controlSchedule = controlSchedule;
     }
 
+    public boolean isLatching() {
+        return latching;
+    }
+
+    public void setLatching(boolean latching) {
+        this.latching = latching;
+    }
+
+    public boolean override() {
+        if (!isLatchingActive()) return false;
+        // TODO apply override logic
+        overriden = true;
+        return true;
+    }
+
     public boolean isOpenTimeSet() {
         return openMinute != null && openHour != null;
     }
@@ -97,7 +115,7 @@ public class Schedule implements Serializable, Comparable<Schedule> {
         return closeMinute != null && closeHour != null;
     }
 
-    public boolean isNow(Integer scheduleHour, Integer scheduleMinute) {
+    private boolean isNow(Integer scheduleHour, Integer scheduleMinute) {
         if (scheduleHour == null || scheduleMinute == null) return false;
 
         Calendar calendar = Calendar.getInstance();
@@ -105,6 +123,45 @@ public class Schedule implements Serializable, Comparable<Schedule> {
         int minute = calendar.get(Calendar.MINUTE);
 
         return hour == scheduleHour && minute == scheduleMinute && getControlSchedule().isAllowed();
+    }
+
+    public boolean isLatchingActive() {
+        if (!isLatching()) return false;
+
+        Calendar openCal = Calendar.getInstance();
+        openCal.set(Calendar.HOUR_OF_DAY, openHour);
+        openCal.set(Calendar.MINUTE, openMinute);
+
+        Calendar closeCal = Calendar.getInstance();
+        closeCal.set(Calendar.HOUR_OF_DAY, closeHour);
+        closeCal.set(Calendar.MINUTE, closeMinute);
+
+        Date startTime, endTime;
+        if (closeCal.getTime().after(openCal.getTime())) {
+            startTime = openCal.getTime();
+            endTime  = closeCal.getTime();
+        } else {
+            startTime = closeCal.getTime();
+            endTime  = openCal.getTime();
+        }
+
+        Date now = new Date();
+
+        boolean insideHourRange = now.after(startTime) && now.before(endTime);
+
+        return insideHourRange && controlSchedule.isAllowed() && !overriden;
+    }
+
+    public boolean isLatchingInitialStateOpen() {
+        Calendar openCal = Calendar.getInstance();
+        openCal.set(Calendar.HOUR_OF_DAY, openHour);
+        openCal.set(Calendar.MINUTE, openMinute);
+
+        Calendar closeCal = Calendar.getInstance();
+        closeCal.set(Calendar.HOUR_OF_DAY, closeHour);
+        closeCal.set(Calendar.MINUTE, closeMinute);
+
+        return isLatching() && closeCal.getTime().after(openCal.getTime());
     }
 
     public void trigger() {

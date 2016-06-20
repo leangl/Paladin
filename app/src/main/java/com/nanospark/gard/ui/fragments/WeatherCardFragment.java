@@ -1,6 +1,7 @@
 package com.nanospark.gard.ui.fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,8 @@ import com.nanospark.gard.R;
 import com.nanospark.gard.weather.Forecast;
 import com.nanospark.gard.weather.Weather;
 import com.nanospark.gard.weather.WeatherManager;
+
+import java.util.concurrent.TimeUnit;
 
 import mobi.tattu.utils.fragments.BaseFragment;
 import roboguice.inject.InjectView;
@@ -55,6 +58,8 @@ public class WeatherCardFragment extends BaseFragment {
 
     private Forecast mForecast;
 
+    private Handler mRefreshHandler;
+
     public static WeatherCardFragment newInstance() {
         return new WeatherCardFragment();
     }
@@ -68,6 +73,7 @@ public class WeatherCardFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mRefreshHandler = new Handler();
         mContainer.setOnClickListener(v -> {
             if (mForecast == null) refresh();
         });
@@ -102,6 +108,11 @@ public class WeatherCardFragment extends BaseFragment {
                         mError.setVisibility(View.VISIBLE);
                     });
         }
+        // Auto refresh every 1 hour
+        mRefreshHandler.removeCallbacksAndMessages(null);
+        mRefreshHandler.postDelayed(() -> {
+            refresh();
+        }, TimeUnit.HOURS.toMillis(1));
     }
 
     private void renderWeather(Forecast forecast) {

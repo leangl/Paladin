@@ -112,7 +112,7 @@ public class GarDService extends BaseService implements IOIOLooperProvider {
         stopIOIO();
         Tattu.runOnUiThread(() -> {
             // Disable IOIO on emulator since it starves all resources
-            if (!BuildConfig.DEBUG || !Utils.isVM()) {
+            if (!Utils.isVM()) {
                 ioioHelper = new IOIOAndroidApplicationHelper(this, this);
                 ioioHelper.create();
                 ioioHelper.start();

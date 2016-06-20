@@ -56,6 +56,8 @@ public class CreateScheduleFragment extends BaseFragment {
     private EditText mOpen;
     @InjectView(R.id.close)
     private EditText mClose;
+    @InjectView(R.id.latching)
+    private CheckBox mAllowOtherOps;
     @Inject
     private ScheduleManager mManager;
 
@@ -107,6 +109,8 @@ public class CreateScheduleFragment extends BaseFragment {
             mOpen.setText(Utils.getHour(mSchedule.getOpenHour(), mSchedule.getOpenMinute()));
         if (mSchedule.isCloseTimeSet())
             mClose.setText(Utils.getHour(mSchedule.getCloseHour(), mSchedule.getCloseMinute()));
+
+        mAllowOtherOps.setChecked(!mSchedule.isLatching());
 
         mOpen.setOnClickListener(v -> showTimerPicker(v.getId(), mSchedule.getOpenTime()));
         mClose.setOnClickListener(v -> showTimerPicker(v.getId(), mSchedule.getCloseTime()));
@@ -387,6 +391,8 @@ public class CreateScheduleFragment extends BaseFragment {
                 return false;
             }
         }
+
+        mSchedule.setLatching(!mAllowOtherOps.isChecked());
 
         mManager.add(mSchedule);
 

@@ -23,11 +23,11 @@ public abstract class BaseActivity extends mobi.tattu.utils.activities.BaseActiv
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (mobi.tattu.utils.Utils.isTablet(this)) {
+        /*if (mobi.tattu.utils.Utils.isTablet(this)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
+        }*/
 
         this.mToolbar = (Toolbar) findViewById(R.id.toolbar);
         if (this.mToolbar != null) {

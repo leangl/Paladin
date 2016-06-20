@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import mobi.tattu.utils.F;
 import mobi.tattu.utils.Tattu;
+import mobi.tattu.utils.annotations.Cache;
 import mobi.tattu.utils.persistance.datastore.DataStore;
 import roboguice.RoboGuice;
 
@@ -29,6 +30,8 @@ public class ScheduleManager {
     private final AlarmManager mAlarmManager;
     @Inject
     private DataStore mDataStore;
+    @Cache
+    private List<Schedule> mCached;
 
     public ScheduleManager() {
         Tattu.register(this);
@@ -46,14 +49,17 @@ public class ScheduleManager {
     }
 
     public List<Schedule> getAll() {
-        List<Schedule> all = new ArrayList<>(mDataStore.getAll(Schedule.class));
-        Collections.sort(all);
-        return all;
+        if (mCached == null) {
+            mCached = new ArrayList<>(mDataStore.getAll(Schedule.class));
+            Collections.sort(mCached);
+        }
+        return mCached;
     }
 
     public void add(Schedule schedule) {
         mDataStore.put(schedule);
         initializeSchedule(schedule);
+        mCached = null;
     }
 
     public void update(Schedule schedule) {
@@ -70,11 +76,13 @@ public class ScheduleManager {
     }
 
     public Schedule getSchedule(String id) {
+        // TODO get from cache
         return mDataStore.get(id, Schedule.class).get();
     }
 
     public void delete(Schedule schedule) {
         mDataStore.delete(schedule, Schedule.class);
+        mCached = null;
     }
 
     private void initializeSchedule(Schedule schedule) {
@@ -105,5 +113,9 @@ public class ScheduleManager {
         intent.putExtra(AlarmReceiver.EXTRA_ID, schedule.getId());
         intent.putExtra(AlarmReceiver.EXTRA_ACTION, action);
         return PendingIntent.getBroadcast(GarD.instance, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    public void override(Schedule schedule) {
+        schedule.override();
     }
 }

@@ -100,12 +100,9 @@ public class CreateUserFragment extends BaseFragment {
         this.mDoorEventSpinner.setEnabled(true);
         this.mPasswordEditText.setEnabled(false);
 
-        ArrayList<User.Notify> notifyList = new ArrayList<>(3);
-        notifyList.add(User.Notify.OPEN);
-        notifyList.add(User.Notify.CLOSE);
-        notifyList.add(User.Notify.ALL);
-
-        ArrayAdapter<User.Notify> adapter = new ArrayAdapter<>(getBaseActivity(), android.R.layout.simple_dropdown_item_1line, notifyList);
+        ArrayAdapter<User.Notify> adapter = new ArrayAdapter<>(getBaseActivity(),
+                android.R.layout.simple_dropdown_item_1line,
+                new User.Notify[]{User.Notify.OPEN, User.Notify.CLOSE, User.Notify.ALL});
 
         this.mDoorEventSpinner.setAdapter(adapter);
         this.mDoorEventSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -113,6 +110,7 @@ public class CreateUserFragment extends BaseFragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 mUser.setNotify((User.Notify) parent.getAdapter().getItem(position));
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }

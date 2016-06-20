@@ -110,8 +110,21 @@
                     android:gravity="center_horizontal"
                     android:hint="n/a" />
             </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/latching"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:layout_gravity="center_horizontal"
+                android:text="Allow other operations"
+                android:textColor="@color/text_color_bold"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+
         </LinearLayout>
 
         <include layout="@layout/repeat_layout" />
+
     </LinearLayout>
 </ScrollView>

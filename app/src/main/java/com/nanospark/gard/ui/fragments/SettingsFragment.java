@@ -23,6 +23,7 @@ import com.nanospark.gard.sms.twilio.TwilioAccount;
 import com.nanospark.gard.ui.custom.BaseFragment;
 import com.nanospark.gard.weather.WeatherManager;
 
+import mobi.tattu.utils.Base64;
 import mobi.tattu.utils.StringUtils;
 import roboguice.inject.InjectView;
 import rx.Observable;
@@ -233,7 +234,7 @@ public class SettingsFragment extends BaseFragment {
                 .setView(content);
 
         AlertDialog dialog = builder.show();
-        dialog.findViewById(android.support.v7.appcompat.R.id.alertTitle).setOnClickListener(v -> {
+        /*dialog.findViewById(android.support.v7.appcompat.R.id.alertTitle).setOnClickListener(v -> {
             if (radioGroup.getCheckedRadioButtonId() == R.id.internet) { // do not open advanced settings if phone is checked
                 touchCount++;
                 if (touchCount == 4) {
@@ -241,7 +242,7 @@ public class SettingsFragment extends BaseFragment {
                     content.findViewById(R.id.advanced).setVisibility(View.VISIBLE);
                 }
             }
-        });
+        });*/
 
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
             if (radioGroup.getCheckedRadioButtonId() == R.id.internet) {

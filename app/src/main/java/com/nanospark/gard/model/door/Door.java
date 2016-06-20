@@ -2,6 +2,7 @@ package com.nanospark.gard.model.door;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -16,6 +17,8 @@ import com.nanospark.gard.events.DoorStateChanged;
 import com.nanospark.gard.events.VoiceRecognitionDisabled;
 import com.nanospark.gard.events.VoiceRecognitionEnabled;
 import com.nanospark.gard.model.CommandSource;
+import com.nanospark.gard.model.scheduler.Schedule;
+import com.nanospark.gard.model.scheduler.ScheduleManager;
 import com.nanospark.gard.model.user.User;
 import com.nanospark.gard.sms.SmsManager;
 import com.nanospark.gard.voice.VoiceRecognizer;
@@ -30,7 +33,6 @@ import ioio.lib.api.DigitalInput;
 import ioio.lib.api.DigitalOutput;
 import ioio.lib.api.IOIO;
 import ioio.lib.api.exception.ConnectionLostException;
-import ioio.lib.spi.Log;
 import mobi.tattu.utils.Tattu;
 import mobi.tattu.utils.ToastManager;
 import mobi.tattu.utils.persistance.datastore.DataStore;
@@ -42,6 +44,8 @@ import roboguice.util.Ln;
  */
 public abstract class Door {
 
+    public static final int TIME_WAIT_FOR_DOOR_STATE = 30000;
+    public static final int TIME_PIN_ACTIVE_FOR_COMMAND = 2000;
     private int mId;
     private State mState = State.UNKNOWN;
     private int mControlPinNumber;
@@ -62,6 +66,8 @@ public abstract class Door {
     private DataStore mDataStore;
     @Inject
     private SmsManager mSmsManager;
+    @Inject
+    private ScheduleManager mScheduleManager;
 
     public Door(int id, Integer controlPinNumber, Integer closedPinNumber, Integer openPinNumber) {
         mId = id;
@@ -151,6 +157,10 @@ public abstract class Door {
     public boolean send(Command command) {
         if (!isEnabled()) {
             Ln.i("Command not processed, Door is disabled.");
+            return false;
+        }
+        if (mHasLatching) {
+            Ln.i("Command not processed, Latching is active.");
             return false;
         }
         return command.apply(this);
@@ -353,38 +363,116 @@ public abstract class Door {
         mOpenPin = ioio.openDigitalInput(mOpenPinNumber, DigitalInput.Spec.Mode.PULL_DOWN);
     }
 
+    private boolean mHasLatching;
+
     public void loop() throws ConnectionLostException, InterruptedException {
+        // Holds the output closed so that other signals, even from non-PALADIN sources, can't be processed.
+        if (processLatching()) {
+            return;
+        }
+
         if (mActivatePin) {
             mActivatePin = false;
             // high for 2 seconds and then low again
             mOutputPin.write(true);
-            Thread.sleep(2000);
+            Thread.sleep(TIME_PIN_ACTIVE_FOR_COMMAND);
             mOutputPin.write(false);
         } else {
-            if (isOpenSwitchEnabled() && isCloseSwitchEnabled()) {
-                boolean isClosed = mClosedPin.read(); // true is closed
-                boolean isOpen = mOpenPin.read(); // true is open
-                Boolean triState = null;
-                if (isClosed != isOpen) { // both pin LOW or HIGH means state is UNKNOWN
-                    triState = isOpen;
-                }
-                State state = State.from(triState);
-                if (!mState.equals(state)) {
-                    confirm(state);
-                }
-            } else if (isCloseSwitchEnabled()) {
-                State state = State.from(!mClosedPin.read()); // true is closed
-                if (!mState.equals(state)) {
-                    confirm(state);
-                }
-            } else if (isOpenSwitchEnabled()) {
-                State state = State.from(mOpenPin.read()); // true is open
-                if (!mState.equals(state)) {
-                    confirm(state);
+            State state = readState();
+            if (!mState.equals(state)) {
+                confirm(state);
+            }
+        }
+    }
+
+
+    /**
+     * Reads door state from open/close pins.
+     * @return Door state
+     */
+    private State readState() throws ConnectionLostException, InterruptedException {
+        if (isOpenSwitchEnabled() && isCloseSwitchEnabled()) {
+            boolean isClosed = mClosedPin.read(); // true is closed
+            boolean isOpen = mOpenPin.read(); // true is open
+            Boolean triState = null;
+            if (isClosed != isOpen) { // both pin LOW or HIGH means state is UNKNOWN
+                triState = isOpen;
+            }
+            return State.from(triState);
+        } else if (isCloseSwitchEnabled()) {
+            return State.from(!mClosedPin.read()); // true is closed
+        } else if (isOpenSwitchEnabled()) {
+            return State.from(mOpenPin.read()); // true is open
+        }
+        return State.UNKNOWN;
+    }
+
+    private boolean latchingActive = false;
+
+    private boolean processLatching() throws ConnectionLostException, InterruptedException {
+        if (!this.isReady()) {
+            //ToastManager.show("Latching scheduled but door not yet ready, waiting for the next loop...");
+            Log.e(toString(), "Latching scheduled but door not yet ready, waiting for the next loop...");
+            return false;
+        }
+
+        Schedule latchingSchedule = null;
+        for (Schedule schedule : mScheduleManager.getAll()) {
+            if (schedule.getDoors().contains(this.getId())) {
+                if (schedule.isLatchingActive()) {
+                    latchingSchedule = schedule;
+                    break;
                 }
             }
-            Thread.sleep(100);
         }
+        if (latchingSchedule == null) {
+            //ToastManager.show("No latching schedule this loop");
+            Log.e(toString(), "No latching schedule this loop");
+            if (latchingActive) {
+                //ToastManager.show("Disabling previous latching schedule");
+                Log.e(toString(), "Disabling previous latching schedule");
+                mOutputPin.write(false);
+                latchingActive = false;
+            }
+            return false;
+        }
+
+        if (latchingSchedule.isLatchingInitialStateOpen() && readState() == State.OPEN) {
+            //ToastManager.show("Closing door for latching schedule");
+            mOutputPin.write(true);
+            Thread.sleep(TIME_PIN_ACTIVE_FOR_COMMAND);
+            mOutputPin.write(false);
+            Thread.sleep(TIME_WAIT_FOR_DOOR_STATE);
+            if (!isClosed()) {
+                //ToastManager.show("Error closing door for latching schedule");
+                Log.e(toString(), "Error closing door for latching schedule");
+            } else {
+                //ToastManager.show("Door closed for latching schedule");
+                Log.e(toString(), "Door closed for latching schedule");
+            }
+
+        } else if (!latchingSchedule.isLatchingInitialStateOpen() && readState() == State.CLOSED) {
+            //ToastManager.show("Opening door for latching schedule");
+            mOutputPin.write(true);
+            Thread.sleep(TIME_PIN_ACTIVE_FOR_COMMAND);
+            mOutputPin.write(false);
+            Thread.sleep(TIME_WAIT_FOR_DOOR_STATE);
+            if (!isOpen()) {
+                //ToastManager.show("Error opening door for latching schedule");
+                Log.e(toString(), "Error opening door for latching schedule");
+            } else {
+                //ToastManager.show("Door opened for latching schedule");
+                Log.e(toString(), "Door opened for latching schedule");
+            }
+        }
+
+        mOutputPin.write(true);
+        latchingActive = true;
+
+        //ToastManager.show("Latching is active");
+        Log.i(toString(), "Latching is active");
+
+        return true;
     }
 
     @Override
@@ -641,6 +729,10 @@ public abstract class Door {
 
     public Command getPendingCommand() {
         return mPendingCommand;
+    }
+
+    public boolean hasLatching() {
+        return mHasLatching;
     }
 
 }

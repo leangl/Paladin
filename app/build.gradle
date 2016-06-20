@@ -21,14 +21,14 @@ repositories {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "22.0.1"
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
         applicationId "com.nanospark.gard"
         minSdkVersion 16
         targetSdkVersion 18 // for alarm repeating at exact times
-        versionCode 6
-        versionName "1.0.6.3"
+        versionCode 10
+        versionName "1.1.0"
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
