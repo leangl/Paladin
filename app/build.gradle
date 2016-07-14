@@ -27,8 +27,8 @@ android {
         applicationId "com.nanospark.gard"
         minSdkVersion 16
         targetSdkVersion 18 // for alarm repeating at exact times
-        versionCode 10
-        versionName "1.1.0"
+        versionCode 11
+        versionName "1.0.7"
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
