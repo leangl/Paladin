@@ -46,6 +46,7 @@ public abstract class Door {
 
     public static final int TIME_WAIT_FOR_DOOR_STATE = 30000;
     public static final int TIME_PIN_ACTIVE_FOR_COMMAND = 2000;
+
     private int mId;
     private State mState = State.UNKNOWN;
     private int mControlPinNumber;
@@ -367,9 +368,10 @@ public abstract class Door {
 
     public void loop() throws ConnectionLostException, InterruptedException {
         // Holds the output closed so that other signals, even from non-PALADIN sources, can't be processed.
-        if (processLatching()) {
+        // TODO incomplete feature, disabled for now...
+        /*if (processLatching()) {
             return;
-        }
+        }*/
 
         if (mActivatePin) {
             mActivatePin = false;
