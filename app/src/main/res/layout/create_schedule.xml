@@ -120,12 +120,13 @@
                 android:id="@+id/latching"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="false"
                 android:layout_gravity="center_horizontal"
+                android:checked="false"
                 android:text="Allow other operations"
                 android:textColor="@color/text_color_bold"
                 android:textSize="16dp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="gone" />
 
         </LinearLayout>
 
