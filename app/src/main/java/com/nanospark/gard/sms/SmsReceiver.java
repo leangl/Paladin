@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.crashlytics.android.Crashlytics;
 import com.nanospark.gard.events.SmsMessage;
 
+import io.fabric.sdk.android.services.common.Crash;
 import mobi.tattu.utils.Tattu;
 
 public class SmsReceiver extends BroadcastReceiver {
@@ -23,6 +25,8 @@ public class SmsReceiver extends BroadcastReceiver {
 
             String body = msg.getMessageBody();
             String from = msg.getOriginatingAddress();
+
+            Crashlytics.log("SMS: " + body + " - from: " + from);
 
             Tattu.post(new SmsMessage(body, from));
         }

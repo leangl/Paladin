@@ -4,6 +4,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
@@ -108,6 +110,7 @@ public class Utils {
 
     public static boolean hasTelephony() {
         PackageManager pm = GarD.instance.getPackageManager();
+        Crashlytics.log("hasTelephony: " + pm.hasSystemFeature(PackageManager.FEATURE_TELEPHONY));
         return pm.hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
     }
 

@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Base64;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -339,12 +340,16 @@ public class SmsManager {
             }
         } catch (Exception e) {
             Ln.e("Invalid command: " + sms.body, e);
+
+            Crashlytics.logException(new Exception("Invalid command: " + sms.body, e));
+
             replyMessage = "Invalid command. Format has to be: {command} {door name}";
             if (fromUser != null && fromUser.isPasswordRequired()) {
                 replyMessage = replyMessage + " {pass code}";
             }
         }
 
+        Crashlytics.log(replyMessage);
         Ln.i(replyMessage);
 
         if (StringUtils.isNotBlank(replyMessage)) { // do not send empty messages
@@ -352,6 +357,7 @@ public class SmsManager {
                 Ln.i("Reply sent successfully");
             }, error -> {
                 Ln.e("Error sending reply.", error);
+                Crashlytics.logException(new Exception("Error sending reply.", error));
             });
         }
     }
